@@ -1,0 +1,21 @@
+{
+  "name": "insips-passport",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @insips/web dev",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "build": "pnpm --filter @insips/contracts build && pnpm --filter @insips/web build && pnpm --filter @insips/infra build",
+    "format:check": "pnpm exec prettier --check .",
+    "format": "pnpm exec prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
+  }
+}
