@@ -1,6 +1,6 @@
 # DynamoDB access patterns
 
-This is the key-design record for INSIPS Passport. Access patterns come first; physical keys follow them. The operational table stores private workflow records. A separate table stores the intentionally narrow public projection so that public reads cannot accidentally expose source documents, extracted text, reviewer notes, membership, or private contact data.
+This is the key-design record for INSIPS. Access patterns come first; physical keys follow them. The operational table stores private workflow records. A separate table stores the intentionally narrow public projection so that public reads cannot accidentally expose source documents, extracted text, reviewer notes, membership, or private contact data.
 
 ## Required access patterns
 

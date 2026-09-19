@@ -1,4 +1,4 @@
-"""Create the synthetic INSIPS Passport evidence fixture.
+"""Create the synthetic INSIPS evidence fixture.
 
 The output is deliberately fictional and visibly watermarked. It is safe for demos
 and must never be represented as an official CSR-1 or government document.
@@ -32,7 +32,7 @@ def decorate_page(canvas, document):
     canvas.rect(0, height - 12 * mm, width, 12 * mm, stroke=0, fill=1)
     canvas.setFillColor(colors.white)
     canvas.setFont("Helvetica-Bold", 8)
-    canvas.drawString(18 * mm, height - 7.5 * mm, "INSIPS PASSPORT - SAFE SYNTHETIC FIXTURE")
+    canvas.drawString(18 * mm, height - 7.5 * mm, "INSIPS - SAFE SYNTHETIC FIXTURE")
 
     canvas.setFillColor(colors.Color(0.42, 0.22, 0.94, alpha=0.08))
     canvas.setFont("Helvetica-Bold", 44)
@@ -61,7 +61,7 @@ def build_pdf():
         topMargin=23 * mm,
         bottomMargin=22 * mm,
         title="Synthetic CSR-1 Evidence Fixture",
-        author="INSIPS Passport",
+        author="INSIPS",
         subject="Safe synthetic evidence document for a hackathon demonstration",
     )
 
@@ -75,7 +75,7 @@ def build_pdf():
     story = [
         Paragraph("SYNTHETIC DEMONSTRATION EVIDENCE", styles["Kicker"]),
         Paragraph("Form CSR-1 Registration Summary", styles["DocumentTitle"]),
-        Paragraph("This is not a Ministry of Corporate Affairs form, registration certificate, legal record, or compliance opinion. It exists only to demonstrate secure document processing and human-reviewed trust claims in INSIPS Passport.", styles["BodyTextSafe"]),
+        Paragraph("This is not a Ministry of Corporate Affairs form, registration certificate, legal record, or compliance opinion. It exists only to demonstrate secure document processing and human-reviewed trust claims in INSIPS.", styles["BodyTextSafe"]),
         Spacer(1, 5 * mm),
     ]
 

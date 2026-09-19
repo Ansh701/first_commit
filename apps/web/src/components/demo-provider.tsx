@@ -41,7 +41,7 @@ const initialState: DemoState = {
 };
 
 const DemoContext = createContext<DemoContextValue | null>(null);
-const storageKey = "insips-passport-demo-v1";
+const storageKey = "insips-demo-v1";
 
 export function DemoProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<DemoState>(initialState);

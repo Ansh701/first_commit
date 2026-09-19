@@ -11,7 +11,10 @@ export function ThemeToggle() {
       | "light"
       | "dark"
       | null;
-    const next = stored ?? "light";
+    const workspaceRoute = /^\/(app|review|csr)(\/|$)/.test(
+      window.location.pathname,
+    );
+    const next = stored ?? (workspaceRoute ? "dark" : "light");
     setTheme(next);
     document.documentElement.dataset.theme = next;
   }, []);

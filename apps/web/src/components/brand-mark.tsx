@@ -1,15 +1,31 @@
+import Image from "next/image";
 import Link from "next/link";
 
-export function BrandMark({ compact = false }: { compact?: boolean }) {
+export function BrandMark({
+  compact = false,
+  inverse = false,
+}: {
+  compact?: boolean;
+  inverse?: boolean;
+}) {
   return (
-    <Link className="brand" href="/" aria-label="INSIPS Passport home">
-      <span className="brand-symbol" aria-hidden="true">
-        <span />
+    <Link
+      className={`brand ${inverse ? "brand-inverse" : ""}`}
+      href="/"
+      aria-label="INSIPS home"
+    >
+      <span className="brand-logo-tile">
+        <Image
+          alt=""
+          height={44}
+          priority
+          src="/brand/insips-logo.png"
+          width={44}
+        />
       </span>
       {!compact && (
         <span className="brand-copy">
           <strong>INSIPS</strong>
-          <small>Passport</small>
         </span>
       )}
     </Link>

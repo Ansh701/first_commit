@@ -67,7 +67,7 @@ export async function handler(
   logger.appendKeys({ requestId, routeKey: event.routeKey });
 
   if (event.rawPath === "/health") {
-    return response(200, { status: "ok", service: "insips-passport-api" });
+    return response(200, { status: "ok", service: "insips-api" });
   }
 
   const subject = event.requestContext.authorizer?.jwt?.claims?.sub;

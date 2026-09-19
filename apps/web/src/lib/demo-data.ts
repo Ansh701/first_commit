@@ -114,28 +114,33 @@ export const publicOrganizations: PublicOrganization[] = [
 
 export const pipelineStages = [
   {
-    label: "Uploaded privately",
-    detail: "Private S3 quarantine",
+    label: "Upload privately",
+    detail: "Restricted evidence workspace",
     state: "complete",
   },
   {
-    label: "Malware scan",
-    detail: "Synthetic clean fixture",
+    label: "Safety check",
+    detail: "Synthetic fixture marked safe",
     state: "complete",
   },
   {
-    label: "Text extracted",
-    detail: "Textract fixture · 2 pages",
+    label: "Read the evidence",
+    detail: "2 pages prepared with references",
     state: "complete",
   },
   {
-    label: "Compass analysis",
-    detail: "3 candidate fields",
-    state: "complete",
-  },
-  {
-    label: "Human confirmation",
-    detail: "Your action is required",
+    label: "Review suggestions",
+    detail: "3 Compass candidates need your input",
     state: "current",
+  },
+  {
+    label: "Human decision",
+    detail: "Independent review follows submission",
+    state: "waiting",
+  },
+  {
+    label: "Publish approved facts",
+    detail: "Only approved current claims appear",
+    state: "waiting",
   },
 ] as const;

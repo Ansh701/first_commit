@@ -1,4 +1,4 @@
-# INSIPS Passport project rules
+# INSIPS project rules
 
 ## Product boundary
 

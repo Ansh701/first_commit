@@ -1,6 +1,6 @@
 # Product and architecture decisions
 
-## ADR-001 — Narrow to INSIPS Passport
+## ADR-001 — Narrow to INSIPS
 
 The hackathon build ships one complete evidence-to-trust loop. Donations and the broader organization operating system remain outside the MVP because they dilute the security-critical workflow and three-minute story.
 
@@ -12,9 +12,13 @@ The brief requested Next.js 16, but current AWS Amplify Hosting documentation su
 
 The judge-facing flow uses clearly labelled synthetic local fixtures until AWS credentials and cost approval are available. Domain policy, workflow states, and AWS interfaces remain production-shaped; the UI never labels fixture results as a live AWS result.
 
-## ADR-004 — No pre-existing logo until ownership is confirmed
+## ADR-004 — Use the owner-supplied INSIPS logo
 
-The supplied logo is reference material with unresolved permission for hackathon use. The app uses an original in-repository INSIPS monogram/wordmark. Replacing it is a manual gate after permission is confirmed and credited.
+The owner explicitly requested the supplied pre-existing logo in this redesign. It is copied unchanged, presented inside a deliberate white tile for contrast, and credited with its provenance. Broader ownership and redistribution terms remain with the project owner.
+
+## ADR-006 — Open-source type fallback
+
+The commercial reference faces Ozik and Aeonik were not supplied. The product therefore uses Archivo Black for display, Manrope for body/UI, and Instrument Serif for restrained editorial accents through `next/font`. This avoids pretending unlicensed fonts are present while preserving the intended editorial contrast.
 
 ## ADR-005 — No aggregate trust score
 

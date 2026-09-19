@@ -52,8 +52,8 @@ export default function EvidenceDetailPage() {
         <ShieldAlert size={17} />
         <span>
           <strong>Synthetic fixture:</strong> the visual stages mirror the
-          production AWS path, but no live GuardDuty, Textract, or Bedrock call
-          occurred in this local session.
+          intended protected workflow, but no live external processing occurred
+          in this local session.
         </span>
       </div>
 
@@ -144,8 +144,8 @@ export default function EvidenceDetailPage() {
           <section className="panel">
             <div className="panel-header">
               <div>
-                <h2>Secure processing</h2>
-                <p>Every gate completed before suggestions.</p>
+                <h2>Evidence progress</h2>
+                <p>The first three gates completed before suggestions.</p>
               </div>
             </div>
             <div className="panel-body processing-timeline">
@@ -188,40 +188,37 @@ export default function EvidenceDetailPage() {
               </div>
             </div>
           </section>
-          <section className="panel">
-            <div className="panel-header">
-              <div>
-                <h2>Compass trace</h2>
-                <p>Stored without full document text.</p>
+          <details className="panel technical-details">
+            <summary>
+              <span>
+                <Sparkles size={18} /> Technical details
+              </span>
+              <small>Optional hackathon context</small>
+            </summary>
+            <div className="panel-body activity-list">
+              <div className="activity-row">
+                <span />
+                <span>
+                  <strong>Processing path</strong>
+                  <p>Private S3 · GuardDuty · Step Functions · Textract</p>
+                </span>
               </div>
-              <Sparkles size={19} />
-            </div>
-            <div className="panel-body">
-              <div className="activity-list">
-                <div className="activity-row">
-                  <span />
-                  <span>
-                    <strong>Schema</strong>
-                    <p>2026-09-01</p>
-                  </span>
-                </div>
-                <div className="activity-row">
-                  <span />
-                  <span>
-                    <strong>Prompt</strong>
-                    <p>evidence-candidates-v1</p>
-                  </span>
-                </div>
-                <div className="activity-row">
-                  <span />
-                  <span>
-                    <strong>Provider</strong>
-                    <p>Amazon Bedrock · fixture mode</p>
-                  </span>
-                </div>
+              <div className="activity-row">
+                <span />
+                <span>
+                  <strong>Compass provider</strong>
+                  <p>Amazon Bedrock · fixture mode</p>
+                </span>
+              </div>
+              <div className="activity-row">
+                <span />
+                <span>
+                  <strong>Schema and prompt</strong>
+                  <p>2026-09-01 · evidence-candidates-v1</p>
+                </span>
               </div>
             </div>
-          </section>
+          </details>
         </aside>
       </div>
     </>

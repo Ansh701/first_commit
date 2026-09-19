@@ -2,7 +2,7 @@
 
 ## Reset
 
-1. Use a fresh browser profile or remove local storage key `insips-passport-demo-v1`.
+1. Use a fresh browser profile or remove local storage key `insips-demo-v1`.
 2. Open the landing page in light mode at desktop width.
 3. Keep reviewer and public profile routes ready in separate tabs only as a backup; the primary recording should navigate naturally.
 4. Confirm the synthetic PDF is visibly watermarked and no real data appears.
@@ -15,7 +15,7 @@ Show the landing hero: “Turn proof into explainable trust.” Say that small o
 
 ### 0:25-0:50 - Organization next action
 
-Open the organization workspace. Point to the 4-step Passport checklist and the clear next action. Open `Synthetic_CSR-1_Certificate.pdf` from Evidence. Call out that local mode is visibly a synthetic fixture.
+Open the organization workspace. Point to the 4-step trust-profile checklist and the clear next action. Open `Synthetic_CSR-1_Certificate.pdf` from Evidence. Call out that local mode is visibly a synthetic fixture.
 
 ### 0:50-1:20 - Meaningful AWS pipeline
 

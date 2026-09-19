@@ -55,8 +55,8 @@ export function DemoWebMcpBridge() {
     };
 
     register({
-      name: "read_passport_demo_status",
-      title: "Read Passport demo status",
+      name: "read_insips_demo_status",
+      title: "Read INSIPS demo status",
       description:
         "Read the current synthetic candidate, submission, and review state without changing it.",
       inputSchema: {

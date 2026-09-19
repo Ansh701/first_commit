@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion, useReducedMotion } from "motion/react";
+import { useEffect } from "react";
 import {
   ArrowLeft,
   BadgeCheck,
@@ -13,6 +15,9 @@ import {
   Gauge,
   ListChecks,
   Menu,
+  Bell,
+  Command,
+  Home,
   Search,
   ShieldCheck,
   Sparkles,
@@ -73,12 +78,62 @@ export function WorkspaceShell({
   const pathname = usePathname();
   const nav = navByRole[role];
   const label = labels[role];
+  const reduceMotion = useReducedMotion();
+  const current =
+    nav.find((item) => isActive(pathname, item.href))?.label ?? label.title;
+
+  useEffect(() => {
+    if (!window.localStorage.getItem("insips-theme")) {
+      window.localStorage.setItem("insips-theme", "dark");
+      document.documentElement.dataset.theme = "dark";
+    }
+  }, []);
 
   return (
     <div className="workspace-frame">
+      <aside className="workspace-rail" aria-label="Workspace switcher">
+        <BrandMark compact />
+        <nav>
+          <Link
+            aria-label="Organization workspace"
+            className={role === "organization" ? "active" : ""}
+            href="/app"
+            title="Organization"
+          >
+            <Building2 size={20} />
+          </Link>
+          <Link
+            aria-label="Review workspace"
+            className={role === "reviewer" ? "active" : ""}
+            href="/review"
+            title="Review"
+          >
+            <ShieldCheck size={20} />
+          </Link>
+          <Link
+            aria-label="CSR workspace"
+            className={role === "csr" ? "active" : ""}
+            href="/csr/discover"
+            title="CSR"
+          >
+            <UsersRound size={20} />
+          </Link>
+          <Link aria-label="Public site" href="/" title="Public site">
+            <Home size={20} />
+          </Link>
+        </nav>
+        <Link
+          className="rail-exit"
+          href="/demo"
+          aria-label="Switch demo role"
+          title="Switch demo role"
+        >
+          <ArrowLeft size={19} />
+        </Link>
+      </aside>
       <aside className="workspace-sidebar">
         <div className="sidebar-brand">
-          <BrandMark />
+          <BrandMark inverse />
         </div>
         <div className="workspace-identity">
           <span className="avatar avatar-gradient">{label.initials}</span>
@@ -88,21 +143,47 @@ export function WorkspaceShell({
           </span>
           <ChevronDown size={15} aria-hidden="true" />
         </div>
+        <p className="workspace-nav-label">Workspace</p>
         <nav className="workspace-nav" aria-label={`${label.title} navigation`}>
           {nav.map((item) => {
             const Icon = item.icon;
             return (
-              <Link
-                href={item.href}
-                className={isActive(pathname, item.href) ? "active" : ""}
+              <motion.div
                 key={item.href}
+                whileHover={reduceMotion ? undefined : { x: 3 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <Icon size={19} aria-hidden="true" />
-                <span>{item.label}</span>
-              </Link>
+                <Link
+                  href={item.href}
+                  className={isActive(pathname, item.href) ? "active" : ""}
+                >
+                  <Icon size={19} aria-hidden="true" />
+                  <span>{item.label}</span>
+                  {item.label === "Evidence" ||
+                  item.label === "Review queue" ? (
+                    <small>1</small>
+                  ) : null}
+                </Link>
+              </motion.div>
             );
           })}
         </nav>
+        <div className="sidebar-group">
+          <p className="workspace-nav-label">Trust profile</p>
+          <Link
+            href={
+              role === "organization"
+                ? "/organizations/udaan-learning-foundation"
+                : "/discover"
+            }
+          >
+            <BadgeCheck size={17} /> Public indicators{" "}
+            <span className="sidebar-status-dot" />
+          </Link>
+          <Link href="/how-trust-works">
+            <Compass size={17} /> Methodology
+          </Link>
+        </div>
         <div className="sidebar-callout">
           <span className="callout-icon">
             <Compass size={18} />
@@ -115,9 +196,6 @@ export function WorkspaceShell({
             How it works <ArrowLeft className="flip" size={14} />
           </Link>
         </div>
-        <Link className="back-home" href="/">
-          <ArrowLeft size={16} /> Back to public site
-        </Link>
       </aside>
 
       <div className="workspace-body">
@@ -126,15 +204,36 @@ export function WorkspaceShell({
             <BrandMark compact />
           </div>
           <div className="topbar-context">
-            <span className="local-mode">
-              <span /> Synthetic local fixture
+            <span className="topbar-breadcrumb">
+              INSIPS <i>/</i> {label.title} <i>/</i> <strong>{current}</strong>
             </span>
-            <span className="topbar-separator" />
-            <span className="topbar-hint">AWS connection pending</span>
           </div>
           <div className="topbar-actions">
+            <label className="topbar-search">
+              <Search size={16} />
+              <span className="sr-only">Search workspace</span>
+              <input placeholder="Search or jump to…" />
+              <kbd>
+                <Command size={12} />K
+              </kbd>
+            </label>
             <ThemeToggle />
+            <button
+              className="icon-button topbar-notification"
+              type="button"
+              aria-label="Notifications"
+            >
+              <Bell size={18} />
+              <i />
+            </button>
             <Link
+              aria-label={
+                role === "organization"
+                  ? "Open reviewer workspace"
+                  : role === "reviewer"
+                    ? "Open public organization view"
+                    : "Open organization workspace"
+              }
               className="role-switch"
               href={
                 role === "organization"
@@ -159,9 +258,18 @@ export function WorkspaceShell({
                     : "Organization view"}
               </span>
             </Link>
-            <span className="avatar">{label.initials}</span>
+            <button
+              className="avatar"
+              type="button"
+              aria-label="Open user menu"
+            >
+              {label.initials}
+            </button>
           </div>
         </header>
+        <div className="fixture-ribbon" role="status">
+          <span /> Synthetic local fixture · no live external processing
+        </div>
         <main className="workspace-main" id="main-content">
           {children}
         </main>

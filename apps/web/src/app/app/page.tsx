@@ -28,7 +28,7 @@ export default function OrganizationOverviewPage() {
         <Sparkles size={17} aria-hidden="true" />
         <span>
           <strong>Demo mode:</strong> this workspace uses synthetic evidence and
-          local browser storage. It does not claim a live AWS result.
+          local browser storage. It does not claim a live external result.
         </span>
       </div>
       <header className="page-heading">
@@ -62,7 +62,7 @@ export default function OrganizationOverviewPage() {
             <div className="readiness-top">
               <div>
                 <h2 id="readiness-title">
-                  Your Passport is {complete}/4 steps ready
+                  Your trust profile is {complete}/4 steps ready
                 </h2>
                 <p>Finish the evidence loop to request human review.</p>
               </div>
@@ -172,7 +172,7 @@ export default function OrganizationOverviewPage() {
                     <ShieldCheck size={17} />
                   </span>
                   <span>
-                    <strong>Malware scan passed</strong>
+                    <strong>Safety check passed</strong>
                     <p>Synthetic pre-scanned fixture</p>
                   </span>
                   <time>12:42</time>

@@ -10,7 +10,7 @@ import { z } from "zod";
 
 const logger = new Logger({ serviceName: "insips-compass" });
 const metrics = new Metrics({
-  namespace: "INSIPS/Passport",
+  namespace: "INSIPS",
   serviceName: "compass",
 });
 const bedrock = new BedrockRuntimeClient({});

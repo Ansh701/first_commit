@@ -2,7 +2,7 @@
 
 ## Project
 
-INSIPS Passport - evidence into explainable trust
+INSIPS - evidence into explainable trust
 
 ## Problem
 
@@ -10,7 +10,7 @@ Small social-impact organizations often keep identity and compliance evidence ac
 
 ## Solution
 
-INSIPS Passport creates one complete evidence-to-publication loop. An organization uploads a private PDF, GuardDuty gates processing, Textract extracts page-aware text, and INSIPS Compass uses Bedrock to prepare bounded candidate fields and missing-evidence items. The organization must confirm every suggestion. A platform reviewer decides each claim. Public and CSR users see only current approved claims with a meaning, date, and safe source summary.
+INSIPS creates one complete evidence-to-publication loop. An organization uploads a private PDF, GuardDuty gates processing, Textract extracts page-aware text, and INSIPS Compass uses Bedrock to prepare bounded candidate fields and missing-evidence items. The organization must confirm every suggestion. A platform reviewer decides each claim. Public and CSR users see only current approved claims with a meaning, date, and safe source summary.
 
 AI assists; it never verifies, approves, rejects, publishes, gives legal/compliance advice, or decides funding eligibility.
 

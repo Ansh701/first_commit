@@ -4,7 +4,7 @@ The local fixture never claims that AWS ran. For a deployed environment, start w
 
 ## CloudWatch triage
 
-1. Check the `INSIPS/Passport` alarms for `InfectedUploads`, `ScanFailures`, and `CompassParseFailure`.
+1. Check the `INSIPS` alarms for `InfectedUploads`, `ScanFailures`, and `CompassParseFailure`.
 2. Use the API request ID to inspect the API Lambda log group. A `401` means no verified subject; a `403` means the loaded membership/capability did not permit the action.
 3. For an upload stuck before extraction, inspect the GuardDuty scan-result event and scan-router logs using the safe object digest. Only `NO_THREATS_FOUND` may start the state machine.
 4. For a running extraction, open the Step Functions execution named with the evidence digest. Check the current state and the matching Textract job ID; do not copy extracted text into logs.

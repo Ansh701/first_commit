@@ -1,6 +1,6 @@
-# INSIPS Passport
+# INSIPS
 
-INSIPS Passport turns private evidence into specific, explainable trust signals for social-impact organizations. INSIPS Compass assists with extraction and candidate preparation; organizations confirm their own facts; independent platform reviewers decide each claim; and the public sees only current approvals with a meaning and review date.
+INSIPS turns private evidence into specific, explainable trust signals for social-impact organizations. INSIPS Compass assists with extraction and candidate preparation; organizations confirm their own facts; independent platform reviewers decide each claim; and the public sees only current approvals with a meaning and review date.
 
 This repository is a new hackathon implementation for WeMakeDevs x AWS First Commit. All people, organizations, documents, addresses, identifiers, review decisions, and activity shown in the demo are synthetic.
 
@@ -18,9 +18,19 @@ The local experience is intentionally labelled as a synthetic fixture. It does n
 
 ## Product preview
 
-![INSIPS Passport public landing page](docs/screenshots/landing-desktop.png)
+![INSIPS public landing page](docs/screenshots/redesign/landing-desktop-full.png)
 
-![INSIPS Passport evidence review on mobile](docs/screenshots/evidence-mobile.png)
+![INSIPS organization workspace in dark mode](docs/screenshots/redesign/organization-dashboard-dark.png)
+
+![INSIPS sign-in experience](docs/screenshots/redesign/sign-in-desktop.png)
+
+## Route inventory
+
+- Public: `/`, `/discover`, `/organizations/[slug]`, `/for-organizations`, `/for-csr-teams`, `/how-trust-works`, `/trust-methodology`, `/compass`, `/resources`, `/faq`, `/security-privacy`, `/help`, `/about`, `/contact`, and `/hackathon`.
+- Authentication and demo: `/auth/sign-in`, `/auth/sign-up`, `/auth/forgot-password`, `/auth/reset-password`, `/auth/verify-email`, `/auth/session-expired`, and `/demo`.
+- Organization: `/app`, `/app/profile`, `/app/evidence`, `/app/evidence/[id]`, and `/app/submission`.
+- Review and CSR: `/review`, `/review/submission-demo`, `/csr/discover`, and `/csr/shortlist`.
+- Legal and resilient states: `/privacy`, `/terms`, `/cookies`, `/accessibility`, `/forbidden`, `/offline`, plus global loading, error, and not-found UI.
 
 ## Architecture
 
@@ -75,11 +85,11 @@ cp .env.example .env.local
 pnpm dev
 ```
 
-Open `http://localhost:3000`. The local flow stores only synthetic demo decisions in browser storage under `insips-passport-demo-v1`.
+Open `http://localhost:3000`. The local flow stores only synthetic demo decisions in browser storage under `insips-demo-v1`.
 
 ### Local demo roles
 
-No demo passwords are required before Cognito is deployed. `Open demo` enters the synthetic organization workspace; the submission screen links to the synthetic reviewer queue; reviewer pages link to the signed-out public result; and the public header exposes CSR discovery. These role switches are transparent local-fixture navigation, not simulated authentication or an authorization boundary.
+No demo passwords are required before Cognito is deployed. `/demo` is a clearly labelled synthetic role launcher, separate from the polished authentication presentation. The submission screen links to the synthetic reviewer queue, reviewer pages link to the signed-out public result, and the public header exposes CSR discovery. These role switches are transparent local-fixture navigation, not simulated authentication or an authorization boundary.
 
 ## Checks
 
@@ -129,14 +139,14 @@ The safe PDF fixture is `output/pdf/Synthetic_CSR-1_Certificate.pdf`. Regenerate
 python3 scripts/create_synthetic_pdf.py
 ```
 
-Reset the browser demo by deleting the `insips-passport-demo-v1` local-storage item or clearing site data. The exact three-minute path and backup plan are in `docs/DEMO.md`.
+Reset the browser demo by deleting the `insips-demo-v1` local-storage item or clearing site data. The exact three-minute path and backup plan are in `docs/DEMO.md`.
 
 ## Current limitations
 
 - AWS is not deployed because region, profile, spending ceiling, budget email, and paid-service approval are unresolved.
 - Cognito Managed Login is represented locally by a transparent role picker, not a simulated password flow.
 - The Next.js BFF/domain API connection, live presigned upload endpoint, durable review writes, and Amplify deployment remain release work after cloud authorization.
-- The provided pre-existing logo is not included until ownership and hackathon reuse permission are confirmed.
+- The user-supplied pre-existing INSIPS logo is included at the owner's explicit direction; broader redistribution terms remain the owner's responsibility.
 - The synthetic pipeline UI demonstrates the intended states; it never labels fixture data as a live AWS result.
 
 ## Teardown

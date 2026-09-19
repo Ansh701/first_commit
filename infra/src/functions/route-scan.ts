@@ -9,7 +9,7 @@ import { z } from "zod";
 
 const logger = new Logger({ serviceName: "insips-scan-router" });
 const metrics = new Metrics({
-  namespace: "INSIPS/Passport",
+  namespace: "INSIPS",
   serviceName: "scan-router",
 });
 const sfn = new SFNClient({});

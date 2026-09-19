@@ -18,7 +18,7 @@ export default function EvidenceListPage() {
           <button
             className="button button-primary"
             type="button"
-            title="Live uploads require the AWS connection"
+            title="Live uploads require a secure service connection"
           >
             <Plus size={16} /> Add evidence
           </button>

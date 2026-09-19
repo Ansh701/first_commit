@@ -39,7 +39,7 @@ export class InsipsStack extends Stack {
   constructor(scope: Construct, id: string, props: InsipsStackProps) {
     super(scope, id, props);
 
-    Tags.of(this).add("project", "insips-passport");
+    Tags.of(this).add("project", "insips");
     Tags.of(this).add("environment", props.environment);
     Tags.of(this).add("owner", "insips-team");
 
@@ -159,7 +159,7 @@ export class InsipsStack extends Stack {
     });
     new cognito.CfnUserPoolDomain(this, "UserPoolDomain", {
       userPoolId: userPool.userPoolId,
-      domain: Fn.join("-", ["insips-passport", Aws.ACCOUNT_ID, Aws.REGION]),
+      domain: Fn.join("-", ["insips", Aws.ACCOUNT_ID, Aws.REGION]),
     });
     for (const groupName of [
       "ORG_ADMIN",
@@ -406,7 +406,7 @@ export class InsipsStack extends Stack {
         },
         actions: { tagging: { status: "ENABLED" } },
         tags: [
-          { key: "project", value: "insips-passport" },
+          { key: "project", value: "insips" },
           { key: "environment", value: props.environment },
         ],
       },
@@ -513,7 +513,7 @@ export class InsipsStack extends Stack {
     ]) {
       new cloudwatch.Alarm(this, `${metricName}Alarm`, {
         metric: new cloudwatch.Metric({
-          namespace: "INSIPS/Passport",
+          namespace: "INSIPS",
           metricName,
           period: Duration.minutes(5),
           statistic: "sum",
@@ -545,7 +545,7 @@ export class InsipsStack extends Stack {
     });
     const budget = new budgets.CfnBudget(this, "HackathonBudget", {
       budget: {
-        budgetName: `insips-passport-${props.environment}`,
+        budgetName: `insips-${props.environment}`,
         budgetType: "COST",
         timeUnit: "MONTHLY",
         budgetLimit: { amount: budgetAmount.valueAsNumber, unit: "USD" },
