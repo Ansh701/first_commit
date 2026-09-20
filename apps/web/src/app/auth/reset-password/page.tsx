@@ -1,12 +1,7 @@
-import { AuthForm } from "@/components/auth-form";
-import { AuthShell } from "@/components/auth-shell";
+import { ResetPasswordExperience } from "./reset-password-experience";
 
 export const metadata = { title: "Reset password" };
 
 export default function ResetPasswordPage() {
-  return (
-    <AuthShell>
-      <AuthForm mode="reset" />
-    </AuthShell>
-  );
+  return <ResetPasswordExperience />;
 }

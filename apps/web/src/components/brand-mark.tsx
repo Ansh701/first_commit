@@ -16,10 +16,10 @@ export function BrandMark({
     >
       <span className="brand-logo-tile">
         <Image
-          alt=""
+          alt="INSIPS mark"
           height={44}
           priority
-          src="/brand/insips-logo.png"
+          src="/brand/insips-logo.svg"
           width={44}
         />
       </span>

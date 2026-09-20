@@ -1,8 +1,8 @@
 # Product and architecture decisions
 
-## ADR-001 — Narrow to INSIPS
+## ADR-001 — Evidence-to-trust core with approved adjacent flows
 
-The hackathon build ships one complete evidence-to-trust loop. Donations and the broader organization operating system remain outside the MVP because they dilute the security-critical workflow and three-minute story.
+The evidence-to-trust loop remains the authorization and publication core. The product also includes the owner-approved organization onboarding, document verification, money and item donations, volunteers, events, corporate shortlists, and account-management flows. These additions reuse the same deny-by-default tenant model and never weaken the approved-only public projection.
 
 ## ADR-002 — Next.js 15 for Amplify Hosting
 
@@ -16,10 +16,10 @@ The judge-facing flow uses clearly labelled synthetic local fixtures until AWS c
 
 The owner explicitly requested the supplied pre-existing logo in this redesign. It is copied unchanged, presented inside a deliberate white tile for contrast, and credited with its provenance. Broader ownership and redistribution terms remain with the project owner.
 
-## ADR-006 — Open-source type fallback
+## ADR-005 — Normal sans-serif typography
 
-The commercial reference faces Ozik and Aeonik were not supplied. The product therefore uses Archivo Black for display, Manrope for body/UI, and Instrument Serif for restrained editorial accents through `next/font`. This avoids pretending unlicensed fonts are present while preserving the intended editorial contrast.
+The commercial reference faces Ozik and Aeonik were not supplied, and the owner requested normal text typography everywhere. The product therefore uses Manrope through `next/font` for display, body, UI, and supporting text. This avoids pretending unlicensed fonts are present and keeps responsive sizing independent from a display-font dependency.
 
-## ADR-005 — No aggregate trust score
+## ADR-006 — No aggregate trust score
 
 Public trust is represented as distinct, explainable claims with review state, scope, evidence summary, and date. Publication, statutory status, physical verification, and payment readiness are never collapsed into one badge.

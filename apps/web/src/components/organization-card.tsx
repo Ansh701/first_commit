@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Bookmark, MapPin } from "lucide-react";
-import type { PublicOrganization } from "@insips/contracts";
+import type { PublicOrganization, PublicOrganizationSummary } from "@insips/contracts";
 import { useDemo } from "./demo-provider";
 import { StatusPill } from "./status-pill";
 
@@ -10,11 +10,14 @@ export function OrganizationCard({
   organization,
   csr = false,
 }: {
-  organization: PublicOrganization;
+  organization: PublicOrganization | PublicOrganizationSummary;
   csr?: boolean;
 }) {
   const { shortlist, toggleShortlist } = useDemo();
   const saved = shortlist.includes(organization.slug);
+  const reviewedCount = "trustClaims" in organization
+    ? organization.trustClaims.length
+    : organization.approvedIndicatorCount;
 
   return (
     <article className="org-card">
@@ -35,9 +38,9 @@ export function OrganizationCard({
           >
             <Bookmark size={17} fill={saved ? "currentColor" : "none"} />
           </button>
-        ) : organization.trustClaims.length > 0 ? (
+        ) : reviewedCount > 0 ? (
           <StatusPill tone="approved">
-            {organization.trustClaims.length} reviewed
+            {reviewedCount} reviewed
           </StatusPill>
         ) : (
           <StatusPill>No public claims</StatusPill>

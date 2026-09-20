@@ -1,0 +1,82 @@
+:root {
+  --canvas: #f3f5f2;
+  --surface: #ffffff;
+  --surface-muted: #e9efeb;
+  --surface-raised: #ffffff;
+  --text: #1b201d;
+  --muted: #55625a;
+  --faint: #5c6a61;
+  --primary: #b44932;
+  --on-primary: #ffffff;
+  --accent: #8b5b1a;
+  --border: #d4ddd7;
+  --border-strong: #b8c5bc;
+  --success: #276b57;
+  --success-soft: #e8f1ec;
+  --warning: #8b5b1a;
+  --warning-soft: #f9efdc;
+  --danger: #b53c3a;
+  --danger-soft: #f8e8e7;
+  --info: #2d5b68;
+  --info-soft: #e6eff1;
+  --focus: #8b4b2d;
+  --shadow-sm: 0 1px 2px rgb(27 32 29 / 0.06), 0 8px 22px rgb(27 32 29 / 0.06);
+  --shadow-md: 0 16px 40px rgb(27 32 29 / 0.12);
+  --radius-control: 6px;
+  --radius-panel: 10px;
+  --radius-feature: 16px;
+  --radius-dialog: 20px;
+  color-scheme: light;
+
+  /* Compatibility aliases for route content being migrated to semantic roles. */
+  --blue: var(--primary);
+  --violet: var(--accent);
+  --lime: var(--primary);
+  --lime-ink: var(--on-primary);
+  --surface-soft: var(--surface-muted);
+  --surface-tint: var(--surface-muted);
+  --shadow-lg: var(--shadow-md);
+  --radius-sm: var(--radius-control);
+  --radius-md: var(--radius-control);
+  --radius-lg: var(--radius-panel);
+  --radius-xl: var(--radius-feature);
+}
+
+:root[data-theme="dark"] {
+  --canvas: #111412;
+  --surface: #1a1f1b;
+  --surface-muted: #242a25;
+  --surface-raised: #202620;
+  --text: #f1f4ef;
+  --muted: #aeb8b0;
+  --faint: #849087;
+  --primary: #d86149;
+  --on-primary: #1a100d;
+  --accent: #d5a24e;
+  --border: #313932;
+  --border-strong: #4a574d;
+  --success: #78c9a8;
+  --success-soft: #19352b;
+  --warning: #e1b365;
+  --warning-soft: #3a2c18;
+  --danger: #ec8e86;
+  --danger-soft: #452423;
+  --info: #8bc2cc;
+  --info-soft: #1a3135;
+  --focus: #f0aa8c;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.22), 0 8px 22px rgb(0 0 0 / 0.18);
+  --shadow-md: 0 18px 48px rgb(0 0 0 / 0.4);
+  color-scheme: dark;
+
+  --blue: var(--primary);
+  --violet: var(--accent);
+  --lime: var(--primary);
+  --lime-ink: var(--on-primary);
+  --surface-soft: var(--surface-muted);
+  --surface-tint: var(--surface-muted);
+  --shadow-lg: var(--shadow-md);
+  --radius-sm: var(--radius-control);
+  --radius-md: var(--radius-control);
+  --radius-lg: var(--radius-panel);
+  --radius-xl: var(--radius-feature);
+}

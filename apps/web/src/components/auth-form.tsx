@@ -10,8 +10,11 @@ import {
   Info,
   LockKeyhole,
   Mail,
+  RefreshCw,
 } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { getIdentityAdapter, type AuthProviderName } from "@/lib/auth-adapter";
 
 type AuthMode = "sign-in" | "sign-up" | "forgot" | "reset" | "verify";
 
@@ -22,7 +25,8 @@ const copy: Record<
   "sign-in": {
     eyebrow: "Welcome back",
     title: "Sign in to INSIPS",
-    description: "Access your organization, review, or CSR workspace securely.",
+    description:
+      "Access your donor, organization, corporate, review, or platform workspace securely.",
     action: "Sign in",
   },
   "sign-up": {
@@ -54,35 +58,128 @@ const copy: Record<
 };
 
 export function AuthForm({ mode }: { mode: AuthMode }) {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [isError, setIsError] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const details = copy[mode];
   const needsEmail =
-    mode === "sign-in" || mode === "sign-up" || mode === "forgot";
+    mode === "sign-in" ||
+    mode === "sign-up" ||
+    mode === "forgot" ||
+    mode === "reset" ||
+    mode === "verify";
   const needsPassword =
     mode === "sign-in" || mode === "sign-up" || mode === "reset";
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => setHydrated(true), []);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setMessage(
-      mode === "forgot"
-        ? "If an account exists, recovery instructions will be sent when secure account access is enabled."
-        : mode === "verify"
-          ? "Email verification is not connected in this local fixture. No code was submitted."
-          : "Secure account actions are not connected in this local fixture. Your details were not sent.",
-    );
+    setSubmitting(true);
+    setMessage(null);
+    const form = new FormData(event.currentTarget);
+    const adapter = getIdentityAdapter();
+    try {
+      const email = String(form.get("email") ?? "");
+      const password = String(form.get("password") ?? "");
+      const code = String(form.get("code") ?? "");
+      if (
+        mode === "reset" &&
+        password !== String(form.get("confirm-password") ?? "")
+      ) {
+        setIsError(true);
+        setMessage("The new passwords do not match.");
+        return;
+      }
+      const result =
+        mode === "sign-up"
+          ? await adapter.signUp({
+              name: String(form.get("name") ?? ""),
+              email,
+              password,
+            })
+          : mode === "sign-in"
+            ? await adapter.signIn({ email, password })
+            : mode === "forgot"
+              ? await adapter.forgotPassword(email)
+              : mode === "verify"
+                ? await adapter.verifyEmail({ email, code })
+                : await adapter.resetPassword({ email, code, password });
+      setIsError(!result.ok);
+      setMessage(result.message);
+      if (result.ok && result.next === "VERIFY_EMAIL") {
+        window.sessionStorage.setItem("insips-verification-email", email);
+        router.push("/auth/verify-email");
+      }
+      if (result.ok && mode === "forgot") {
+        window.sessionStorage.setItem("insips-reset-email", email);
+        router.push("/auth/reset-password");
+      }
+      if (result.ok && result.next === "SIGNED_IN") {
+        router.push(mode === "sign-in" ? "/app" : "/auth/sign-in");
+      }
+    } catch (error) {
+      setIsError(true);
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "The account action could not be completed.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function federate(provider: AuthProviderName) {
+    setSubmitting(true);
+    setMessage(null);
+    try {
+      await getIdentityAdapter().signInWithProvider(provider);
+    } catch (error) {
+      setIsError(true);
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Federated sign-in is unavailable.",
+      );
+      setSubmitting(false);
+    }
   }
 
   return (
     <motion.div
       animate={{ opacity: 1, y: 0 }}
       className="auth-form-card"
-      initial={{ opacity: 0, y: 18 }}
+      initial={false}
       transition={{ duration: 0.5 }}
     >
       <p className="auth-eyebrow">{details.eyebrow}</p>
       <h2>{details.title}</h2>
       <p className="auth-description">{details.description}</p>
+      <div className="auth-adapter-note" role="note">
+        <Info size={15} />
+        {getIdentityAdapter().kind === "LOCAL_TEST"
+          ? "Local test adapter. No real account is created in this demo."
+          : "Protected account access with secure session handling."}
+      </div>
+      {mode === "sign-in" || mode === "sign-up" ? (
+        <div className="federated-auth" aria-label="Federated sign in">
+          {(["Google", "Facebook", "Apple"] as const).map((provider) => (
+            <button
+              disabled={submitting || !hydrated}
+              key={provider}
+              onClick={() => void federate(provider)}
+              type="button"
+            >
+              Continue with {provider}
+            </button>
+          ))}
+          <span>or continue with email</span>
+        </div>
+      ) : null}
       <form onSubmit={submit}>
         {mode === "sign-up" ? (
           <div className="auth-field">
@@ -114,9 +211,11 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
             </div>
           </div>
         ) : null}
-        {mode === "verify" ? (
+        {mode === "verify" || mode === "reset" ? (
           <div className="auth-field">
-            <label htmlFor="code">Verification code</label>
+            <label htmlFor="code">
+              {mode === "verify" ? "Verification code" : "Recovery code"}
+            </label>
             <div>
               <input
                 autoComplete="one-time-code"
@@ -129,7 +228,10 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
                 required
               />
             </div>
-            <small>Six digits · codes expire for your protection</small>
+            <small>
+              Six digits · local fixture codes are shown after the preceding
+              action
+            </small>
           </div>
         ) : null}
         {needsPassword ? (
@@ -195,17 +297,29 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           </div>
         ) : null}
         {message ? (
-          <div className="auth-inline-message" role="status">
+          <div
+            className={`auth-inline-message ${isError ? "error" : "success"}`}
+            role={isError ? "alert" : "status"}
+          >
             <Info size={17} />
             <span>{message}</span>
           </div>
         ) : null}
         <motion.button
           className="button button-accent button-full auth-submit"
+          disabled={submitting || !hydrated}
           type="submit"
           whileTap={{ scale: 0.985 }}
         >
-          {details.action} <ArrowRight size={17} />
+          {submitting ? (
+            <>
+              <RefreshCw className="spin" size={17} /> Working…
+            </>
+          ) : (
+            <>
+              {details.action} <ArrowRight size={17} />
+            </>
+          )}
         </motion.button>
       </form>
       <div className="auth-card-foot">

@@ -14,8 +14,15 @@ const future = Date.now() + 60_000;
 describe("authorization policy", () => {
   const orgA: Actor = {
     userId: "user-a",
-    role: "ORG_ADMIN",
-    organizationId: "org-a",
+    role: "ORGANIZATION_ADMIN",
+    memberships: [
+      {
+        tenantId: "org-a",
+        tenantType: "ORGANIZATION",
+        permission: "ADMIN",
+        status: "ACTIVE",
+      },
+    ],
     sessionExpiresAt: future,
   };
 
@@ -40,7 +47,8 @@ describe("authorization policy", () => {
   it("requires reviewer assignment where one exists", () => {
     const reviewer: Actor = {
       userId: "reviewer-a",
-      role: "PLATFORM_REVIEWER",
+      role: "REVIEWER",
+      memberships: [],
       sessionExpiresAt: future,
     };
     expect(
@@ -60,6 +68,39 @@ describe("authorization policy", () => {
       authorize({ ...orgA, sessionExpiresAt: 0 }, "profile:read", {
         organizationId: "org-a",
       }),
+    ).toBe(false);
+  });
+
+  it("keeps donor history owner-scoped", () => {
+    const donor: Actor = {
+      userId: "donor-a",
+      role: "INDIVIDUAL_DONOR",
+      memberships: [],
+      sessionExpiresAt: future,
+    };
+    expect(
+      authorize(donor, "donation:read:self", { ownerUserId: "donor-a" }),
+    ).toBe(true);
+    expect(
+      authorize(donor, "donation:read:self", { ownerUserId: "donor-b" }),
+    ).toBe(false);
+  });
+
+  it("rejects suspended tenant memberships", () => {
+    expect(
+      authorize(
+        {
+          ...orgA,
+          memberships: [
+            {
+              ...orgA.memberships[0],
+              status: "SUSPENDED",
+            },
+          ],
+        },
+        "evidence:upload",
+        { organizationId: "org-a" },
+      ),
     ).toBe(false);
   });
 });

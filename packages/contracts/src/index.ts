@@ -1,13 +1,11 @@
 import { z } from "zod";
+import { cognitoGroupSchema, type TenantMembership } from "./product.ts";
 
-export const roleSchema = z.enum([
-  "ORG_ADMIN",
-  "ORG_MEMBER",
-  "PLATFORM_REVIEWER",
-  "PLATFORM_ADMIN",
-  "CSR_USER",
-  "PUBLIC",
-]);
+export * from "./product.ts";
+export * from "./content.ts";
+export * from "./payment.ts";
+
+export const roleSchema = z.union([cognitoGroupSchema, z.literal("PUBLIC")]);
 
 export type Role = z.infer<typeof roleSchema>;
 
@@ -91,42 +89,93 @@ export const organizationProfileSchema = z.object({
 export type OrganizationProfile = z.infer<typeof organizationProfileSchema>;
 
 export type Capability =
+  | "account:manage"
   | "profile:read"
   | "profile:write"
+  | "onboarding:write"
   | "evidence:read"
   | "evidence:upload"
   | "claim:confirm"
   | "claim:submit"
   | "review:read"
   | "review:decide"
+  | "organization:moderate"
+  | "donation:create"
+  | "donation:read:self"
+  | "donation:read:tenant"
+  | "item:pledge"
+  | "item:manage"
+  | "volunteer:apply"
+  | "volunteer:manage"
   | "public:read"
   | "shortlist:write";
 
 const grants: Record<Role, readonly Capability[]> = {
-  ORG_ADMIN: [
+  INDIVIDUAL_DONOR: [
+    "account:manage",
+    "donation:create",
+    "donation:read:self",
+    "item:pledge",
+    "volunteer:apply",
+    "public:read",
+  ],
+  ORGANIZATION_ADMIN: [
+    "account:manage",
     "profile:read",
     "profile:write",
+    "onboarding:write",
     "evidence:read",
     "evidence:upload",
     "claim:confirm",
     "claim:submit",
+    "donation:read:tenant",
+    "item:manage",
+    "volunteer:manage",
+    "public:read",
   ],
-  ORG_MEMBER: ["profile:read", "evidence:read"],
-  PLATFORM_REVIEWER: ["review:read", "review:decide", "public:read"],
-  PLATFORM_ADMIN: ["review:read", "review:decide", "public:read"],
-  CSR_USER: ["public:read", "shortlist:write"],
+  ORGANIZATION_MEMBER: [
+    "account:manage",
+    "profile:read",
+    "evidence:read",
+    "donation:read:tenant",
+    "public:read",
+  ],
+  CORPORATE_ADMIN: [
+    "account:manage",
+    "donation:create",
+    "donation:read:self",
+    "public:read",
+    "shortlist:write",
+  ],
+  CORPORATE_MEMBER: [
+    "account:manage",
+    "donation:create",
+    "donation:read:self",
+    "public:read",
+    "shortlist:write",
+  ],
+  REVIEWER: ["account:manage", "review:read", "review:decide", "public:read"],
+  PLATFORM_ADMIN: [
+    "account:manage",
+    "review:read",
+    "review:decide",
+    "organization:moderate",
+    "donation:read:tenant",
+    "public:read",
+  ],
   PUBLIC: ["public:read"],
 };
 
 export type Actor = {
   userId: string;
   role: Role;
-  organizationId?: string;
+  memberships: TenantMembership[];
   sessionExpiresAt: number;
 };
 
 export type ResourceContext = {
   organizationId?: string;
+  ownerUserId?: string;
   assignedReviewerId?: string;
 };
 
@@ -140,13 +189,32 @@ export function authorize(
   if (!actor || actor.sessionExpiresAt <= now) return false;
   if (!grants[actor.role].includes(capability)) return false;
 
-  if (actor.role === "ORG_ADMIN" || actor.role === "ORG_MEMBER") {
+  if (
+    actor.role === "ORGANIZATION_ADMIN" ||
+    actor.role === "ORGANIZATION_MEMBER"
+  ) {
     if (!resource.organizationId) return false;
-    return actor.organizationId === resource.organizationId;
+    const requiredPermission =
+      actor.role === "ORGANIZATION_ADMIN" ? "ADMIN" : "MEMBER";
+    return actor.memberships.some(
+      (membership) =>
+        membership.tenantId === resource.organizationId &&
+        membership.tenantType === "ORGANIZATION" &&
+        membership.status === "ACTIVE" &&
+        (membership.permission === requiredPermission ||
+          membership.permission === "ADMIN"),
+    );
   }
 
-  if (actor.role === "PLATFORM_REVIEWER" && resource.assignedReviewerId) {
+  if (actor.role === "REVIEWER" && resource.assignedReviewerId) {
     return resource.assignedReviewerId === actor.userId;
+  }
+
+  if (
+    capability === "donation:read:self" &&
+    resource.ownerUserId !== actor.userId
+  ) {
+    return false;
   }
 
   return true;

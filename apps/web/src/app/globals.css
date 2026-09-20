@@ -1,64 +1,5 @@
 @import "tailwindcss";
 
-:root {
-  --canvas: #f7f8fc;
-  --surface: #ffffff;
-  --surface-raised: #ffffff;
-  --surface-soft: #eef1f8;
-  --surface-tint: #f2f0ff;
-  --text: #0b1220;
-  --muted: #526077;
-  --faint: #768399;
-  --border: #dfe3ed;
-  --border-strong: #c8cfdd;
-  --blue: #246bfe;
-  --blue-strong: #1658dd;
-  --violet: #6938ef;
-  --violet-soft: #eee9ff;
-  --lime: #c8ff6a;
-  --lime-ink: #2f5900;
-  --success: #067647;
-  --success-soft: #ecfdf3;
-  --warning: #9a3e00;
-  --warning-soft: #fff6e8;
-  --danger: #b42318;
-  --danger-soft: #fff0ee;
-  --shadow-sm:
-    0 1px 2px rgba(11, 18, 32, 0.05), 0 7px 24px rgba(11, 18, 32, 0.04);
-  --shadow-lg: 0 24px 70px rgba(23, 29, 58, 0.14);
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
-}
-
-:root[data-theme="dark"] {
-  --canvas: #0b0b12;
-  --surface: #15141e;
-  --surface-raised: #1d1b29;
-  --surface-soft: #201f2a;
-  --surface-tint: #211b39;
-  --text: #f7f7fb;
-  --muted: #a5a4b3;
-  --faint: #848294;
-  --border: #2d2a3d;
-  --border-strong: #403b55;
-  --blue: #6ea1ff;
-  --blue-strong: #8ab3ff;
-  --violet: #9a7bff;
-  --violet-soft: #2a2146;
-  --lime: #c8ff6a;
-  --lime-ink: #1e3c00;
-  --success: #75e0ad;
-  --success-soft: #15372b;
-  --warning: #ffb96b;
-  --warning-soft: #3e2b1b;
-  --danger: #ff8a82;
-  --danger-soft: #45211f;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.22), 0 7px 24px rgba(0, 0, 0, 0.16);
-  --shadow-lg: 0 28px 80px rgba(0, 0, 0, 0.42);
-}
-
 * {
   box-sizing: border-box;
 }
@@ -69,17 +10,14 @@ html {
 }
 
 body {
+  --font-display: var(--font-body);
+  --font-editorial: var(--font-body);
+  --font-marketing-body: var(--font-body);
   min-height: 100vh;
   margin: 0;
   background: var(--canvas);
   color: var(--text);
-  font-family:
-    Inter,
-    ui-sans-serif,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   font-size: 16px;
   line-height: 1.55;
   text-rendering: optimizeLegibility;
@@ -107,7 +45,8 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
-select:focus-visible {
+select:focus-visible,
+.responsive-table:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--blue) 42%, transparent);
   outline-offset: 3px;
 }
@@ -356,7 +295,7 @@ select:focus-visible {
 
 .hero h1 em {
   color: var(--violet);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   font-weight: 400;
 }
 
@@ -1836,11 +1775,11 @@ select:focus-visible {
 }
 .document-preview h4 {
   margin: 2rem 0 0.4rem;
-  font-family: Georgia, serif;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   font-size: 1.1rem;
 }
 .document-preview p {
-  font-family: Georgia, serif;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   font-size: 0.67rem;
   line-height: 1.7;
 }

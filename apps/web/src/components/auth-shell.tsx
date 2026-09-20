@@ -1,53 +1,29 @@
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, BadgeCheck, LockKeyhole, Sparkles } from "lucide-react";
+import { ArrowLeft, BadgeCheck, FileSearch, LockKeyhole } from "lucide-react";
 import { BrandMark } from "./brand-mark";
 import { ThemeToggle } from "./theme-toggle";
 
 export function AuthShell({ children }: { children: React.ReactNode }) {
   return (
     <main className="auth-experience" id="main-content">
-      <section className="auth-art" aria-label="INSIPS trust workflow">
-        <div className="auth-art-top">
-          <BrandMark inverse />
-          <Link href="/">
-            <ArrowLeft size={15} /> Back to INSIPS
-          </Link>
+      <a className="skip-link" href="#auth-form">Skip to sign in form</a>
+      <section className="auth-context" aria-label="INSIPS trust workflow">
+        <div className="auth-context-top"><BrandMark /><Link href="/"><ArrowLeft size={15} /> Back to INSIPS</Link></div>
+        <div className="auth-context-copy">
+          <p className="eyebrow">A clear path to trusted work</p>
+          <h1>Keep the evidence private. Keep the decision visible.</h1>
+          <p>INSIPS connects source context, human confirmation, and independent review in one accountable workspace.</p>
         </div>
-        <div className="auth-art-copy">
-          <p>One evidence profile. Clear human decisions.</p>
-          <h1>TRUST THAT SHOWS ITS WORK.</h1>
-          <p>
-            Prepare evidence privately, keep people in control, and publish only
-            approved, current facts.
-          </p>
+        <div className="auth-ledger" aria-hidden="true">
+          <div><span><LockKeyhole size={16} /></span><strong>Private evidence</strong><small>Restricted to the right workspace</small></div>
+          <div><span><FileSearch size={16} /></span><strong>Source context</strong><small>Page-aware, candidate-ready</small></div>
+          <div><span><BadgeCheck size={16} /></span><strong>Approved projection</strong><small>Specific, dated, explained</small></div>
         </div>
-        <div className="auth-art-scene" aria-hidden="true">
-          <span className="auth-float auth-float-a">
-            <LockKeyhole size={17} /> Private evidence
-          </span>
-          <span className="auth-float auth-float-b">
-            <Sparkles size={17} /> Compass candidate
-          </span>
-          <span className="auth-float auth-float-c">
-            <BadgeCheck size={17} /> Human reviewed
-          </span>
-          <div className="auth-orbit auth-orbit-one" />
-          <div className="auth-orbit auth-orbit-two" />
-          <div className="auth-core">
-            <Image alt="" height={58} src="/brand/insips-logo.png" width={58} />
-          </div>
-        </div>
-        <p className="auth-art-foot">
-          Synthetic local experience · no real personal data
-        </p>
+        <p className="auth-context-foot">Use synthetic demo access if you are exploring the product.</p>
       </section>
       <section className="auth-form-side">
-        <div className="auth-form-top">
-          <BrandMark />
-          <ThemeToggle />
-        </div>
-        <div className="auth-form-wrap">{children}</div>
+        <div className="auth-form-top"><BrandMark /><ThemeToggle /></div>
+        <div className="auth-form-wrap" id="auth-form">{children}</div>
       </section>
     </main>
   );

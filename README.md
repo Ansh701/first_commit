@@ -10,11 +10,15 @@ This repository is a new hackathon implementation for WeMakeDevs x AWS First Com
 - Organization readiness dashboard, profile editor, evidence list, staged processing timeline, Compass candidate confirmation, and review submission.
 - Platform review queue, claim-by-claim source comparison, approve/reject/request-changes decisions, and approved-only public presentation.
 - CSR discovery and a browser-local shortlist.
+- Cognito-backed production identity architecture with signup, verification, recovery, session refresh, account archival, seven coarse groups, and optional Google, Facebook, and Apple federation. Local development uses a clearly labelled test adapter.
+- Resumable ten-step organization onboarding, private document verification, attributed admin decisions, correction and resubmission, and organization lifecycle controls.
+- Test-mode money donations with a 25-basis-point platform fee, captured-payment progress, idempotent webhooks, refunds, Route transfer states, donor and organization histories, receipts, QR codes, and CSV exports.
+- Quantity-based item donations, volunteers, events, follows, bookmarks, organization updates, corporate shortlists, team invitations, notifications, and analytics using synthetic fixtures.
 - Light and dark themes, keyboard-visible focus, reduced-motion support, mobile workspace navigation, intentional empty states, and safe fixture labelling.
 - Strict schemas, document and claim state transitions, deny-by-default role/tenant policy, and tests for the highest-risk publication rules.
 - AWS CDK for Cognito, HTTP API/Lambda, DynamoDB, private S3, conditional GuardDuty Malware Protection, EventBridge, Step Functions, Textract, Bedrock, CloudWatch, and a conditional AWS Budget.
 
-The local experience is intentionally labelled as a synthetic fixture. It does not claim that GuardDuty, Textract, Bedrock, Cognito, or DynamoDB ran locally.
+The local experience is intentionally labelled as a synthetic fixture. It does not claim that GuardDuty, Textract, Bedrock, Cognito, PostgreSQL, DynamoDB, or Razorpay ran locally.
 
 ## Product preview
 
@@ -26,11 +30,11 @@ The local experience is intentionally labelled as a synthetic fixture. It does n
 
 ## Route inventory
 
-- Public: `/`, `/discover`, `/organizations/[slug]`, `/for-organizations`, `/for-csr-teams`, `/how-trust-works`, `/trust-methodology`, `/compass`, `/resources`, `/faq`, `/security-privacy`, `/help`, `/about`, `/contact`, and `/hackathon`.
-- Authentication and demo: `/auth/sign-in`, `/auth/sign-up`, `/auth/forgot-password`, `/auth/reset-password`, `/auth/verify-email`, `/auth/session-expired`, and `/demo`.
-- Organization: `/app`, `/app/profile`, `/app/evidence`, `/app/evidence/[id]`, and `/app/submission`.
-- Review and CSR: `/review`, `/review/submission-demo`, `/csr/discover`, and `/csr/shortlist`.
-- Legal and resilient states: `/privacy`, `/terms`, `/cookies`, `/accessibility`, `/forbidden`, `/offline`, plus global loading, error, and not-found UI.
+- Public: `/`, `/discover`, `/causes`, `/causes/[slug]`, `/items`, `/volunteer`, `/events`, `/feed`, `/organizations/[slug]`, `/for-organizations`, `/for-corporate-teams`, `/how-trust-works`, `/trust-methodology`, `/compass`, `/resources`, `/faq`, `/security-privacy`, `/help`, `/about`, `/contact`, and `/hackathon`.
+- Authentication and account: `/auth/sign-in`, `/auth/sign-up`, `/auth/verify-email`, `/auth/forgot-password`, `/auth/reset-password`, `/auth/callback`, `/auth/session-expired`, `/account`, `/notifications`, and `/demo`.
+- Organization: `/app`, `/app/onboarding`, `/app/profile`, `/app/evidence`, `/app/evidence/[id]`, `/app/submission`, `/app/donations`, `/app/items`, `/app/volunteers`, `/app/team`, and `/app/analytics`.
+- Donor, corporate, and platform administration: `/donor`, `/donor/donations`, `/donor/donations/[id]`, `/donor/items`, `/corporate`, `/corporate/discover`, `/corporate/shortlist`, `/corporate/matching`, `/admin`, `/admin/organizations`, `/admin/organizations/[id]`, and `/admin/donations`.
+- Legal and resilient states: `/privacy`, `/terms`, `/cookies`, `/donation-refund-policy`, `/acceptable-use`, `/accessibility`, `/security`, `/forbidden`, `/offline`, plus global loading, error, and not-found UI. Legal copy is a hackathon draft requiring professional review.
 
 ## Architecture
 
@@ -41,7 +45,8 @@ flowchart LR
   N --> BFF[Thin Next.js session/BFF boundary]
   BFF --> A[API Gateway JWT authorizer]
   A --> L[TypeScript Lambda domain handlers]
-  L --> D[(DynamoDB private records)]
+  L --> D[(PostgreSQL memberships, payments,<br/>workflow and accounting)]
+  L --> KV[(DynamoDB evidence processing state)]
   L --> P[(Approved public projection)]
 
   N -->|short-lived constrained upload| S3[(Private S3 quarantine)]
@@ -59,7 +64,8 @@ flowchart LR
 
 Security-critical boundaries:
 
-- Browser identity is never trusted as authorization. API Gateway verifies the Cognito JWT; Lambda must load capability and tenant membership server-side.
+- Browser identity is never trusted as authorization. API Gateway verifies the Cognito JWT; Lambda then loads tenant membership and permissions from PostgreSQL. Cognito groups provide coarse roles only.
+- Razorpay webhooks use a separate signature-verifying handler and a PostgreSQL unique event key so retries cannot increase progress twice. All payment infrastructure remains in test mode until explicitly approved.
 - A GuardDuty `NO_THREATS_FOUND` event is the only scan result routed into extraction. `THREATS_FOUND`, `UNSUPPORTED`, `ACCESS_DENIED`, and `FAILED` remain blocked.
 - Extracted text is untrusted. Compass has no tools, receives a bounded prompt, and its JSON must pass the shared Zod schema.
 - Review decisions are separate records. Updating an approved source value invalidates the public projection until re-review.
@@ -85,11 +91,11 @@ cp .env.example .env.local
 pnpm dev
 ```
 
-Open `http://localhost:3000`. The local flow stores only synthetic demo decisions in browser storage under `insips-demo-v1`.
+Open `http://localhost:3000`. The local evidence flow stores synthetic decisions under `insips-demo-v1`; the expanded product-flow fixture uses `insips-product-demo-v1`.
 
 ### Local demo roles
 
-No demo passwords are required before Cognito is deployed. `/demo` is a clearly labelled synthetic role launcher, separate from the polished authentication presentation. The submission screen links to the synthetic reviewer queue, reviewer pages link to the signed-out public result, and the public header exposes CSR discovery. These role switches are transparent local-fixture navigation, not simulated authentication or an authorization boundary.
+`/demo` is a clearly labelled synthetic role launcher, separate from the polished authentication presentation. The local identity adapter supports signup, verification, sign-in, recovery, refresh, logout, and account archival without pretending to be Cognito; the UI labels its test codes. These role switches and browser fixtures are not an authorization boundary. In production, Cognito verifies identity and each backend request loads active PostgreSQL tenant membership before authorizing access.
 
 ## Checks
 
@@ -101,7 +107,7 @@ pnpm build
 pnpm --filter @insips/web e2e
 ```
 
-The contracts suite covers tenant isolation, self-approval denial, reviewer assignment, expired sessions, clean-before-extract transitions, claim review transitions, approved-only publication, stale-approval invalidation, and restricted-field removal. CDK assertions cover private storage, encryption, DynamoDB recovery, Cognito registration policy, Node.js 22 Lambdas, the Step Functions workflow, and the GuardDuty event boundary.
+The contracts suite covers tenant isolation, suspended membership denial, self-approval denial, reviewer assignment, expired sessions, clean-before-extract transitions, claim review transitions, approved-only publication, stale-approval invalidation, restricted-field removal, 25-basis-point fee calculation, idempotent capture/refund accounting, item donations, and volunteer states. CDK assertions cover private storage, encryption, DynamoDB recovery, Cognito signup and groups, encrypted PostgreSQL, the Razorpay webhook boundary, Node.js 22 Lambdas, the Step Functions workflow, and the GuardDuty event boundary.
 
 The DynamoDB access patterns and key design are recorded in `docs/DYNAMODB.md`; keys were derived from those access patterns rather than guessed from screens. `docs/OPERATIONS.md` is the CloudWatch-safe troubleshooting runbook.
 
@@ -143,8 +149,9 @@ Reset the browser demo by deleting the `insips-demo-v1` local-storage item or cl
 
 ## Current limitations
 
-- AWS is not deployed because region, profile, spending ceiling, budget email, and paid-service approval are unresolved.
-- Cognito Managed Login is represented locally by a transparent role picker, not a simulated password flow.
+- AWS and Razorpay are not deployed because region, profile, spending ceiling, provider credentials, budget email, and paid-service approval are unresolved.
+- Cognito is the only production identity provider. Local development uses an explicit test adapter; federation appears only when credentials are configured.
+- Aurora PostgreSQL and its schema migration are synthesized but not deployed. DynamoDB remains limited to the existing evidence-processing state.
 - The Next.js BFF/domain API connection, live presigned upload endpoint, durable review writes, and Amplify deployment remain release work after cloud authorization.
 - The user-supplied pre-existing INSIPS logo is included at the owner's explicit direction; broader redistribution terms remain the owner's responsibility.
 - The synthetic pipeline UI demonstrates the intended states; it never labels fixture data as a live AWS result.

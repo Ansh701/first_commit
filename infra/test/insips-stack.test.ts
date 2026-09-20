@@ -12,7 +12,7 @@ function template() {
   return Template.fromStack(stack);
 }
 
-describe("INSIPS infrastructure controls", () => {
+describe("INSIPS infrastructure controls", { timeout: 30_000 }, () => {
   it("keeps the evidence bucket private, encrypted, versioned, and TLS-only", () => {
     const result = template();
     result.hasResourceProperties("AWS::S3::Bucket", {
@@ -47,10 +47,29 @@ describe("INSIPS infrastructure controls", () => {
     });
   });
 
-  it("uses Cognito without public self-registration", () => {
+  it("uses Cognito self-registration with the seven coarse role groups", () => {
     template().hasResourceProperties("AWS::Cognito::UserPool", {
-      AdminCreateUserConfig: { AllowAdminCreateUserOnly: true },
+      AdminCreateUserConfig: { AllowAdminCreateUserOnly: false },
       MfaConfiguration: "OPTIONAL",
+    });
+    template().resourceCountIs("AWS::Cognito::UserPoolGroup", 7);
+  });
+
+  it("stores tenant membership and accounting in encrypted PostgreSQL", () => {
+    const result = template();
+    result.resourceCountIs("AWS::RDS::DBCluster", 1);
+    result.hasResourceProperties("AWS::RDS::DBCluster", {
+      DatabaseName: "insips",
+      Engine: "aurora-postgresql",
+      StorageEncrypted: true,
+      EnableHttpEndpoint: true,
+    });
+  });
+
+  it("exposes a dedicated unsigned Razorpay route backed by signature verification", () => {
+    template().hasResourceProperties("AWS::ApiGatewayV2::Route", {
+      RouteKey: "POST /webhooks/razorpay",
+      AuthorizationType: "NONE",
     });
   });
 

@@ -2,46 +2,44 @@
 
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowRight, Menu, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { BrandMark } from "./brand-mark";
 import { ThemeToggle } from "./theme-toggle";
+import { usePathname } from "next/navigation";
 
 const navigation = [
-  { href: "/#platform", label: "Platform" },
+  { href: "/#platform", label: "Platform", menu: true },
   { href: "/for-organizations", label: "For organizations" },
-  { href: "/for-csr-teams", label: "For CSR teams" },
+  { href: "/for-corporate-teams", label: "For corporate teams" },
   { href: "/how-trust-works", label: "How it works" },
-  { href: "/resources", label: "Resources" },
+  { href: "/resources", label: "Resources", menu: true },
 ];
 
 export function PublicHeader() {
   const [open, setOpen] = useState(false);
   const reduceMotion = useReducedMotion();
+  const pathname = usePathname();
 
   return (
-    <motion.header
-      animate={{ opacity: 1, y: 0 }}
-      className="public-header"
-      initial={reduceMotion ? false : { opacity: 0, y: -18 }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <BrandMark inverse />
+    <header className="public-header">
+      <div className="public-brand-lockup">
+        <BrandMark />
+        <span className="nav-status-tag">Human-led</span>
+      </div>
       <nav className="public-nav" aria-label="Primary navigation">
-        {navigation.map((item, index) => (
-          <motion.span
-            animate={{ opacity: 1, y: 0 }}
-            initial={reduceMotion ? false : { opacity: 0, y: -8 }}
-            key={item.href}
-            transition={{ delay: 0.08 + index * 0.05 }}
-          >
-            <Link href={item.href}>{item.label}</Link>
-          </motion.span>
+        {navigation.map((item) => (
+          <span key={item.href}>
+            <Link aria-current={pathname === item.href ? "page" : undefined} href={item.href}>
+              {item.label}
+              {item.menu ? <ChevronDown aria-hidden="true" size={12} /> : null}
+            </Link>
+          </span>
         ))}
       </nav>
       <div className="header-actions">
         <ThemeToggle />
-        <Link className="header-sign-in hide-tablet" href="/auth/sign-in">
+        <Link className="header-sign-in" href="/auth/sign-in">
           Sign in
         </Link>
         <motion.span
@@ -49,7 +47,7 @@ export function PublicHeader() {
           whileTap={{ scale: 0.97 }}
         >
           <Link className="button button-accent header-cta" href="/demo">
-            Explore demo <ArrowRight size={16} />
+            Open the demo <ArrowRight size={16} />
           </Link>
         </motion.span>
         <button
@@ -74,6 +72,7 @@ export function PublicHeader() {
             <nav aria-label="Mobile navigation">
               {navigation.map((item) => (
                 <Link
+                  aria-current={pathname === item.href ? "page" : undefined}
                   href={item.href}
                   key={item.href}
                   onClick={() => setOpen(false)}
@@ -88,6 +87,6 @@ export function PublicHeader() {
           </motion.div>
         ) : null}
       </AnimatePresence>
-    </motion.header>
+    </header>
   );
 }

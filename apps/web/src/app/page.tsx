@@ -1,17 +1,16 @@
 import { LandingExperience } from "@/components/landing-experience";
-import { PublicHeader } from "@/components/public-header";
-import { SiteFooter } from "@/components/site-footer";
+import { PublicShell } from "@/components/public-shell";
+import { getPublicOrganizations, getPublishedCauses, getPublishedFeed } from "@/lib/server/content-repository";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [organizations, causes, feed] = await Promise.all([
+    getPublicOrganizations(),
+    getPublishedCauses(),
+    getPublishedFeed({ limit: 6 }),
+  ]);
   return (
-    <div className="marketing-site">
-      <div className="marketing-dark-shell">
-        <PublicHeader />
-      </div>
-      <main id="main-content">
-        <LandingExperience />
-      </main>
-      <SiteFooter />
-    </div>
+    <PublicShell className="marketing-site">
+      <LandingExperience organizations={organizations} causes={causes} posts={feed.items} />
+    </PublicShell>
   );
 }

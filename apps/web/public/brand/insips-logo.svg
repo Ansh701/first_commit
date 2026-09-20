@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">INSIPS</title>
+  <desc id="desc">The INSIPS interwoven signal mark.</desc>
+  <defs>
+    <linearGradient id="signal" x1="14" y1="16" x2="82" y2="82" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1769e8" />
+      <stop offset="0.52" stop-color="#5b4df5" />
+      <stop offset="1" stop-color="#8f35dc" />
+    </linearGradient>
+  </defs>
+  <path fill="url(#signal)" d="M48.2 7.5c3.3.1 6.2 1.1 9 2.9l28.1 18.1c5.9 3.8 7.8 11.6 4.2 17.6L68.1 80.2c-3.6 6-11.4 8.4-17.6 4.8L18.3 68.1c-6.1-3.5-8.2-11.4-4.7-17.6l20.8-36.5c2.9-5 8.2-7.1 13.8-6.5Z" />
+  <path fill="#172535" d="m33.2 35.5 5-8.7 26.5 17c4.8 3.1 6.3 9.4 3.4 14.3l-5.2 8.7-26.1-16.9c-4.8-3.1-6.4-9.5-3.6-14.4Z" />
+  <path fill="#f6f8fc" d="m63.1 60.8-4.5 7.5-26.4-17c-4.8-3.1-6.3-9.3-3.5-14.2l4.6-7.9 26.4 17.1c4.8 3.1 6.3 9.5 3.4 14.5Z" opacity=".96" />
+  <path fill="#172535" d="m32.8 35.8 5.2-9 26.6 17.1c4.8 3.1 6.3 9.4 3.4 14.3l-5.1 8.6-26.5-17c-4.8-3.1-6.4-9.2-3.6-14Z" />
+  <path fill="url(#signal)" d="m36.3 43.6 5-8.5c1.2-2 3.8-2.7 5.8-1.4l16.9 10.9c2.1 1.3 2.7 4 1.5 6.1l-5 8.5c-1.2 2.1-4 2.7-6 1.4L37.7 49.7c-2.1-1.3-2.7-4-1.4-6.1Z" />
+</svg>

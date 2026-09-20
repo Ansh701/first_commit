@@ -1,9 +1,15 @@
 import { Search, SlidersHorizontal } from "lucide-react";
 import { OrganizationCard } from "@/components/organization-card";
 import { StatusPill } from "@/components/status-pill";
-import { publicOrganizations } from "@/lib/demo-data";
+import { getPublicOrganizations } from "@/lib/server/content-repository";
 
-export default function CsrDiscoverPage() {
+export default async function CsrDiscoverPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const params = await searchParams;
+  const organizations = await getPublicOrganizations({ query: params.q });
   return (
     <>
       <header className="page-heading">
@@ -20,14 +26,14 @@ export default function CsrDiscoverPage() {
         <label className="search-field">
           <Search size={16} />
           <span className="sr-only">Search organizations</span>
-          <input placeholder="Search by focus or location…" />
+          <input defaultValue={params.q} name="q" placeholder="Search by focus or location…" />
         </label>
         <button className="button button-secondary" type="button">
           <SlidersHorizontal size={16} /> Filters
         </button>
       </div>
       <div className="organization-grid">
-        {publicOrganizations.map((organization) => (
+        {organizations.map((organization) => (
           <OrganizationCard
             csr
             organization={organization}

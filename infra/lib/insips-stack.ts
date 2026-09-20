@@ -7,6 +7,7 @@ import {
   CfnCondition,
   CfnOutput,
   CfnParameter,
+  CustomResource,
   Duration,
   Fn,
   RemovalPolicy,
@@ -17,8 +18,10 @@ import {
 import * as apigwv2 from "aws-cdk-lib/aws-apigatewayv2";
 import * as budgets from "aws-cdk-lib/aws-budgets";
 import * as cloudwatch from "aws-cdk-lib/aws-cloudwatch";
+import * as customResources from "aws-cdk-lib/custom-resources";
 import * as cognito from "aws-cdk-lib/aws-cognito";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as events from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
 import * as guardduty from "aws-cdk-lib/aws-guardduty";
@@ -26,7 +29,9 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as lambdaNode from "aws-cdk-lib/aws-lambda-nodejs";
 import * as logs from "aws-cdk-lib/aws-logs";
+import * as rds from "aws-cdk-lib/aws-rds";
 import * as s3 from "aws-cdk-lib/aws-s3";
+import * as secretsmanager from "aws-cdk-lib/aws-secretsmanager";
 import * as sfn from "aws-cdk-lib/aws-stepfunctions";
 import * as tasks from "aws-cdk-lib/aws-stepfunctions-tasks";
 import { Construct } from "constructs";
@@ -78,6 +83,130 @@ export class InsipsStack extends Stack {
       description: "Notification email approved by the owner.",
     });
 
+    const googleClientId = new CfnParameter(this, "GoogleClientId", {
+      type: "String",
+      default: "",
+      description: "Optional Google OAuth client ID for Cognito federation.",
+    });
+    const googleClientSecret = new CfnParameter(this, "GoogleClientSecret", {
+      type: "String",
+      default: "",
+      noEcho: true,
+      description: "Optional Google OAuth client secret.",
+    });
+    const facebookClientId = new CfnParameter(this, "FacebookClientId", {
+      type: "String",
+      default: "",
+      description: "Optional Facebook app ID for Cognito federation.",
+    });
+    const facebookClientSecret = new CfnParameter(
+      this,
+      "FacebookClientSecret",
+      {
+        type: "String",
+        default: "",
+        noEcho: true,
+        description: "Optional Facebook app secret.",
+      },
+    );
+    const appleServicesId = new CfnParameter(this, "AppleServicesId", {
+      type: "String",
+      default: "",
+      description: "Optional Apple Services ID for Cognito federation.",
+    });
+    const appleTeamId = new CfnParameter(this, "AppleTeamId", {
+      type: "String",
+      default: "",
+    });
+    const appleKeyId = new CfnParameter(this, "AppleKeyId", {
+      type: "String",
+      default: "",
+    });
+    const applePrivateKey = new CfnParameter(this, "ApplePrivateKey", {
+      type: "String",
+      default: "",
+      noEcho: true,
+    });
+
+    const googleFederationConfigured = new CfnCondition(
+      this,
+      "GoogleFederationConfigured",
+      {
+        expression: Fn.conditionAnd(
+          Fn.conditionNot(Fn.conditionEquals(googleClientId.valueAsString, "")),
+          Fn.conditionNot(
+            Fn.conditionEquals(googleClientSecret.valueAsString, ""),
+          ),
+        ),
+      },
+    );
+    const facebookFederationConfigured = new CfnCondition(
+      this,
+      "FacebookFederationConfigured",
+      {
+        expression: Fn.conditionAnd(
+          Fn.conditionNot(
+            Fn.conditionEquals(facebookClientId.valueAsString, ""),
+          ),
+          Fn.conditionNot(
+            Fn.conditionEquals(facebookClientSecret.valueAsString, ""),
+          ),
+        ),
+      },
+    );
+    const appleFederationConfigured = new CfnCondition(
+      this,
+      "AppleFederationConfigured",
+      {
+        expression: Fn.conditionAnd(
+          Fn.conditionNot(
+            Fn.conditionEquals(appleServicesId.valueAsString, ""),
+          ),
+          Fn.conditionNot(Fn.conditionEquals(appleTeamId.valueAsString, "")),
+          Fn.conditionNot(Fn.conditionEquals(appleKeyId.valueAsString, "")),
+          Fn.conditionNot(
+            Fn.conditionEquals(applePrivateKey.valueAsString, ""),
+          ),
+        ),
+      },
+    );
+
+    const vpc = new ec2.Vpc(this, "ProductVpc", {
+      maxAzs: 2,
+      natGateways: 0,
+      subnetConfiguration: [
+        {
+          name: "isolated",
+          subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
+        },
+      ],
+    });
+    const productDatabase = new rds.DatabaseCluster(this, "ProductDatabase", {
+      engine: rds.DatabaseClusterEngine.auroraPostgres({
+        version: rds.AuroraPostgresEngineVersion.VER_16_4,
+      }),
+      writer: rds.ClusterInstance.serverlessV2("writer", {
+        publiclyAccessible: false,
+      }),
+      serverlessV2MinCapacity: 0.5,
+      serverlessV2MaxCapacity: 2,
+      defaultDatabaseName: "insips",
+      enableDataApi: true,
+      storageEncrypted: true,
+      vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
+      deletionProtection: false,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+    const razorpaySecret = new secretsmanager.Secret(
+      this,
+      "RazorpayTestCredentials",
+      {
+        description:
+          "Razorpay test-mode credentials. Replace values out of band; never commit them.",
+      },
+    );
+
     const appTable = new dynamodb.Table(this, "AppTable", {
       partitionKey: { name: "pk", type: dynamodb.AttributeType.STRING },
       sortKey: { name: "sk", type: dynamodb.AttributeType.STRING },
@@ -123,7 +252,7 @@ export class InsipsStack extends Stack {
     });
 
     const userPool = new cognito.UserPool(this, "UserPool", {
-      selfSignUpEnabled: false,
+      selfSignUpEnabled: true,
       signInAliases: { email: true },
       standardAttributes: { email: { required: true, mutable: false } },
       mfa: cognito.Mfa.OPTIONAL,
@@ -138,6 +267,56 @@ export class InsipsStack extends Stack {
       },
       removalPolicy: RemovalPolicy.DESTROY,
     });
+    const googleProvider = new cognito.CfnUserPoolIdentityProvider(
+      this,
+      "GoogleIdentityProvider",
+      {
+        userPoolId: userPool.userPoolId,
+        providerName: "Google",
+        providerType: "Google",
+        providerDetails: {
+          client_id: googleClientId.valueAsString,
+          client_secret: googleClientSecret.valueAsString,
+          authorize_scopes: "openid email profile",
+        },
+        attributeMapping: { email: "email", name: "name" },
+      },
+    );
+    googleProvider.cfnOptions.condition = googleFederationConfigured;
+    const facebookProvider = new cognito.CfnUserPoolIdentityProvider(
+      this,
+      "FacebookIdentityProvider",
+      {
+        userPoolId: userPool.userPoolId,
+        providerName: "Facebook",
+        providerType: "Facebook",
+        providerDetails: {
+          client_id: facebookClientId.valueAsString,
+          client_secret: facebookClientSecret.valueAsString,
+          authorize_scopes: "public_profile,email",
+        },
+        attributeMapping: { email: "email", name: "name" },
+      },
+    );
+    facebookProvider.cfnOptions.condition = facebookFederationConfigured;
+    const appleProvider = new cognito.CfnUserPoolIdentityProvider(
+      this,
+      "AppleIdentityProvider",
+      {
+        userPoolId: userPool.userPoolId,
+        providerName: "SignInWithApple",
+        providerType: "SignInWithApple",
+        providerDetails: {
+          client_id: appleServicesId.valueAsString,
+          team_id: appleTeamId.valueAsString,
+          key_id: appleKeyId.valueAsString,
+          private_key: applePrivateKey.valueAsString,
+          authorize_scopes: "name email",
+        },
+        attributeMapping: { email: "email", name: "name" },
+      },
+    );
+    appleProvider.cfnOptions.condition = appleFederationConfigured;
     const userPoolClient = userPool.addClient("WebClient", {
       generateSecret: false,
       authFlows: { userSrp: true },
@@ -148,7 +327,7 @@ export class InsipsStack extends Stack {
           cognito.OAuthScope.EMAIL,
           cognito.OAuthScope.PROFILE,
         ],
-        callbackUrls: [`${appOrigin.valueAsString}/api/auth/callback`],
+        callbackUrls: [`${appOrigin.valueAsString}/auth/callback`],
         logoutUrls: [`${appOrigin.valueAsString}/`],
       },
       preventUserExistenceErrors: true,
@@ -157,16 +336,38 @@ export class InsipsStack extends Stack {
       refreshTokenValidity: Duration.days(1),
       enableTokenRevocation: true,
     });
+    const cfnUserPoolClient = userPoolClient.node
+      .defaultChild as cognito.CfnUserPoolClient;
+    cfnUserPoolClient.supportedIdentityProviders = [
+      "COGNITO",
+      Fn.conditionIf(
+        googleFederationConfigured.logicalId,
+        "Google",
+        Aws.NO_VALUE,
+      ).toString(),
+      Fn.conditionIf(
+        facebookFederationConfigured.logicalId,
+        "Facebook",
+        Aws.NO_VALUE,
+      ).toString(),
+      Fn.conditionIf(
+        appleFederationConfigured.logicalId,
+        "SignInWithApple",
+        Aws.NO_VALUE,
+      ).toString(),
+    ];
     new cognito.CfnUserPoolDomain(this, "UserPoolDomain", {
       userPoolId: userPool.userPoolId,
       domain: Fn.join("-", ["insips", Aws.ACCOUNT_ID, Aws.REGION]),
     });
     for (const groupName of [
-      "ORG_ADMIN",
-      "ORG_MEMBER",
-      "PLATFORM_REVIEWER",
+      "INDIVIDUAL_DONOR",
+      "ORGANIZATION_MEMBER",
+      "ORGANIZATION_ADMIN",
+      "CORPORATE_MEMBER",
+      "CORPORATE_ADMIN",
+      "REVIEWER",
       "PLATFORM_ADMIN",
-      "CSR_USER",
     ]) {
       new cognito.CfnUserPoolGroup(this, `${groupName}Group`, {
         userPoolId: userPool.userPoolId,
@@ -187,6 +388,99 @@ export class InsipsStack extends Stack {
         format: lambdaNode.OutputFormat.ESM,
       },
     } as const;
+
+    const postConfirmation = new lambdaNode.NodejsFunction(
+      this,
+      "PostConfirmationFunction",
+      {
+        ...commonLambdaProps,
+        logGroup: new logs.LogGroup(this, "PostConfirmationLogs", {
+          retention: logs.RetentionDays.ONE_WEEK,
+          removalPolicy: RemovalPolicy.DESTROY,
+        }),
+        entry: path.join(
+          currentDirectory,
+          "../src/functions/post-confirmation.ts",
+        ),
+        handler: "handler",
+        environment: {
+          DATABASE_CLUSTER_ARN: productDatabase.clusterArn,
+          DATABASE_SECRET_ARN: productDatabase.secret?.secretArn ?? "",
+          DATABASE_NAME: "insips",
+        },
+      },
+    );
+    productDatabase.grantDataApiAccess(postConfirmation);
+    postConfirmation.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ["cognito-idp:AdminAddUserToGroup"],
+        // Do not reference this pool directly here. The pool owns the trigger,
+        // so a pool ARN token in the function role would create a CloudFormation
+        // dependency cycle. The handler still receives and uses Cognito's
+        // server-issued userPoolId, and this policy is bounded to user pools in
+        // the current account and region.
+        resources: [
+          Arn.format(
+            {
+              service: "cognito-idp",
+              resource: "userpool",
+              resourceName: "*",
+              arnFormat: ArnFormat.SLASH_RESOURCE_NAME,
+            },
+            this,
+          ),
+        ],
+      }),
+    );
+    userPool.addTrigger(
+      cognito.UserPoolOperation.POST_CONFIRMATION,
+      postConfirmation,
+    );
+
+    const databaseMigration = new lambdaNode.NodejsFunction(
+      this,
+      "DatabaseMigrationFunction",
+      {
+        ...commonLambdaProps,
+        logGroup: new logs.LogGroup(this, "DatabaseMigrationLogs", {
+          retention: logs.RetentionDays.ONE_WEEK,
+          removalPolicy: RemovalPolicy.DESTROY,
+        }),
+        entry: path.join(
+          currentDirectory,
+          "../src/functions/database-migrate.ts",
+        ),
+        handler: "handler",
+        environment: {
+          DATABASE_CLUSTER_ARN: productDatabase.clusterArn,
+          DATABASE_SECRET_ARN: productDatabase.secret?.secretArn ?? "",
+          DATABASE_NAME: "insips",
+        },
+        bundling: {
+          ...commonLambdaProps.bundling,
+          commandHooks: {
+            beforeBundling: () => [],
+            beforeInstall: () => [],
+            afterBundling: (inputDirectory, outputDirectory) => [
+              ...["001_product_core", "002_content_foundation", "003_content_seed", "004_site_content_seed"].map(
+                (migration) =>
+                  `cp ${path.join(inputDirectory, `infra/sql/${migration}.sql`)} ${path.join(outputDirectory, `${migration}.sql`)}`,
+              ),
+            ],
+          },
+        },
+      },
+    );
+    productDatabase.grantDataApiAccess(databaseMigration);
+    const migrationProvider = new customResources.Provider(
+      this,
+      "DatabaseMigrationProvider",
+      { onEventHandler: databaseMigration },
+    );
+    new CustomResource(this, "ProductDatabaseSchema", {
+      serviceToken: migrationProvider.serviceToken,
+      properties: { migration: "001_product_core,002_content_foundation,003_content_seed,004_site_content_seed" },
+    });
 
     const startExtraction = new lambdaNode.NodejsFunction(
       this,
@@ -425,11 +719,43 @@ export class InsipsStack extends Stack {
         APP_TABLE_NAME: appTable.tableName,
         PUBLIC_TABLE_NAME: publicTable.tableName,
         EVIDENCE_BUCKET_NAME: evidenceBucket.bucketName,
+        DATABASE_CLUSTER_ARN: productDatabase.clusterArn,
+        DATABASE_SECRET_ARN: productDatabase.secret?.secretArn ?? "",
+        DATABASE_NAME: "insips",
+        RAZORPAY_SECRET_ARN: razorpaySecret.secretArn,
       },
     });
     appTable.grantReadWriteData(apiFunction);
     publicTable.grantReadWriteData(apiFunction);
     evidenceBucket.grantReadWrite(apiFunction, "quarantine/*");
+    evidenceBucket.grantRead(apiFunction, "verification/*");
+    productDatabase.grantDataApiAccess(apiFunction);
+    razorpaySecret.grantRead(apiFunction);
+
+    const razorpayWebhookFunction = new lambdaNode.NodejsFunction(
+      this,
+      "RazorpayWebhookFunction",
+      {
+        ...commonLambdaProps,
+        logGroup: new logs.LogGroup(this, "RazorpayWebhookLogs", {
+          retention: logs.RetentionDays.ONE_WEEK,
+          removalPolicy: RemovalPolicy.DESTROY,
+        }),
+        entry: path.join(
+          currentDirectory,
+          "../src/functions/razorpay-webhook.ts",
+        ),
+        handler: "handler",
+        environment: {
+          DATABASE_CLUSTER_ARN: productDatabase.clusterArn,
+          DATABASE_SECRET_ARN: productDatabase.secret?.secretArn ?? "",
+          DATABASE_NAME: "insips",
+          RAZORPAY_SECRET_ARN: razorpaySecret.secretArn,
+        },
+      },
+    );
+    productDatabase.grantDataApiAccess(razorpayWebhookFunction);
+    razorpaySecret.grantRead(razorpayWebhookFunction);
 
     const api = new apigwv2.CfnApi(this, "HttpApi", {
       protocolType: "HTTP",
@@ -454,6 +780,18 @@ export class InsipsStack extends Stack {
       payloadFormatVersion: "2.0",
       timeoutInMillis: 28_000,
     });
+    const webhookIntegration = new apigwv2.CfnIntegration(
+      this,
+      "RazorpayWebhookIntegration",
+      {
+        apiId: api.ref,
+        integrationType: "AWS_PROXY",
+        integrationUri: razorpayWebhookFunction.functionArn,
+        integrationMethod: "POST",
+        payloadFormatVersion: "2.0",
+        timeoutInMillis: 28_000,
+      },
+    );
     const authorizer = new apigwv2.CfnAuthorizer(this, "JwtAuthorizer", {
       apiId: api.ref,
       authorizerType: "JWT",
@@ -473,6 +811,12 @@ export class InsipsStack extends Stack {
       apiId: api.ref,
       routeKey: "GET /health",
       target: `integrations/${integration.ref}`,
+      authorizationType: "NONE",
+    });
+    new apigwv2.CfnRoute(this, "RazorpayWebhookRoute", {
+      apiId: api.ref,
+      routeKey: "POST /webhooks/razorpay",
+      target: `integrations/${webhookIntegration.ref}`,
       authorizationType: "NONE",
     });
     new apigwv2.CfnRoute(this, "ProtectedRoutes", {
@@ -503,6 +847,20 @@ export class InsipsStack extends Stack {
         ":",
         api.ref,
         "/*/*/*",
+      ]),
+    });
+    razorpayWebhookFunction.addPermission("AllowApiGatewayWebhook", {
+      principal: new iam.ServicePrincipal("apigateway.amazonaws.com"),
+      sourceArn: Fn.join("", [
+        "arn:",
+        Aws.PARTITION,
+        ":execute-api:",
+        Aws.REGION,
+        ":",
+        Aws.ACCOUNT_ID,
+        ":",
+        api.ref,
+        "/*/POST/webhooks/razorpay",
       ]),
     });
 
@@ -576,6 +934,12 @@ export class InsipsStack extends Stack {
     });
     new CfnOutput(this, "EvidenceWorkflowArn", {
       value: evidenceWorkflow.stateMachineArn,
+    });
+    new CfnOutput(this, "ProductDatabaseClusterArn", {
+      value: productDatabase.clusterArn,
+    });
+    new CfnOutput(this, "RazorpayTestSecretArn", {
+      value: razorpaySecret.secretArn,
     });
   }
 }

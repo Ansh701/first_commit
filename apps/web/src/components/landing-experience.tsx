@@ -1,792 +1,95 @@
-"use client";
-
+import type {
+  PublicCause,
+  PublicFeedPost,
+  PublicMedia,
+  PublicOrganizationSummary,
+} from "@insips/contracts";
 import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   ArrowRight,
   BadgeCheck,
   Building2,
-  Check,
+  CalendarDays,
   CheckCircle2,
-  CircleUserRound,
-  FileCheck2,
   FileSearch,
   Landmark,
-  LockKeyhole,
-  SearchCheck,
   ShieldCheck,
-  Sparkles,
   UsersRound,
 } from "lucide-react";
-import { useState } from "react";
+import { BeforeAfterSlider } from "./before-after-slider";
+import { CauseReel } from "./cause-reel";
+import { EcosystemOrbit } from "./ecosystem-orbit";
+import { EvidenceWorkbench } from "./evidence-workbench";
+import { HeroCarousel, type HeroSlide } from "./hero-carousel";
+import { LogoMarquee } from "./logo-marquee";
+import { PublicUpdateList } from "./public-update-list";
+import { ScreenshotStack } from "./screenshot-stack";
 
-const featureData = {
-  prepare: {
-    label: "Prepare evidence",
-    eyebrow: "A calm place for every document",
-    title: "Know what is ready—and what needs attention.",
-    text: "A guided evidence profile turns scattered files into a clear next-action workspace without exposing private material publicly.",
-  },
-  confirm: {
-    label: "Confirm facts",
-    eyebrow: "INSIPS Compass",
-    title: "Suggestions stay suggestions until you decide.",
-    text: "Compare each candidate with its source, then accept, edit, or dismiss it. Confidence describes the source match, not legitimacy.",
-  },
-  review: {
-    label: "Human review",
-    eyebrow: "Independent decisions",
-    title: "Reviewers decide claim by claim.",
-    text: "The submitted value and source context stay together. Review decisions are separate, attributable, and never silently rewrite organization facts.",
-  },
-  public: {
-    label: "Public trust",
-    eyebrow: "Specific, dated, explained",
-    title: "Share only what is approved and current.",
-    text: "Public profiles show the claim, what it means, and when it was reviewed—without publishing private evidence or internal notes.",
-  },
-} as const;
-
-type FeatureKey = keyof typeof featureData;
-
-const ecosystem = [
-  "Education",
-  "Healthcare",
-  "Climate",
-  "Livelihoods",
-  "Organizations",
-  "CSR teams",
-  "Reviewers",
-  "Donors",
+const audiencePaths = [
+  { label: "For organizations", title: "Prepare once. Explain every claim.", text: "Keep evidence private, confirm candidate fields, and see what needs a human decision next.", href: "/for-organizations", icon: Building2 },
+  { label: "For reviewers", title: "Decide with the source in view.", text: "Review claim by claim with the organization-confirmed value and its safe evidence context together.", href: "/review", icon: UsersRound },
+  { label: "For CSR teams", title: "Compare specific indicators.", text: "Discover organizations through dated, explained public signals instead of a black-box score.", href: "/for-csr-teams", icon: Landmark },
 ];
 
-const flowSteps = [
-  { label: "Upload privately", icon: LockKeyhole },
-  { label: "Safety check", icon: ShieldCheck },
-  { label: "Read the evidence", icon: FileSearch },
-  { label: "Review suggestions", icon: Sparkles },
-  { label: "Human decision", icon: CircleUserRound },
-  { label: "Publish approved facts", icon: BadgeCheck },
-];
-
-const reveal = {
-  hidden: { opacity: 0, y: 34 },
-  visible: { opacity: 1, y: 0 },
-};
-
-function FeatureMockup({ active }: { active: FeatureKey }) {
-  if (active === "prepare") {
-    return (
-      <div className="feature-mockup-grid">
-        <div className="mockup-summary">
-          <span>Evidence readiness</span>
-          <strong>3 of 4</strong>
-          <div className="mockup-progress">
-            <i />
-            <i />
-            <i />
-            <i />
-          </div>
-          <small>One action before review</small>
-        </div>
-        <div className="mockup-list">
-          {[
-            ["Organization profile", "Ready"],
-            ["CSR-1 certificate", "Prepared"],
-            ["80G certificate", "Missing"],
-          ].map(([title, state]) => (
-            <div className="mockup-row" key={title}>
-              <span className="mockup-file">
-                <FileCheck2 size={17} />
-              </span>
-              <span>
-                <strong>{title}</strong>
-                <small>Evidence profile</small>
-              </span>
-              <em>{state}</em>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (active === "confirm") {
-    return (
-      <div className="feature-confirm-scene">
-        <div className="source-sheet">
-          <small>Synthetic source · page 1</small>
-          <h4>Form CSR-1 registration</h4>
-          <p>Registration number</p>
-          <mark>CSR00018427</mark>
-          <span className="source-line" />
-          <span className="source-line short" />
-        </div>
-        <div className="candidate-card">
-          <span className="candidate-label">
-            <Sparkles size={14} /> Candidate field
-          </span>
-          <h4>CSR-1 registration</h4>
-          <strong>CSR00018427</strong>
-          <p>High source match · page 1</p>
-          <div>
-            <button type="button">
-              <Check size={14} /> Accept
-            </button>
-            <button type="button">Edit</button>
-            <button type="button">Dismiss</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (active === "review") {
-    return (
-      <div className="feature-review-scene">
-        <div className="review-queue-mini">
-          <span className="queue-label">Review queue</span>
-          <h4>Udaan Learning Foundation</h4>
-          <p>1 organization-confirmed claim</p>
-          <div className="review-source-mini">
-            <SearchCheck size={20} />
-            <span>
-              <strong>Source located</strong>
-              <small>Page 1 · exact label match</small>
-            </span>
-          </div>
-        </div>
-        <div className="review-decision-mini">
-          <span>Claim decision</span>
-          <strong>CSR00018427</strong>
-          <button type="button">
-            <CheckCircle2 size={16} /> Approve
-          </button>
-          <button type="button">Request changes</button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="feature-public-scene">
-      <div className="public-org-mini">
-        <span className="public-org-avatar">UL</span>
-        <small>Public trust profile</small>
-        <h4>Udaan Learning Foundation</h4>
-        <p>Community learning · Pune</p>
-      </div>
-      <div className="approved-claim-mini">
-        <span>
-          <BadgeCheck size={16} /> Reviewed indicator
-        </span>
-        <h4>CSR-1 registration</h4>
-        <strong>CSR00018427</strong>
-        <p>Matched to submitted evidence · reviewed 19 Sep 2026</p>
-      </div>
-    </div>
-  );
-}
-
-export function LandingExperience() {
-  const reduceMotion = useReducedMotion();
-  const [activeFeature, setActiveFeature] = useState<FeatureKey>("prepare");
-  const [activeStep, setActiveStep] = useState(3);
-  const feature = featureData[activeFeature];
-
-  const ambient = (delay: number, y = 9) =>
-    reduceMotion
-      ? undefined
-      : {
-          y: [0, -y, 0],
-          rotate: [0, delay % 2 ? 2 : -2, 0],
-          transition: {
-            duration: 8 + delay,
-            repeat: Infinity,
-            ease: "easeInOut" as const,
-            delay,
-          },
-        };
+export function LandingExperience({
+  organizations,
+  causes,
+  posts,
+}: {
+  organizations: PublicOrganizationSummary[];
+  causes: PublicCause[];
+  posts: PublicFeedPost[];
+}) {
+  const media: PublicMedia[] = organizations.flatMap((organization) => {
+    const local = organization.slug === "udaan-learning-foundation" ? "/admin-org-marketing-1440.png" : "/corporate-discovery-dark.png";
+    return [{ id: `homepage-${organization.slug}`, type: "IMAGE" as const, title: `${organization.displayName} workspace`, alt: `INSIPS product workspace preview for ${organization.displayName}.`, canonicalUrl: local, sourceUrl: local, provider: "INSIPS local product capture", permission: "LOCAL_FIXTURE" as const, publishingState: "PUBLISHED" as const, width: 1440, height: 900 }];
+  });
+  const heroSlides: HeroSlide[] = [
+    { eyebrow: "Organization story", title: "Make every public claim easier to explain.", body: "Give people the context behind a signal: what was checked, who decided, and when it was reviewed.", href: "/discover", cta: "Discover organizations", image: "/admin-org-marketing-1440.png", alt: "INSIPS organization workspace showing a clear evidence-to-public trail." },
+    { eyebrow: "Cause story", title: "Contribution deserves a visible next step.", body: "Keep causes, owners, targets, current progress, and end dates together so giving feels specific rather than abstract.", href: "/causes", cta: "Explore causes", image: "/media/home/carousel-community.png", alt: "Community learning and food-support work shown across a local programme and a volunteer packing team." },
+    { eyebrow: "Evidence story", title: "A suggestion is useful only when a person can decide.", body: "Compass prepares candidates. Organizations confirm. Independent reviewers decide what can be projected publicly.", href: "/how-trust-works", cta: "See how review works", image: "/admin-org-marketing-1440.png", alt: "INSIPS product screen showing evidence review and human decision context." },
+  ];
 
   return (
     <>
-      <section className="landing-hero" aria-labelledby="hero-title">
-        <div className="hero-grid-glow" aria-hidden="true" />
-        <motion.div className="hero-chip hero-chip-org" animate={ambient(0)}>
-          <Building2 size={16} />
-          <span>Organizations</span>
-        </motion.div>
-        <motion.div
-          className="hero-chip hero-chip-evidence"
-          animate={ambient(1.2, 12)}
-        >
-          <FileSearch size={16} />
-          <span>Private evidence</span>
-        </motion.div>
-        <motion.div
-          className="hero-chip hero-chip-review"
-          animate={ambient(0.7, 7)}
-        >
-          <UsersRound size={16} />
-          <span>Human reviewers</span>
-        </motion.div>
-        <motion.div
-          className="hero-chip hero-chip-csr"
-          animate={ambient(1.8, 10)}
-        >
-          <Landmark size={16} />
-          <span>CSR teams</span>
-        </motion.div>
-        <div className="landing-hero-content">
-          <motion.p
-            animate={{ opacity: 1, y: 0 }}
-            className="hero-kicker"
-            initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-          >
-            Evidence, made understandable.
-          </motion.p>
-          <h1 id="hero-title" aria-label="Turn evidence into explainable trust">
-            {["TURN EVIDENCE", "INTO EXPLAINABLE", "HUMAN-REVIEWED TRUST."].map(
-              (line, index) => (
-                <span className={index === 1 ? "accent-line" : ""} key={line}>
-                  <motion.i
-                    animate={{ y: 0 }}
-                    initial={reduceMotion ? false : { y: "110%" }}
-                    transition={{
-                      delay: 0.12 + index * 0.1,
-                      duration: 0.68,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
-                  >
-                    {line}
-                  </motion.i>
-                </span>
-              ),
-            )}
-          </h1>
-          <motion.p
-            animate={{ opacity: 1, y: 0 }}
-            className="hero-support"
-            initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-            transition={{ delay: 0.48, duration: 0.55 }}
-          >
-            INSIPS helps social-impact organizations prepare evidence, confirm
-            every suggested fact, and publish only what an independent reviewer
-            approves.
-          </motion.p>
-          <motion.div
-            animate={{ opacity: 1, y: 0 }}
-            className="hero-actions hero-actions-centered"
-            initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-            transition={{ delay: 0.58 }}
-          >
-            <Link className="button button-accent button-large" href="/demo">
-              Explore the demo <ArrowRight size={18} />
-            </Link>
-            <Link
-              className="button button-on-dark button-large"
-              href="/discover"
-            >
-              Discover organizations
-            </Link>
-          </motion.div>
-          <motion.div
-            animate={{ opacity: 1 }}
-            className="hero-trust-note"
-            initial={reduceMotion ? false : { opacity: 0 }}
-            transition={{ delay: 0.72 }}
-          >
-            <ShieldCheck size={15} /> AI assists. Organizations confirm. People
-            decide.
-          </motion.div>
+      <section className="landing-hero landing-hero-story" aria-labelledby="hero-title">
+        <div className="landing-hero-copy">
+          <p className="eyebrow"><span className="eyebrow-dot" /> Evidence-to-trust platform</p>
+          <h1 id="hero-title">Trust is a trail, not a badge.</h1>
+          <p className="hero-support">INSIPS helps impact organizations prepare private evidence, confirm every suggested fact, and publish only what an independent reviewer approves.</p>
+          <div className="hero-actions"><Link className="button button-primary button-large" href="/demo">Open the product demo <ArrowRight size={17} /></Link><Link className="button button-secondary button-large" href="/discover">Discover organizations</Link></div>
+          <div className="hero-proof-row" aria-label="Workflow assurances"><span><ShieldCheck size={15} /> Private by default</span><span><BadgeCheck size={15} /> Approved-only public view</span></div>
         </div>
-
-        <motion.div
-          className="hero-product-scene"
-          initial={reduceMotion ? false : { opacity: 0, y: 60, scale: 0.97 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ delay: 0.5, duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <div className="hero-scene-toolbar">
-            <span className="scene-dots">
-              <i />
-              <i />
-              <i />
-            </span>
-            <span>INSIPS · Evidence workspace</span>
-            <span className="scene-ready">
-              <i /> Private workspace
-            </span>
-          </div>
-          <div className="hero-scene-body">
-            <div className="hero-scene-nav">
-              <span className="scene-logo">I</span>
-              {["Overview", "Evidence", "Claims", "Public profile"].map(
-                (item, index) => (
-                  <span className={index === 1 ? "active" : ""} key={item}>
-                    {item}
-                  </span>
-                ),
-              )}
-            </div>
-            <div className="hero-scene-main">
-              <div className="scene-heading">
-                <div>
-                  <small>INSIPS Compass</small>
-                  <h2>Review suggested facts</h2>
-                </div>
-                <span className="scene-status">3 candidates</span>
-              </div>
-              <div className="scene-columns">
-                <div className="scene-card scene-source">
-                  <span className="scene-card-label">Source evidence</span>
-                  <div className="paper-preview">
-                    <small>SYNTHETIC DOCUMENT</small>
-                    <strong>Form CSR-1</strong>
-                    <p>Udaan Learning Foundation</p>
-                    <mark>Registration No. CSR00018427</mark>
-                    <span />
-                    <span />
-                    <span className="short" />
-                  </div>
-                </div>
-                <div className="scene-card scene-candidates">
-                  <span className="scene-card-label">Candidate fields</span>
-                  {[
-                    "CSR-1 registration",
-                    "Registered legal name",
-                    "80G status",
-                  ].map((item, index) => (
-                    <div className="scene-candidate" key={item}>
-                      <span>
-                        <strong>{item}</strong>
-                        <small>
-                          {index === 2
-                            ? "Review carefully"
-                            : "High source match"}
-                        </small>
-                      </span>
-                      <i className={index === 0 ? "selected" : ""}>
-                        {index === 0 ? <Check size={13} /> : index + 1}
-                      </i>
-                    </div>
-                  ))}
-                  <button type="button">
-                    Continue with 1 claim <ArrowRight size={14} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+        <HeroCarousel slides={heroSlides} />
       </section>
 
-      <section
-        className="ecosystem-strip"
-        aria-label="People and cause areas supported by INSIPS"
-      >
-        <p>Built for the impact ecosystem</p>
-        <div className="marquee-window">
-          <div className="marquee-track">
-            {[...ecosystem, ...ecosystem].map((item, index) => (
-              <span key={`${item}-${index}`}>
-                <i />
-                {item}
-              </span>
-            ))}
-          </div>
-        </div>
+      <LogoMarquee organizations={organizations} />
+
+      <section className="marketing-section workbench-section" id="platform" aria-labelledby="workbench-section-title">
+        <div className="section-heading-split"><div><p className="marketing-kicker">The product idea</p><h2 id="workbench-section-title">Keep the source, decision, and public meaning close.</h2></div><p>Files, fields, and decisions usually drift apart. The evidence workbench makes the next action explicit without turning private documents into public content.</p></div>
+        <EvidenceWorkbench />
       </section>
 
-      <motion.section
-        className="marketing-section feature-section"
-        id="platform"
-        variants={reveal}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.16 }}
-        transition={{ duration: reduceMotion ? 0 : 0.6 }}
-      >
-        <div className="section-heading-centered">
-          <p className="marketing-kicker">The platform</p>
-          <h2>EVERY STEP HAS A HUMAN OWNER.</h2>
-          <p>
-            Move from private evidence to public clarity without losing context,
-            control, or accountability.
-          </p>
-        </div>
-        <div
-          className="feature-tabs"
-          role="tablist"
-          aria-label="Platform capabilities"
-        >
-          {(Object.keys(featureData) as FeatureKey[]).map((key) => (
-            <button
-              aria-selected={activeFeature === key}
-              className={activeFeature === key ? "active" : ""}
-              key={key}
-              onClick={() => setActiveFeature(key)}
-              role="tab"
-              type="button"
-            >
-              {activeFeature === key ? (
-                <motion.span
-                  className="feature-tab-highlight"
-                  layoutId="feature-tab"
-                />
-              ) : null}
-              <span>{featureData[key].label}</span>
-            </button>
-          ))}
-        </div>
-        <div className="feature-showcase">
-          <div className="feature-copy">
-            <AnimatePresence mode="wait">
-              <motion.div
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                initial={{ opacity: 0, y: 12 }}
-                key={activeFeature}
-                transition={{ duration: reduceMotion ? 0 : 0.28 }}
-              >
-                <p className="feature-eyebrow">{feature.eyebrow}</p>
-                <h3>{feature.title}</h3>
-                <p>{feature.text}</p>
-                <Link href={activeFeature === "public" ? "/discover" : "/demo"}>
-                  See it in action <ArrowRight size={16} />
-                </Link>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-          <div className="feature-visual">
-            <AnimatePresence mode="wait">
-              <motion.div
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.98, x: -16 }}
-                initial={{ opacity: 0, scale: 0.98, x: 16 }}
-                key={activeFeature}
-                transition={{ duration: reduceMotion ? 0 : 0.34 }}
-              >
-                <FeatureMockup active={activeFeature} />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
-      </motion.section>
+      <section className="ledger-strip" aria-label="INSIPS principles"><div><span>01</span><strong>Source stays close</strong><p>Page-aware context remains attached to each candidate.</p></div><div><span>02</span><strong>People own decisions</strong><p>AI can suggest; people confirm and review.</p></div><div><span>03</span><strong>Public means current</strong><p>Only approved projections are visible outside the workspace.</p></div></section>
 
-      <section
-        className="marketing-section action-section"
-        aria-labelledby="action-title"
-      >
-        <div className="section-heading-split">
-          <div>
-            <p className="marketing-kicker">Product in action</p>
-            <h2 id="action-title">FROM A PRIVATE FILE TO A PUBLIC FACT.</h2>
-          </div>
-          <p>
-            Explore the six visible stages. The product always shows what is
-            happening, what is blocked, and who needs to act next.
-          </p>
-        </div>
-        <div className="action-demo">
-          <div
-            className="action-steps"
-            role="tablist"
-            aria-label="Evidence workflow steps"
-          >
-            {flowSteps.map((step, index) => {
-              const Icon = step.icon;
-              return (
-                <button
-                  aria-selected={activeStep === index}
-                  className={
-                    activeStep === index
-                      ? "active"
-                      : index < activeStep
-                        ? "complete"
-                        : ""
-                  }
-                  key={step.label}
-                  onClick={() => setActiveStep(index)}
-                  role="tab"
-                  type="button"
-                >
-                  <span>
-                    {index < activeStep ? (
-                      <Check size={15} />
-                    ) : (
-                      <Icon size={16} />
-                    )}
-                  </span>
-                  <strong>{step.label}</strong>
-                  <small>0{index + 1}</small>
-                </button>
-              );
-            })}
-          </div>
-          <div className="action-stage">
-            <AnimatePresence mode="wait">
-              <motion.div
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                initial={{ opacity: 0, y: 15 }}
-                key={activeStep}
-                transition={{ duration: reduceMotion ? 0 : 0.3 }}
-                className="action-stage-card"
-              >
-                <div className="stage-orbit" aria-hidden="true">
-                  <i />
-                  <i />
-                  <i />
-                </div>
-                <span className="stage-number">0{activeStep + 1}</span>
-                <div>
-                  <p>
-                    {activeStep === 3
-                      ? "Your decision"
-                      : activeStep === 4
-                        ? "Independent review"
-                        : activeStep === 5
-                          ? "Public result"
-                          : "Protected workflow"}
-                  </p>
-                  <h3>{flowSteps[activeStep].label}</h3>
-                  <p>
-                    {
-                      [
-                        "Add a PDF to a restricted workspace. Its display name is separated from the protected storage identity.",
-                        "The file stays blocked until the safety result is known. Failed or unsupported files never move forward.",
-                        "The system prepares page-aware text so every later suggestion can point back to its source.",
-                        "Compass prepares candidates; you compare the source and accept, edit, or dismiss each one.",
-                        "A reviewer sees the confirmed value with its evidence context and records a claim-level decision.",
-                        "Only approved, current facts reach the public profile. Private evidence and notes stay restricted.",
-                      ][activeStep]
-                    }
-                  </p>
-                </div>
-                <span className="stage-icon">
-                  {(() => {
-                    const Icon = flowSteps[activeStep].icon;
-                    return <Icon size={38} />;
-                  })()}
-                </span>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
+      <EcosystemOrbit />
+      <CauseReel causes={causes} />
+      <ScreenshotStack media={media} />
+      <BeforeAfterSlider />
+      <PublicUpdateList posts={posts} />
+
+      <section className="marketing-section story-section">
+        <div className="section-heading-split"><div><p className="marketing-kicker">A human-owned workflow</p><h2>Every step has a clear owner.</h2></div><p>Preparation can be assisted. Confirmation and review remain decisions made by people with the right context.</p></div>
+        <div className="ledger-bands"><article className="ledger-band"><span className="ledger-band-number">A</span><div><p className="marketing-kicker">Prepare</p><h3>Know what is ready and what needs attention.</h3><p>A calm evidence profile makes the next action explicit before anything reaches review.</p></div><FileSearch size={25} /></article><article className="ledger-band"><span className="ledger-band-number">B</span><div><p className="marketing-kicker">Confirm</p><h3>Suggestions stay suggestions until you decide.</h3><p>Compare the source, accept or edit the candidate, and leave a clear human record.</p></div><CheckCircle2 size={25} /></article><article className="ledger-band"><span className="ledger-band-number">C</span><div><p className="marketing-kicker">Publish</p><h3>Show the claim, its meaning, and its review date.</h3><p>Public profiles stay specific and current without exposing the source document or reviewer notes.</p></div><BadgeCheck size={25} /></article></div>
       </section>
 
-      <section className="audience-section" aria-labelledby="audience-title">
-        <div className="marketing-section">
-          <div className="section-heading-centered">
-            <p className="marketing-kicker">
-              Designed for the impact ecosystem
-            </p>
-            <h2 id="audience-title">ONE TRUST WORKFLOW. THREE CLEAR VIEWS.</h2>
-            <p>
-              Each person sees the context and action that belongs to
-              them—nothing more.
-            </p>
-          </div>
-          <div className="audience-editorial-grid">
-            {[
-              {
-                title: "Organizations",
-                text: "Prepare evidence once, understand what is missing, and stay in control of every fact.",
-                href: "/for-organizations",
-                icon: Building2,
-                tone: "violet",
-              },
-              {
-                title: "Platform reviewers",
-                text: "Compare confirmed claims with source context and make accountable decisions.",
-                href: "/review",
-                icon: UsersRound,
-                tone: "blue",
-              },
-              {
-                title: "CSR teams",
-                text: "Discover organizations through specific, dated indicators instead of a black-box score.",
-                href: "/for-csr-teams",
-                icon: Landmark,
-                tone: "lime",
-              },
-            ].map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <motion.article
-                  className={`audience-editorial-card audience-${item.tone}`}
-                  initial={reduceMotion ? false : { opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.08, duration: 0.55 }}
-                  whileHover={reduceMotion ? undefined : { y: -8 }}
-                  key={item.title}
-                >
-                  <div className="audience-art">
-                    <span>
-                      <Icon size={32} />
-                    </span>
-                    <i />
-                    <i />
-                    <i />
-                  </div>
-                  <div>
-                    <p>0{index + 1}</p>
-                    <h3>{item.title}</h3>
-                    <p>{item.text}</p>
-                    <Link href={item.href}>
-                      Explore this view <ArrowRight size={16} />
-                    </Link>
-                  </div>
-                </motion.article>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      <section className="proof-section"><div className="marketing-section proof-grid"><div><p className="marketing-kicker">A public signal with edges</p><h2>CSR-1 registration · reviewed 19 September 2026</h2><p>This indicator means a platform reviewer matched the organization-confirmed value to submitted evidence. It does not guarantee future conduct, and it is not a general trust score.</p><Link className="text-action" href="/organizations/udaan-learning-foundation">See the public profile <ArrowRight size={15} /></Link></div><div className="proof-card"><div className="proof-card-top"><BadgeCheck size={18} /><span>Approved and current</span></div><strong>CSR00018427</strong><p>Meaning, scope, and review date remain visible together.</p><div className="proof-card-foot"><CalendarDays size={14} /> Reviewed 19 Sep 2026</div></div></div></section>
 
-      <section className="story-section">
-        <div className="marketing-section story-grid">
-          <article className="story-lead">
-            <p className="marketing-kicker">The problem</p>
-            <h2>TRUST GETS LOST BETWEEN FILES, FORMS, AND REPEATED CHECKS.</h2>
-            <p>
-              Social-impact organizations spend time resending evidence.
-              Reviewers lose context. Public claims often reveal too little
-              about what was actually checked.
-            </p>
-          </article>
-          <div className="story-cards">
-            <article>
-              <span>
-                <FileSearch size={20} />
-              </span>
-              <p className="marketing-kicker">Challenge</p>
-              <h3>Evidence is fragmented.</h3>
-              <p>
-                Documents, claims, and decisions drift apart, making every new
-                request feel like starting again.
-              </p>
-            </article>
-            <article>
-              <span>
-                <Sparkles size={20} />
-              </span>
-              <p className="marketing-kicker">Solution</p>
-              <h3>Make the review path visible.</h3>
-              <p>
-                INSIPS keeps sources, human confirmation, and independent
-                decisions connected without making private evidence public.
-              </p>
-            </article>
-            <blockquote>
-              “Trust should be explainable at the level of each claim—not
-              compressed into one magic badge.”
-              <cite>INSIPS product principle</cite>
-            </blockquote>
-          </div>
-        </div>
-      </section>
+      <section className="marketing-section audience-section" aria-labelledby="audience-title"><div className="section-heading-centered"><p className="marketing-kicker">One workflow, clear views</p><h2 id="audience-title">The right context for each person.</h2><p>Organizations, reviewers, and CSR teams see the action and context that belongs to them.</p></div><div className="audience-editorial-grid">{audiencePaths.map((item, index) => { const Icon = item.icon; return <article className="audience-editorial-card" key={item.label}><div className="audience-card-top"><span>0{index + 1}</span><Icon size={23} /></div><p className="marketing-kicker">{item.label}</p><h3>{item.title}</h3><p>{item.text}</p><Link className="text-action" href={item.href}>Explore this view <ArrowRight size={15} /></Link></article>; })}</div></section>
 
-      <section className="marketing-section trust-section">
-        <div className="section-heading-split">
-          <div>
-            <p className="marketing-kicker">Explainable trust</p>
-            <h2>WHAT THE PUBLIC SIGNAL ACTUALLY MEANS.</h2>
-          </div>
-          <p>
-            No customer claims, invented awards, or opaque scores. The demo uses
-            clearly labeled synthetic scenarios to show how the trust model
-            behaves.
-          </p>
-        </div>
-        <div className="trust-scenario-grid">
-          {[
-            {
-              status: "Approved & current",
-              title: "Visible publicly",
-              text: "The approved version matches the current organization-confirmed value.",
-              icon: CheckCircle2,
-            },
-            {
-              status: "Changed after review",
-              title: "Approval is removed",
-              text: "A later edit invalidates the public indicator until the new version is reviewed.",
-              icon: FileCheck2,
-            },
-            {
-              status: "Evidence incomplete",
-              title: "Uncertainty stays visible",
-              text: "A reference without its supporting certificate remains a candidate, not a public fact.",
-              icon: SearchCheck,
-            },
-          ].map((item) => {
-            const Icon = item.icon;
-            return (
-              <article key={item.status}>
-                <span className="scenario-icon">
-                  <Icon size={23} />
-                </span>
-                <small>{item.status}</small>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
-              </article>
-            );
-          })}
-        </div>
-      </section>
+      <section className="privacy-section"><div className="marketing-section privacy-grid"><div><p className="marketing-kicker">Private by default</p><h2>Your evidence stays protected while it is checked and prepared.</h2><p>Clear explanations do not require public access to the document itself.</p></div><div className="privacy-ledger"><div><span>01</span><strong>Restricted evidence</strong></div><div><span>02</span><strong>Human confirmation</strong></div><div><span>03</span><strong>Independent review</strong></div><div><span>04</span><strong>Approved projection</strong></div></div></div></section>
 
-      <section className="privacy-section">
-        <div className="marketing-section privacy-grid">
-          <div>
-            <p className="marketing-kicker">
-              Private by default. Public only by choice.
-            </p>
-            <h2>
-              YOUR EVIDENCE STAYS PRIVATE WHILE IT IS CHECKED AND PREPARED.
-            </h2>
-            <p>
-              You confirm every suggested fact, and an independent reviewer
-              decides what can appear publicly.
-            </p>
-            <Link className="button button-on-dark" href="/security-privacy">
-              Read our security approach <ArrowRight size={16} />
-            </Link>
-          </div>
-          <div className="privacy-flow">
-            {flowSteps.map((step, index) => (
-              <div key={step.label}>
-                <span>0{index + 1}</span>
-                <strong>{step.label}</strong>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="marketing-section final-marketing-cta">
-        <motion.div
-          initial={reduceMotion ? false : { opacity: 0, scale: 0.98 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <p>Ready to make every claim clearer?</p>
-          <h2>BUILD A TRUST PROFILE PEOPLE CAN UNDERSTAND.</h2>
-          <div>
-            <Link className="button button-accent button-large" href="/demo">
-              Explore the demo <ArrowRight size={18} />
-            </Link>
-            <Link
-              className="button button-secondary button-large"
-              href="/how-trust-works"
-            >
-              See how it works
-            </Link>
-          </div>
-        </motion.div>
-      </section>
+      <section className="marketing-section final-marketing-cta"><p className="marketing-kicker">Start with the trail</p><h2>Make every claim easier to understand.</h2><div><Link className="button button-primary button-large" href="/demo">Open the product demo <ArrowRight size={17} /></Link><Link className="button button-secondary button-large" href="/how-trust-works">How the review works</Link></div></section>
     </>
   );
 }

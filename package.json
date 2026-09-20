@@ -12,6 +12,8 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "build": "pnpm --filter @insips/contracts build && pnpm --filter @insips/web build && pnpm --filter @insips/infra build",
+    "db:seed": "node apps/web/scripts/content-db.mjs seed",
+    "db:reset": "node apps/web/scripts/content-db.mjs reset",
     "format:check": "pnpm exec prettier --check .",
     "format": "pnpm exec prettier --write ."
   },

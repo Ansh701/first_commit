@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { BrandMark } from "./brand-mark";
-import { ThemeToggle } from "./theme-toggle";
 
 const footerGroups = [
   {
     title: "Platform",
     links: [
       ["Discover organizations", "/discover"],
+      ["Discover causes", "/causes"],
       ["For organizations", "/for-organizations"],
-      ["For CSR teams", "/for-csr-teams"],
+      ["For corporate teams", "/for-corporate-teams"],
       ["Trust methodology", "/trust-methodology"],
       ["INSIPS Compass", "/compass"],
     ],
@@ -20,7 +20,8 @@ const footerGroups = [
       ["How it works", "/how-trust-works"],
       ["FAQ", "/faq"],
       ["Security and privacy", "/security-privacy"],
-      ["Help/contact", "/help"],
+      ["Help centre", "/help"],
+      ["Organization activity", "/feed"],
     ],
   },
   {
@@ -37,7 +38,10 @@ const footerGroups = [
       ["Privacy policy", "/privacy"],
       ["Terms of use", "/terms"],
       ["Cookie notice", "/cookies"],
+      ["Donation and refund policy", "/donation-refund-policy"],
+      ["Acceptable use policy", "/acceptable-use"],
       ["Accessibility", "/accessibility"],
+      ["Security", "/security"],
     ],
   },
 ] as const;
@@ -53,7 +57,7 @@ export function SiteFooter() {
             human-reviewed.
           </p>
           <Link className="footer-demo-link" href="/demo">
-            Explore the synthetic demo <ArrowUpRight size={16} />
+            Open the demo <ArrowUpRight size={16} />
           </Link>
         </div>
         <div className="footer-link-grid">
@@ -72,11 +76,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="footer-bottom">
-        <span>© 2026 INSIPS. Synthetic hackathon demonstration.</span>
-        <div>
-          <span>Built on AWS for First Commit</span>
-          <ThemeToggle />
-        </div>
+        <span>© 2026 INSIPS. Evidence made understandable.</span>
       </div>
     </footer>
   );

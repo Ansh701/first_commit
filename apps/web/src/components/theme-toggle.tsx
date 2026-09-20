@@ -7,22 +7,33 @@ export function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("insips-theme") as
-      | "light"
-      | "dark"
-      | null;
-    const workspaceRoute = /^\/(app|review|csr)(\/|$)/.test(
-      window.location.pathname,
-    );
-    const next = stored ?? (workspaceRoute ? "dark" : "light");
-    setTheme(next);
-    document.documentElement.dataset.theme = next;
+    try {
+      const stored = window.localStorage.getItem("insips-theme") as
+        | "light"
+        | "dark"
+        | null;
+      const domTheme = document.documentElement.dataset.theme as
+        | "light"
+        | "dark"
+        | undefined;
+      const next = stored ?? domTheme ?? "light";
+      setTheme(next);
+      document.documentElement.dataset.theme = next;
+    } catch {
+      const next = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+      setTheme(next);
+    }
   }, []);
 
   function toggle() {
-    const next = theme === "light" ? "dark" : "light";
+    const current = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+    const next = current === "light" ? "dark" : "light";
     setTheme(next);
-    window.localStorage.setItem("insips-theme", next);
+    try {
+      window.localStorage.setItem("insips-theme", next);
+    } catch {
+      // Theme remains active for the current session when storage is unavailable.
+    }
     document.documentElement.dataset.theme = next;
   }
 

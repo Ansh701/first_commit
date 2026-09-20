@@ -1,12 +1,7 @@
-import { AuthForm } from "@/components/auth-form";
-import { AuthShell } from "@/components/auth-shell";
+import { SignInExperience } from "./sign-in-experience";
 
 export const metadata = { title: "Sign in" };
 
 export default function SignInPage() {
-  return (
-    <AuthShell>
-      <AuthForm mode="sign-in" />
-    </AuthShell>
-  );
+  return <SignInExperience />;
 }

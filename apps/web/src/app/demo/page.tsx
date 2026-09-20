@@ -1,5 +1,13 @@
 import Link from "next/link";
-import { ArrowRight, Building2, Landmark, ShieldCheck } from "lucide-react";
+import {
+  ArrowRight,
+  Building2,
+  HandHeart,
+  Landmark,
+  Settings,
+  ShieldCheck,
+  UserRound,
+} from "lucide-react";
 import { AuthShell } from "@/components/auth-shell";
 
 export const metadata = { title: "Synthetic demo" };
@@ -18,10 +26,28 @@ const roles = [
     icon: ShieldCheck,
   },
   {
-    href: "/csr/discover",
-    title: "CSR user",
+    href: "/corporate",
+    title: "Corporate member",
     detail: "Discover reviewed indicators and build a shortlist",
     icon: Landmark,
+  },
+  {
+    href: "/donor",
+    title: "Individual donor",
+    detail: "Review donations, receipts, item pledges, and volunteering",
+    icon: UserRound,
+  },
+  {
+    href: "/admin",
+    title: "Platform admin",
+    detail: "Verify organizations and inspect the donation ledger",
+    icon: Settings,
+  },
+  {
+    href: "/volunteer",
+    title: "Public supporter",
+    detail: "Explore causes, events, item needs, and opportunities",
+    icon: HandHeart,
   },
 ];
 

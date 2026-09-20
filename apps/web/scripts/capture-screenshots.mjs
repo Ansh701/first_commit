@@ -58,6 +58,13 @@ try {
     "public-profile-desktop.png",
     true,
   );
+  await capture(
+    publicPage,
+    "/causes/learning-kits-2026",
+    "cause-donation-desktop.png",
+    true,
+  );
+  await capture(publicPage, "/items", "item-donation-public-desktop.png", true);
   await capture(publicPage, "/privacy", "privacy-footer-desktop.png", true);
   await publicContext.close();
 
@@ -109,6 +116,28 @@ try {
     "review-detail-dark.png",
   );
   await capture(workspacePage, "/csr/discover", "csr-discovery-dark.png");
+  await capture(
+    workspacePage,
+    "/app/onboarding",
+    "organization-onboarding-dark.png",
+  );
+  await capture(
+    workspacePage,
+    "/admin/organizations/org-udaan-learning",
+    "organization-verification-dark.png",
+  );
+  await capture(
+    workspacePage,
+    "/app/donations",
+    "organization-donations-dark.png",
+  );
+  await capture(workspacePage, "/app/items", "item-donations-dark.png");
+  await capture(workspacePage, "/donor/donations", "donor-history-dark.png");
+  await capture(
+    workspacePage,
+    "/corporate/discover",
+    "corporate-discovery-dark.png",
+  );
   await workspaceContext.close();
 
   const mobileContext = await browser.newContext({
@@ -118,6 +147,18 @@ try {
   const mobilePage = await mobileContext.newPage();
   await capture(mobilePage, "/", "landing-mobile-full.png", true);
   await capture(mobilePage, "/auth/sign-in", "sign-in-mobile.png", true);
+  await capture(
+    mobilePage,
+    "/app/onboarding",
+    "organization-onboarding-mobile.png",
+    true,
+  );
+  await capture(
+    mobilePage,
+    "/causes/learning-kits-2026",
+    "cause-donation-mobile.png",
+    true,
+  );
   await mobileContext.close();
 } finally {
   await browser.close();

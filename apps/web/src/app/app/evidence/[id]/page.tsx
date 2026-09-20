@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useDemo } from "@/components/demo-provider";
 import { StatusPill } from "@/components/status-pill";
-import { pipelineStages } from "@/lib/demo-data";
+import { evidencePipelineStages } from "@/lib/workspace-fixtures";
 
 export default function EvidenceDetailPage() {
   const { claims, suggestions, decideSuggestion } = useDemo();
@@ -31,7 +31,7 @@ export default function EvidenceDetailPage() {
           <h1>Review what Compass found</h1>
           <p>
             Compare every candidate with its source. Accept, edit, or dismiss
-            it—nothing moves forward without you.
+            it. Nothing moves forward without you.
           </p>
         </div>
         <div className="page-actions">
@@ -149,7 +149,7 @@ export default function EvidenceDetailPage() {
               </div>
             </div>
             <div className="panel-body processing-timeline">
-              {pipelineStages.map((stage) => (
+              {evidencePipelineStages.map((stage) => (
                 <div
                   className={`processing-step ${stage.state}`}
                   key={stage.label}
@@ -200,14 +200,14 @@ export default function EvidenceDetailPage() {
                 <span />
                 <span>
                   <strong>Processing path</strong>
-                  <p>Private S3 · GuardDuty · Step Functions · Textract</p>
+                  <p>Private processing path · safety gate · extraction</p>
                 </span>
               </div>
               <div className="activity-row">
                 <span />
                 <span>
                   <strong>Compass provider</strong>
-                  <p>Amazon Bedrock · fixture mode</p>
+                  <p>Assistive extraction · fixture mode</p>
                 </span>
               </div>
               <div className="activity-row">
