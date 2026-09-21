@@ -2,26 +2,22 @@ version: 1
 applications:
   - appRoot: apps/web
     frontend:
+      buildPath: /
       phases:
         preBuild:
           commands:
             - npm install --global pnpm@11.19.0
-            - cd ../..
-            - pnpm install --frozen-lockfile --config.node-linker=hoisted
+            - pnpm install --frozen-lockfile
         build:
           commands:
             - pnpm --filter @insips/contracts build
             - pnpm --filter @insips/web build
-            - runtime_dir="$(mktemp -d)"
-            - pnpm --filter @insips/web deploy --prod --legacy --node-linker=hoisted "$runtime_dir"
-            - mkdir -p apps/web/.next/node_modules
-            - cp -R "$runtime_dir/node_modules/." apps/web/.next/node_modules/
       artifacts:
-        baseDirectory: .next
+        baseDirectory: apps/web/.next
         files:
           - "**/*"
       cache:
         paths:
-          - ../../node_modules/**/*
-          - ../../.pnpm-store/**/*
-          - .next/cache/**/*
+          - node_modules/**/*
+          - .pnpm-store/**/*
+          - apps/web/.next/cache/**/*
