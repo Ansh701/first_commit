@@ -12,6 +12,10 @@ applications:
           commands:
             - pnpm --filter @insips/contracts build
             - pnpm --filter @insips/web build
+            - runtime_dir="$(mktemp -d)"
+            - pnpm --filter @insips/web deploy --prod --legacy --node-linker=hoisted "$runtime_dir"
+            - mkdir -p apps/web/.next/node_modules
+            - cp -R "$runtime_dir/node_modules/." apps/web/.next/node_modules/
       artifacts:
         baseDirectory: .next
         files:
