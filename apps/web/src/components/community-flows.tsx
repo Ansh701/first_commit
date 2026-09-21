@@ -25,9 +25,10 @@ import {
   Video,
 } from "lucide-react";
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { getIdentityAdapter } from "@/lib/auth-adapter";
 import {
+  corporateMatchingCampaigns,
   demoCauses,
   organizationFeed,
   volunteerOpportunities,
@@ -44,6 +45,14 @@ function downloadCsv(filename: string, rows: (string | number)[][]) {
   anchor.download = filename;
   anchor.click();
   URL.revokeObjectURL(url);
+}
+
+function formatInr(paise: number) {
+  return new Intl.NumberFormat("en-IN", {
+    currency: "INR",
+    maximumFractionDigits: 0,
+    style: "currency",
+  }).format(paise / 100);
 }
 
 export function ItemNeedsDirectory() {
@@ -177,7 +186,50 @@ export function ItemNeedsDirectory() {
 }
 
 export function DonorItemHistory() {
-  const { itemPledges, itemNeeds } = useProductDemo();
+  const { itemPledges, itemNeeds, transitionItemPledge } = useProductDemo();
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [notice, setNotice] = useState("");
+
+  const visiblePledges = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    return itemPledges.filter((pledge) => {
+      const need = itemNeeds.find((item) => item.id === pledge.needId);
+      const matchesQuery = normalizedQuery
+        ? [need?.title, need?.category, pledge.condition, pledge.preference]
+            .filter(Boolean)
+            .some((value) => value?.toLowerCase().includes(normalizedQuery))
+        : true;
+      const matchesStatus =
+        statusFilter === "ALL" || pledge.status === statusFilter;
+      return matchesQuery && matchesStatus;
+    });
+  }, [itemNeeds, itemPledges, query, statusFilter]);
+
+  const totalQuantity = itemPledges.reduce(
+    (total, pledge) => total + pledge.quantity,
+    0,
+  );
+  const activePledges = itemPledges.filter(
+    (pledge) => !["RECEIVED", "REJECTED", "CANCELLED"].includes(pledge.status),
+  ).length;
+  const receivedQuantity = itemPledges
+    .filter((pledge) => pledge.status === "RECEIVED")
+    .reduce((total, pledge) => total + pledge.quantity, 0);
+
+  function cancelPledge(id: string) {
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm(
+        "Cancel this item pledge? The organization will no longer expect this quantity.",
+      )
+    ) {
+      return;
+    }
+    transitionItemPledge(id, "CANCELLED");
+    setNotice("Pledge cancelled. The organization has been notified in this local fixture.");
+  }
+
   return (
     <div className="flow-page">
       <header className="flow-page-heading">
@@ -189,25 +241,106 @@ export function DonorItemHistory() {
             separately from money donations.
           </p>
         </div>
+        <Link className="button button-primary" href="/items">
+          Browse item needs
+        </Link>
       </header>
-      <div className="timeline-card-grid">
-        {itemPledges.map((pledge) => {
+      <section className="donor-items-summary" aria-label="Item pledge summary">
+        <article>
+          <small>Total pledged</small>
+          <strong>{totalQuantity}</strong>
+          <span>items across all pledges</span>
+        </article>
+        <article>
+          <small>In progress</small>
+          <strong>{activePledges}</strong>
+          <span>pledges awaiting completion</span>
+        </article>
+        <article>
+          <small>Received</small>
+          <strong>{receivedQuantity}</strong>
+          <span>items marked received</span>
+        </article>
+      </section>
+      <section className="donor-items-toolbar" aria-label="Filter item pledges">
+        <label>
+          <span>Search pledges</span>
+          <input
+            aria-label="Search item pledges"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search by item or category"
+            type="search"
+            value={query}
+          />
+        </label>
+        <label>
+          <span>Status</span>
+          <select
+            aria-label="Filter item pledges by status"
+            onChange={(event) => setStatusFilter(event.target.value)}
+            value={statusFilter}
+          >
+            <option value="ALL">All statuses</option>
+            <option value="PLEDGED">Pledged</option>
+            <option value="CHANGES_REQUESTED">Changes requested</option>
+            <option value="ACCEPTED">Accepted</option>
+            <option value="SCHEDULED">Scheduled</option>
+            <option value="RECEIVED">Received</option>
+            <option value="REJECTED">Rejected</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+        </label>
+        <span className="donor-items-result-count" role="status">
+          {visiblePledges.length} of {itemPledges.length} pledges
+        </span>
+      </section>
+      {notice ? (
+        <div className="inline-result" role="status">
+          {notice}
+        </div>
+      ) : null}
+      {visiblePledges.length > 0 ? (
+        <div className="donor-items-list">
+          {visiblePledges.map((pledge) => {
           const need = itemNeeds.find((item) => item.id === pledge.needId);
+          const organization = demoCauses.find(
+            (cause) => cause.organizationId === need?.organizationId,
+          )?.organization;
           return (
-            <article className="flow-panel" key={pledge.id}>
+            <article className="flow-panel donor-item-card" key={pledge.id}>
               <div className="flow-panel-head">
                 <div>
-                  <small>{need?.category}</small>
-                  <h2>{need?.title}</h2>
+                  <small>{need?.category ?? "Item need"}</small>
+                  <h2>{need?.title ?? "Item need unavailable"}</h2>
+                  <p className="donor-item-organization">
+                    {organization ?? "Verified organization"}
+                  </p>
                 </div>
                 <span className={`state-badge ${pledge.status.toLowerCase()}`}>
                   {pledge.status.replaceAll("_", " ")}
                 </span>
               </div>
-              <p>
-                {pledge.quantity} items · {pledge.condition} ·{" "}
-                {pledge.preference.toLowerCase()}
-              </p>
+              <dl className="donor-item-details">
+                <div>
+                  <dt>Quantity</dt>
+                  <dd>{pledge.quantity} items</dd>
+                </div>
+                <div>
+                  <dt>Condition</dt>
+                  <dd>{pledge.condition}</dd>
+                </div>
+                <div>
+                  <dt>Fulfilment</dt>
+                  <dd>
+                    {pledge.preference === "PICKUP" ? "Pickup requested" : "Drop-off"}
+                  </dd>
+                </div>
+              </dl>
+              {pledge.notes ? (
+                <p className="donor-item-notes">
+                  <strong>Your note</strong> {pledge.notes}
+                </p>
+              ) : null}
               <div className="timeline-list">
                 {pledge.timeline.map((entry) => (
                   <div key={`${entry.label}-${entry.at}`}>
@@ -219,10 +352,51 @@ export function DonorItemHistory() {
                   </div>
                 ))}
               </div>
+              <div className="donor-item-card-footer">
+                {need ? (
+                  <Link href="/items">View this item need</Link>
+                ) : null}
+                {["PLEDGED", "CHANGES_REQUESTED", "ACCEPTED", "SCHEDULED"].includes(
+                  pledge.status,
+                ) ? (
+                  <button
+                    className="text-button donor-item-cancel"
+                    onClick={() => cancelPledge(pledge.id)}
+                    type="button"
+                  >
+                    Cancel pledge
+                  </button>
+                ) : null}
+              </div>
             </article>
           );
-        })}
-      </div>
+          })}
+        </div>
+      ) : (
+        <section className="flow-panel donor-items-empty" role="status">
+          <PackageCheck size={28} />
+          <h2>No item pledges match these filters</h2>
+          <p>
+            Try another search or browse current item needs to find a practical
+            way to contribute.
+          </p>
+          <div>
+            <button
+              className="button button-secondary"
+              onClick={() => {
+                setQuery("");
+                setStatusFilter("ALL");
+              }}
+              type="button"
+            >
+              Clear filters
+            </button>
+            <Link className="button button-primary" href="/items">
+              Browse item needs
+            </Link>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
@@ -415,6 +589,8 @@ export function OrganizationItemManagement() {
 export function VolunteerDirectory({ manage = false }: { manage?: boolean }) {
   const { volunteerApplications, applyVolunteer, transitionVolunteer } =
     useProductDemo();
+  const [opportunityQuery, setOpportunityQuery] = useState("");
+  const [opportunityMode, setOpportunityMode] = useState("ALL");
   const actions: Record<VolunteerStatus, VolunteerStatus[]> = {
     APPLIED: ["APPROVED", "REJECTED"],
     APPROVED: ["COMPLETED"],
@@ -422,6 +598,21 @@ export function VolunteerDirectory({ manage = false }: { manage?: boolean }) {
     COMPLETED: [],
     WITHDRAWN: [],
   };
+  const visibleOpportunities = volunteerOpportunities.filter((opportunity) => {
+    const query = opportunityQuery.trim().toLowerCase();
+    const matchesQuery = query
+      ? [
+          opportunity.title,
+          opportunity.organization,
+          opportunity.location,
+          opportunity.commitment,
+        ].some((value) => value.toLowerCase().includes(query))
+      : true;
+    const matchesMode =
+      opportunityMode === "ALL" ||
+      opportunity.location.toLowerCase().includes(opportunityMode.toLowerCase());
+    return matchesQuery && matchesMode;
+  });
   return (
     <div className={manage ? "flow-page" : "public-flow-page"}>
       {manage ? (
@@ -445,6 +636,30 @@ export function VolunteerDirectory({ manage = false }: { manage?: boolean }) {
             Applications are reviewed by the organization. Applying never
             implies acceptance.
           </p>
+          <div className="volunteer-public-controls">
+            <label>
+              <span>Search opportunities</span>
+              <input
+                aria-label="Search volunteer opportunities"
+                onChange={(event) => setOpportunityQuery(event.target.value)}
+                placeholder="Role, organization, or place"
+                type="search"
+                value={opportunityQuery}
+              />
+            </label>
+            <label>
+              <span>Format</span>
+              <select
+                aria-label="Filter volunteer opportunities by format"
+                onChange={(event) => setOpportunityMode(event.target.value)}
+                value={opportunityMode}
+              >
+                <option value="ALL">All formats</option>
+                <option value="in person">In person</option>
+                <option value="remote">Remote</option>
+              </select>
+            </label>
+          </div>
         </header>
       )}
       {manage ? (
@@ -507,8 +722,9 @@ export function VolunteerDirectory({ manage = false }: { manage?: boolean }) {
           ) : null}
         </section>
       ) : (
-        <div className="opportunity-grid">
-          {volunteerOpportunities.map((opportunity) => {
+        visibleOpportunities.length ? (
+          <div className="opportunity-grid">
+            {visibleOpportunities.map((opportunity) => {
             const application = volunteerApplications.find(
               (item) => item.opportunityId === opportunity.id,
             );
@@ -538,8 +754,25 @@ export function VolunteerDirectory({ manage = false }: { manage?: boolean }) {
                 </button>
               </article>
             );
-          })}
-        </div>
+            })}
+          </div>
+        ) : (
+          <section className="flow-panel volunteer-empty-state" role="status">
+            <HandHeart size={26} />
+            <h2>No volunteer opportunities match</h2>
+            <p>Try a broader search or switch back to all formats.</p>
+            <button
+              className="button button-secondary"
+              onClick={() => {
+                setOpportunityQuery("");
+                setOpportunityMode("ALL");
+              }}
+              type="button"
+            >
+              Clear filters
+            </button>
+          </section>
+        )
       )}
     </div>
   );
@@ -795,6 +1028,17 @@ export function AccountSettings() {
     if (kind === "restore") restoreAccount();
     setMessage(result.message);
   }
+  function requestDeletion() {
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm(
+        "Archive this account now? You can restore it during the retention window.",
+      )
+    ) {
+      return;
+    }
+    void action("delete");
+  }
   return (
     <div className="flow-page">
       <header className="flow-page-heading">
@@ -879,7 +1123,7 @@ export function AccountSettings() {
           ) : (
             <button
               className="button button-danger"
-              onClick={() => void action("delete")}
+              onClick={requestDeletion}
               type="button"
             >
               Request account deletion
@@ -903,8 +1147,373 @@ export function AccountSettings() {
   );
 }
 
+function CorporateMatchingWorkspace() {
+  const [campaigns, setCampaigns] = useState(corporateMatchingCampaigns);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formError, setFormError] = useState("");
+  const [formSuccess, setFormSuccess] = useState("");
+  const [form, setForm] = useState({
+    name: "",
+    matchRatio: "1:1",
+    budgetRupees: "200000",
+    startDate: "2026-10-01",
+    endDate: "2026-12-31",
+  });
+  const [eligibleCauseIds, setEligibleCauseIds] = useState<string[]>([
+    "cause-learning-kits",
+  ]);
+
+  const totalBudgetPaise = campaigns.reduce(
+    (total, campaign) => total + campaign.budgetPaise,
+    0,
+  );
+  const totalPledgedPaise = campaigns.reduce(
+    (total, campaign) => total + campaign.pledgedPaise,
+    0,
+  );
+  const totalCapturedPaise = campaigns.reduce(
+    (total, campaign) => total + campaign.capturedPaise,
+    0,
+  );
+
+  function resetForm(options: { clearFeedback?: boolean } = {}) {
+    setEditingId(null);
+    setForm({
+      name: "",
+      matchRatio: "1:1",
+      budgetRupees: "200000",
+      startDate: "2026-10-01",
+      endDate: "2026-12-31",
+    });
+    setEligibleCauseIds(["cause-learning-kits"]);
+    setFormError("");
+    if (options.clearFeedback !== false) setFormSuccess("");
+  }
+
+  function editCampaign(campaign: (typeof corporateMatchingCampaigns)[number]) {
+    setEditingId(campaign.id);
+    setForm({
+      name: campaign.name,
+      matchRatio: campaign.matchRatio,
+      budgetRupees: String(campaign.budgetPaise / 100),
+      startDate: campaign.startDate,
+      endDate: campaign.endDate,
+    });
+    setEligibleCauseIds(campaign.eligibleCauseIds);
+    setFormError("");
+    setFormSuccess("");
+  }
+
+  function submitCampaign(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setFormError("");
+    setFormSuccess("");
+    const budgetRupees = Number(form.budgetRupees);
+    if (!form.name.trim()) {
+      setFormError("Add a campaign name before saving.");
+      return;
+    }
+    if (!Number.isFinite(budgetRupees) || budgetRupees <= 0) {
+      setFormError("Enter a budget greater than ₹0.");
+      return;
+    }
+    if (form.endDate < form.startDate) {
+      setFormError("The end date must be on or after the start date.");
+      return;
+    }
+    if (!eligibleCauseIds.length) {
+      setFormError("Select at least one eligible cause.");
+      return;
+    }
+    const budgetPaise = Math.round(budgetRupees * 100);
+    if (editingId) {
+      setCampaigns((current) =>
+        current.map((campaign) =>
+          campaign.id === editingId
+            ? {
+                ...campaign,
+                name: form.name.trim(),
+                matchRatio: form.matchRatio,
+                budgetPaise,
+                startDate: form.startDate,
+                endDate: form.endDate,
+                eligibleCauseIds,
+                history: [
+                  ...campaign.history,
+                  "Campaign details edited in the local workspace fixture.",
+                ],
+              }
+            : campaign,
+        ),
+      );
+      resetForm({ clearFeedback: false });
+      setFormSuccess("Campaign changes are saved in the local workspace fixture.");
+    } else {
+      setCampaigns((current) => [
+        ...current,
+        {
+          id: `matching-local-${Date.now()}`,
+          name: form.name.trim(),
+          matchRatio: form.matchRatio,
+          budgetPaise,
+          pledgedPaise: 0,
+          capturedPaise: 0,
+          startDate: form.startDate,
+          endDate: form.endDate,
+          eligibleCauseIds,
+          status: "DRAFT",
+          history: ["Campaign drafted in the local workspace fixture."],
+        },
+      ]);
+      resetForm({ clearFeedback: false });
+      setFormSuccess("Campaign draft created in the local workspace fixture.");
+    }
+  }
+
+  return (
+    <div className="flow-page">
+      <header className="flow-page-heading">
+        <div>
+          <span className="fixture-chip">Corporate matching records</span>
+          <h1>Matching pledges</h1>
+          <p>
+            Plan a matching campaign with explicit budget rules. These local
+            records represent commitments, not captured donations.
+          </p>
+        </div>
+      </header>
+      <section aria-label="Matching campaign summary" className="matching-summary">
+        <div>
+          <span>Campaign budget</span>
+          <strong>{formatInr(totalBudgetPaise)}</strong>
+        </div>
+        <div>
+          <span>Pledged</span>
+          <strong>{formatInr(totalPledgedPaise)}</strong>
+        </div>
+        <div>
+          <span>Captured</span>
+          <strong>{formatInr(totalCapturedPaise)}</strong>
+        </div>
+        <div>
+          <span>Remaining budget</span>
+          <strong>{formatInr(Math.max(0, totalBudgetPaise - totalCapturedPaise))}</strong>
+        </div>
+      </section>
+      <div className="matching-workbench">
+        <section className="flow-panel matching-editor">
+          <div className="matching-section-heading">
+            <div>
+              <span className="fixture-chip">Local campaign editor</span>
+              <h2>{editingId ? "Edit campaign" : "Create a matching campaign"}</h2>
+            </div>
+            {editingId ? (
+              <button className="button button-secondary" onClick={() => resetForm()} type="button">
+                New campaign
+              </button>
+            ) : null}
+          </div>
+          <p className="matching-helper">
+            Define the commitment first. Payment capture remains a separate server-confirmed
+            event and never changes from this form.
+          </p>
+          <form className="matching-form" onSubmit={submitCampaign}>
+            <label>
+              <span>Campaign name</span>
+              <input
+                aria-label="Campaign name"
+                onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+                value={form.name}
+              />
+            </label>
+            <div className="matching-form-grid">
+              <label>
+                <span>Budget in INR</span>
+                <input
+                  aria-label="Budget in INR"
+                  inputMode="numeric"
+                  min="1"
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, budgetRupees: event.target.value }))
+                  }
+                  type="number"
+                  value={form.budgetRupees}
+                />
+              </label>
+              <label>
+                <span>Match ratio</span>
+                <select
+                  aria-label="Match ratio"
+                  onChange={(event) =>
+                    setForm((current) => ({ ...current, matchRatio: event.target.value }))
+                  }
+                  value={form.matchRatio}
+                >
+                  <option>1:1</option>
+                  <option>2:1</option>
+                  <option>1:2</option>
+                </select>
+              </label>
+            </div>
+            <div className="matching-form-grid">
+              <label>
+                <span>Start date</span>
+                <input
+                  aria-label="Start date"
+                  onChange={(event) => setForm((current) => ({ ...current, startDate: event.target.value }))}
+                  type="date"
+                  value={form.startDate}
+                />
+              </label>
+              <label>
+                <span>End date</span>
+                <input
+                  aria-label="End date"
+                  onChange={(event) => setForm((current) => ({ ...current, endDate: event.target.value }))}
+                  type="date"
+                  value={form.endDate}
+                />
+              </label>
+            </div>
+            <fieldset>
+              <legend>Eligible causes</legend>
+              <div className="matching-cause-options">
+                {demoCauses.map((cause) => (
+                  <label key={cause.id}>
+                    <input
+                      checked={eligibleCauseIds.includes(cause.id)}
+                      onChange={() =>
+                        setEligibleCauseIds((current) =>
+                          current.includes(cause.id)
+                            ? current.filter((id) => id !== cause.id)
+                            : [...current, cause.id],
+                        )
+                      }
+                      type="checkbox"
+                    />
+                    <span>{cause.title}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            {formError ? (
+              <p aria-live="assertive" className="matching-form-message error" role="alert">
+                {formError}
+              </p>
+            ) : null}
+            {formSuccess ? (
+              <p aria-live="polite" className="matching-form-message success" role="status">
+                {formSuccess}
+              </p>
+            ) : null}
+            <div className="matching-form-actions">
+              <button className="button button-primary" type="submit">
+                {editingId ? "Save campaign" : "Create campaign"}
+              </button>
+              <button className="button button-secondary" onClick={() => resetForm()} type="button">
+                Clear form
+              </button>
+            </div>
+          </form>
+        </section>
+        <section aria-label="Matching campaigns" className="matching-campaign-list">
+          <div className="matching-section-heading">
+            <div>
+              <span className="fixture-chip">Campaign history</span>
+              <h2>Commitments in review</h2>
+            </div>
+            <span className="matching-count">{campaigns.length} record{campaigns.length === 1 ? "" : "s"}</span>
+          </div>
+          {campaigns.length ? (
+            campaigns.map((campaign) => {
+              const eligibleCauses = demoCauses.filter((cause) =>
+                campaign.eligibleCauseIds.includes(cause.id),
+              );
+              return (
+                <article className="matching-campaign" key={campaign.id}>
+                  <header>
+                    <div>
+                      <h3>{campaign.name}</h3>
+                      <p>
+                        {campaign.matchRatio} match · {campaign.startDate} to {campaign.endDate}
+                      </p>
+                    </div>
+                    <span className={`matching-status ${campaign.status.toLowerCase()}`}>
+                      {campaign.status}
+                    </span>
+                  </header>
+                  <div className="matching-metrics">
+                    <div><span>Budget</span><strong>{formatInr(campaign.budgetPaise)}</strong></div>
+                    <div><span>Pledged</span><strong>{formatInr(campaign.pledgedPaise)}</strong></div>
+                    <div><span>Captured</span><strong>{formatInr(campaign.capturedPaise)}</strong></div>
+                    <div><span>Remaining</span><strong>{formatInr(Math.max(0, campaign.budgetPaise - campaign.capturedPaise))}</strong></div>
+                  </div>
+                  <div className="matching-cause-list">
+                    <span>Eligible causes</span>
+                    <div>{eligibleCauses.map((cause) => <span key={cause.id}>{cause.category}</span>)}</div>
+                  </div>
+                  <div className="matching-campaign-actions">
+                    <button className="button button-secondary" onClick={() => editCampaign(campaign)} type="button">
+                      Edit campaign
+                    </button>
+                    <details>
+                      <summary>View history</summary>
+                      <ul>{campaign.history.map((event) => <li key={event}>{event}</li>)}</ul>
+                    </details>
+                  </div>
+                </article>
+              );
+            })
+          ) : (
+            <div className="empty-flow-state">
+              <strong>No matching campaigns yet</strong>
+              <p>Create a campaign when your internal approval is ready.</p>
+            </div>
+          )}
+        </section>
+      </div>
+    </div>
+  );
+}
+
 export function OrganizationAnalytics() {
-  const { donations, itemNeeds, volunteerApplications } = useProductDemo();
+  const { donations, itemNeeds, volunteerApplications, causes } =
+    useProductDemo();
+  const [range, setRange] = useState("365");
+  const rangeStart =
+    range === "all"
+      ? null
+      : Date.now() - Number(range) * 24 * 60 * 60 * 1000;
+  const filteredDonations = donations.filter(
+    (donation) =>
+      rangeStart === null || new Date(donation.createdAt).getTime() >= rangeStart,
+  );
+  const recognizedDonations = filteredDonations.filter(
+    (donation) =>
+      donation.status === "CAPTURED" || donation.status === "PARTIALLY_REFUNDED",
+  );
+  const causeActivity = causes
+    .map((cause) => {
+      const amountPaise = recognizedDonations
+        .filter((donation) => donation.causeId === cause.id)
+        .reduce(
+          (total, donation) =>
+            total + Math.max(0, donation.amountPaise - donation.refundedPaise),
+          0,
+        );
+      return { cause, amountPaise };
+    })
+    .filter((entry) => entry.amountPaise > 0);
+  const maxCauseAmount = Math.max(
+    ...causeActivity.map((entry) => entry.amountPaise),
+    1,
+  );
+  const causeUpdateCount = causes.reduce(
+    (total, cause) => total + cause.updateCount,
+    0,
+  );
+  const formatRupees = (amountPaise: number) =>
+    `₹${(amountPaise / 100).toLocaleString("en-IN")}`;
   return (
     <div className="flow-page">
       <header className="flow-page-heading">
@@ -918,27 +1527,43 @@ export function OrganizationAnalytics() {
             volunteer activity remain separate measures.
           </p>
         </div>
-        <button
-          className="button button-secondary"
-          onClick={() =>
-            downloadCsv("insips-impact-export.csv", [
-              ["Metric", "Value"],
-              ["Donation records", donations.length],
-              ["Item needs", itemNeeds.length],
-              ["Volunteer applications", volunteerApplications.length],
-            ])
-          }
-          type="button"
-        >
-          <Download size={16} /> Export impact CSV
-        </button>
+        <div className="analytics-header-actions">
+          <label className="analytics-range">
+            <span>Date range</span>
+            <select
+              aria-label="Analytics date range"
+              onChange={(event) => setRange(event.target.value)}
+              value={range}
+            >
+              <option value="30">Last 30 days</option>
+              <option value="90">Last 90 days</option>
+              <option value="365">Last 12 months</option>
+              <option value="all">All recorded</option>
+            </select>
+          </label>
+          <button
+            className="button button-secondary"
+            onClick={() =>
+              downloadCsv("insips-impact-export.csv", [
+                ["Metric", "Value"],
+                ["Donation records", filteredDonations.length],
+                ["Recognized donation amount", recognizedDonations.reduce((total, donation) => total + Math.max(0, donation.amountPaise - donation.refundedPaise), 0)],
+                ["Item needs", itemNeeds.length],
+                ["Volunteer applications", volunteerApplications.length],
+              ])
+            }
+            type="button"
+          >
+            <Download size={16} /> Export impact CSV
+          </button>
+        </div>
       </header>
       <div className="summary-stat-grid">
         <article>
           <strong>
-            {donations.filter((item) => item.status === "CAPTURED").length}
+            {recognizedDonations.length}
           </strong>
-          <span>captured donations</span>
+          <span>recognized donations</span>
         </article>
         <article>
           <strong>
@@ -954,25 +1579,39 @@ export function OrganizationAnalytics() {
           <span>volunteer applications</span>
         </article>
         <article>
-          <strong>4</strong>
+          <strong>{causeUpdateCount}</strong>
           <span>cause updates</span>
         </article>
       </div>
       <section className="flow-panel">
         <div className="flow-panel-head">
           <div>
-            <small>Last six periods</small>
-            <h2>Confirmed donation activity</h2>
+            <small>{recognizedDonations.length} records in range</small>
+            <h2>Donation activity by cause</h2>
           </div>
         </div>
-        <div className="simple-chart tall">
-          <i style={{ height: "34%" }} />
-          <i style={{ height: "52%" }} />
-          <i style={{ height: "47%" }} />
-          <i style={{ height: "76%" }} />
-          <i style={{ height: "66%" }} />
-          <i style={{ height: "91%" }} />
-        </div>
+        {causeActivity.length ? (
+          <div aria-label="Donation activity by cause" className="analytics-bars" role="list">
+            {causeActivity.map(({ cause, amountPaise }) => (
+              <div className="analytics-bar" key={cause.id} role="listitem">
+                <div className="analytics-bar-copy">
+                  <strong>{cause.title}</strong>
+                  <span>{formatRupees(amountPaise)}</span>
+                </div>
+                <div className="analytics-bar-track">
+                  <i
+                    style={{ width: `${(amountPaise / maxCauseAmount) * 100}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="empty-flow-state">
+            <strong>No recognized donations in this range</strong>
+            <p>Choose a wider date range or return when a confirmed donation is recorded.</p>
+          </div>
+        )}
       </section>
     </div>
   );
@@ -984,56 +1623,59 @@ export function CorporateWorkspace({
   page?: "overview" | "discover" | "shortlist" | "matching";
 }) {
   const { corporateShortlist, toggleCorporateShortlist } = useProductDemo();
+  const [discoverQuery, setDiscoverQuery] = useState("");
+  const [discoverCategory, setDiscoverCategory] = useState("All focus areas");
+  const [discoverSort, setDiscoverSort] = useState("relevance");
+  const [shortlistQuery, setShortlistQuery] = useState("");
+  const [comparisonIds, setComparisonIds] = useState<string[]>([]);
+  const [shortlistNotes, setShortlistNotes] = useState<Record<string, string>>({});
+  const [savedNoteId, setSavedNoteId] = useState<string | null>(null);
   if (page === "matching")
+    return <CorporateMatchingWorkspace />;
+  const categories = [
+    "All focus areas",
+    ...Array.from(new Set(demoCauses.map((cause) => cause.category))),
+  ];
+  const discoveryResults = demoCauses
+    .filter((cause) => {
+      const query = discoverQuery.trim().toLowerCase();
+      const matchesQuery =
+        !query ||
+        [cause.title, cause.organization, cause.summary, cause.category].some(
+          (value) => value.toLowerCase().includes(query),
+        );
+      const matchesCategory =
+        discoverCategory === "All focus areas" ||
+        cause.category === discoverCategory;
+      return matchesQuery && matchesCategory;
+    })
+    .sort((left, right) => {
+      if (discoverSort === "organization") {
+        return left.organization.localeCompare(right.organization);
+      }
+      if (discoverSort === "ending") {
+        return left.endDate.localeCompare(right.endDate);
+      }
+      return left.title.localeCompare(right.title);
+    });
+  const shortlistResults = demoCauses.filter((cause) => {
+    if (!corporateShortlist.includes(cause.id)) return false;
+    const query = shortlistQuery.trim().toLowerCase();
     return (
-      <div className="flow-page">
-        <header className="flow-page-heading">
-          <div>
-            <span className="fixture-chip">Corporate matching records</span>
-            <h1>Matching pledges</h1>
-            <p>
-              Records represent corporate commitments, not captured donations.
-              Cause progress changes only after confirmed payment events.
-            </p>
-          </div>
-        </header>
-        <section className="flow-panel">
-          <div
-            aria-label="Corporate matching pledges"
-            className="responsive-table"
-            role="region"
-            tabIndex={0}
-          >
-            <table>
-              <thead>
-                <tr>
-                  <th>Programme</th>
-                  <th>Match rule</th>
-                  <th>Ceiling</th>
-                  <th>Matched</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Learning kits 2026</td>
-                  <td>1:1 employee match</td>
-                  <td>₹2,00,000</td>
-                  <td>₹74,500</td>
-                  <td>
-                    <span className="state-badge pending">PLEDGED</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
+      !query ||
+      [cause.title, cause.organization, cause.category].some((value) =>
+        value.toLowerCase().includes(query),
+      )
     );
+  });
   const visible =
     page === "shortlist"
-      ? demoCauses.filter((cause) => corporateShortlist.includes(cause.id))
-      : demoCauses;
+      ? shortlistResults
+      : page === "discover"
+        ? discoveryResults
+        : demoCauses;
+  const isOverview = page === "overview";
+  const isShortlist = page === "shortlist";
   return (
     <div className="flow-page">
       <header className="flow-page-heading">
@@ -1052,8 +1694,145 @@ export function CorporateWorkspace({
           </p>
         </div>
       </header>
-      <div className="cause-card-grid compact">
-        {visible.map((cause) => (
+      {page === "discover" ? (
+        <>
+          <section aria-label="Cause discovery filters" className="corporate-discovery-controls">
+            <label className="corporate-filter">
+              <span>Search causes or organizations</span>
+              <input
+                aria-label="Search causes or organizations"
+                onChange={(event) => setDiscoverQuery(event.target.value)}
+                placeholder="Try education, water, or an organization"
+                type="search"
+                value={discoverQuery}
+              />
+            </label>
+            <label className="corporate-filter">
+              <span>Focus area</span>
+              <select
+                aria-label="Filter by focus area"
+                onChange={(event) => setDiscoverCategory(event.target.value)}
+                value={discoverCategory}
+              >
+                {categories.map((category) => (
+                  <option key={category}>{category}</option>
+                ))}
+              </select>
+            </label>
+            <label className="corporate-filter">
+              <span>Sort by</span>
+              <select
+                aria-label="Sort discovered causes"
+                onChange={(event) => setDiscoverSort(event.target.value)}
+                value={discoverSort}
+              >
+                <option value="relevance">Cause name</option>
+                <option value="organization">Organization</option>
+                <option value="ending">End date</option>
+              </select>
+            </label>
+          </section>
+          <div className="corporate-discovery-meta">
+            <span>
+              Showing <strong>{visible.length}</strong> of {demoCauses.length} seeded causes
+            </span>
+            <span>Shortlist decisions stay separate from public totals.</span>
+          </div>
+        </>
+      ) : null}
+      {isShortlist ? (
+        <>
+          <section
+            aria-label="Shortlist summary"
+            className="corporate-shortlist-summary"
+          >
+            <div>
+              <strong>{corporateShortlist.length}</strong>
+              <span>saved causes</span>
+            </div>
+            <div>
+              <strong>{comparisonIds.length}</strong>
+              <span>selected to compare</span>
+            </div>
+            <div>
+              <strong>{corporateShortlist.length ? "Ready" : "Open"}</strong>
+              <span>matching review</span>
+            </div>
+          </section>
+          <section aria-label="Shortlist tools" className="corporate-shortlist-tools">
+            <label className="corporate-filter">
+              <span>Search saved causes</span>
+              <input
+                aria-label="Search saved causes"
+                onChange={(event) => setShortlistQuery(event.target.value)}
+                placeholder="Search by cause or organization"
+                type="search"
+                value={shortlistQuery}
+              />
+            </label>
+            <div className="corporate-shortlist-actions">
+              <button
+                className="button button-secondary"
+                onClick={() =>
+                  downloadCsv("insips-corporate-shortlist.csv", [
+                    ["Cause", "Organization", "Focus area", "End date"],
+                    ...shortlistResults.map((cause) => [
+                      cause.title,
+                      cause.organization,
+                      cause.category,
+                      cause.endDate,
+                    ]),
+                  ])
+                }
+                type="button"
+              >
+                Export shortlist
+              </button>
+              <Link className="button button-primary" href="/corporate/discover">
+                Discover more
+              </Link>
+            </div>
+          </section>
+        </>
+      ) : null}
+      {isOverview ? (
+        <>
+          <section className="corporate-overview-brief">
+            <div className="corporate-stat-strip" aria-label="Corporate workspace summary">
+              <div className="corporate-stat">
+                <strong>{corporateShortlist.length}</strong>
+                <span>saved causes</span>
+              </div>
+              <div className="corporate-stat">
+                <strong>{demoCauses.length}</strong>
+                <span>aligned causes available</span>
+              </div>
+            </div>
+            <div className="corporate-next-actions">
+              <div>
+                <small>Next actions</small>
+                <h2>Turn discovery into a reviewable brief</h2>
+                <p>
+                  Save a focused shortlist, inspect the trust trail, then take
+                  the matching decision to your internal team.
+                </p>
+              </div>
+              <div className="corporate-overview-links">
+                <Link href="/corporate/discover">Discover causes</Link>
+                <Link href="/corporate/shortlist">Open shortlist</Link>
+                <Link href="/how-trust-works">Review trust</Link>
+              </div>
+            </div>
+          </section>
+          <div className="corporate-section-heading">
+            <span>Suggested causes</span>
+            <Link href="/corporate/discover">Browse all causes</Link>
+          </div>
+        </>
+      ) : null}
+      {visible.length ? (
+        <div className="cause-card-grid compact">
+          {visible.map((cause) => (
           <article className="cause-card" key={cause.id}>
             <div className="cause-art" data-category={cause.category}>
               <span>{cause.category}</span>
@@ -1062,6 +1841,61 @@ export function CorporateWorkspace({
               <small>{cause.organization}</small>
               <h2>{cause.title}</h2>
               <p>{cause.summary}</p>
+              {isShortlist ? (
+                <div className="corporate-shortlist-detail">
+                  <div className="corporate-shortlist-detail-row">
+                    <span>Trust trail</span>
+                    <Link href={`/causes/${cause.slug}`}>Open cause evidence</Link>
+                  </div>
+                  <div className="corporate-shortlist-detail-row">
+                    <span>Review window</span>
+                    <strong>Through {cause.endDate}</strong>
+                  </div>
+                  <div className="corporate-shortlist-note">
+                    <span>Internal note</span>
+                    <textarea
+                      aria-label={`Internal note for ${cause.title}`}
+                      onChange={(event) =>
+                        setShortlistNotes((current) => ({
+                          ...current,
+                          [cause.id]: event.target.value,
+                        }))
+                      }
+                      placeholder="Add a question or decision note for your team"
+                      rows={3}
+                      value={shortlistNotes[cause.id] ?? ""}
+                    />
+                    <span className="corporate-shortlist-note-actions">
+                      <button
+                        className="button button-secondary"
+                        onClick={() => setSavedNoteId(cause.id)}
+                        type="button"
+                      >
+                        Save note
+                      </button>
+                      {savedNoteId === cause.id ? (
+                        <span aria-live="polite" className="corporate-note-status" role="status">
+                          Note saved to this local workspace.
+                        </span>
+                      ) : null}
+                    </span>
+                  </div>
+                  <label className="corporate-compare-control">
+                    <input
+                      checked={comparisonIds.includes(cause.id)}
+                      onChange={() =>
+                        setComparisonIds((current) =>
+                          current.includes(cause.id)
+                            ? current.filter((id) => id !== cause.id)
+                            : [...current, cause.id],
+                        )
+                      }
+                      type="checkbox"
+                    />
+                    <span>Include in comparison</span>
+                  </label>
+                </div>
+              ) : null}
               <button
                 className="button button-secondary"
                 onClick={() => toggleCorporateShortlist(cause.id)}
@@ -1072,14 +1906,82 @@ export function CorporateWorkspace({
                   : "Add to shortlist"}
               </button>
             </div>
-          </article>
-        ))}
-      </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="empty-flow-state">
+          <strong>
+            {isShortlist
+              ? shortlistQuery
+                ? "No saved causes match this search"
+                : "Your shortlist is empty"
+              : "No causes match these filters"}
+          </strong>
+          <p>
+            {isShortlist
+              ? shortlistQuery
+                ? "Try a shorter search phrase or clear it to see every saved cause."
+                : "Save a cause from discovery when your team is ready to review it."
+              : "Try a broader focus area or a shorter search phrase."}
+          </p>
+          {isShortlist ? (
+            shortlistQuery ? (
+              <button
+                className="button button-secondary"
+                onClick={() => setShortlistQuery("")}
+                type="button"
+              >
+                Clear search
+              </button>
+            ) : (
+              <Link className="button button-primary" href="/corporate/discover">
+                Discover causes
+              </Link>
+            )
+          ) : (
+            <button
+              className="button button-secondary"
+              onClick={() => {
+                setDiscoverQuery("");
+                setDiscoverCategory("All focus areas");
+                setDiscoverSort("relevance");
+              }}
+              type="button"
+            >
+              Clear filters
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
 export function AdminOverview() {
+  const {
+    causes,
+    donations,
+    itemNeeds,
+    notifications,
+    reviewHistory,
+    verificationDocuments,
+  } = useProductDemo();
+  const pendingDocuments = verificationDocuments.filter((document) =>
+    ["PENDING", "CHANGES_REQUESTED"].includes(document.status),
+  ).length;
+  const paymentExceptions = donations.filter(
+    (donation) =>
+      ["PENDING", "FAILED"].includes(donation.status) ||
+      donation.transferStatus === "FAILED",
+  ).length;
+  const unreadNotifications = notifications.filter((item) => !item.read).length;
+  const approvedOrganizations = new Set(
+    causes.map((cause) => cause.organizationId),
+  ).size;
+  const attentionCount =
+    pendingDocuments + paymentExceptions + unreadNotifications;
+
   return (
     <div className="flow-page">
       <header className="flow-page-heading">
@@ -1097,28 +1999,109 @@ export function AdminOverview() {
           Open verification queue
         </Link>
       </header>
-      <div className="summary-stat-grid">
+      <div className="summary-stat-grid admin-overview-kpis">
         <article>
           <ClipboardCheck size={20} />
           <span>Pending cases</span>
-          <strong>2</strong>
+          <strong>{pendingDocuments}</strong>
         </article>
         <article>
           <ShieldCheck size={20} />
           <span>Approved organizations</span>
-          <strong>1</strong>
+          <strong>{approvedOrganizations}</strong>
         </article>
         <article>
           <PackageCheck size={20} />
           <span>Item needs</span>
-          <strong>2</strong>
+          <strong>{itemNeeds.length}</strong>
         </article>
         <article>
           <BookOpen size={20} />
           <span>Audit events</span>
-          <strong>8</strong>
+          <strong>{reviewHistory.length}</strong>
         </article>
       </div>
+      <section className="admin-overview-grid">
+        <div className="flow-panel admin-attention-panel">
+          <div className="flow-panel-head">
+            <div>
+              <small>Needs attention</small>
+              <h2>{attentionCount} open operational signals</h2>
+            </div>
+            <ClipboardCheck size={21} />
+          </div>
+          <div className="admin-attention-list">
+            <Link href="/admin/organizations">
+              <span>
+                <strong>{pendingDocuments} evidence cases</strong>
+                <small>Documents awaiting a human decision</small>
+              </span>
+              <span>Review queue →</span>
+            </Link>
+            <Link href="/admin/donations">
+              <span>
+                <strong>{paymentExceptions} payment exceptions</strong>
+                <small>Pending or failed money movement records</small>
+              </span>
+              <span>Open ledger →</span>
+            </Link>
+            <a href="#admin-activity">
+              <span>
+                <strong>{unreadNotifications} unread alerts</strong>
+                <small>Recent events that may need administrator review</small>
+              </span>
+              <span>View activity →</span>
+            </a>
+          </div>
+        </div>
+        <div className="flow-panel admin-decision-panel">
+          <div className="flow-panel-head">
+            <div>
+              <small>Decision ledger</small>
+              <h2>Recent review history</h2>
+            </div>
+            <Link href="/admin/organizations">All reviews</Link>
+          </div>
+          {reviewHistory.length ? (
+            <div className="admin-review-list">
+              {reviewHistory.slice(0, 4).map((entry) => (
+                <div key={entry.id}>
+                  <strong>{entry.action}</strong>
+                  <small>{entry.actor} · {entry.at}</small>
+                  {entry.reason ? <p>{entry.reason}</p> : null}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="admin-empty-copy">No review decisions recorded yet.</p>
+          )}
+        </div>
+      </section>
+      <section className="flow-panel admin-activity-panel" id="admin-activity">
+        <div className="flow-panel-head">
+          <div>
+            <small>Recent activity</small>
+            <h2>Keep consequential work attributable</h2>
+          </div>
+          <span className="state-badge approved">Human reviewed</span>
+        </div>
+        <div className="admin-activity-list">
+          {notifications.length ? (
+            notifications.map((notification) => (
+              <div key={notification.id}>
+                <Bell size={17} />
+                <span>
+                  <strong>{notification.title}</strong>
+                  <small>{notification.detail}</small>
+                </span>
+                <em>{notification.read ? "Read" : "Unread"}</em>
+              </div>
+            ))
+          ) : (
+            <p className="admin-empty-copy">No recent platform activity.</p>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

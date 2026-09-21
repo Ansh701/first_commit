@@ -102,8 +102,9 @@ export function WorkspaceShell({ role, children }: { role: WorkspaceRole; childr
         <nav className="workspace-nav">
           {nav.map((item) => {
             const Icon = item.icon;
+            const active = isActive(pathname, item.href);
             return <motion.div key={item.href} whileHover={reduceMotion ? undefined : { x: 2 }} whileTap={{ scale: 0.985 }}>
-              <Link href={item.href} className={isActive(pathname, item.href) ? "active" : ""} aria-current={isActive(pathname, item.href) ? "page" : undefined}>
+              <Link href={item.href} className={active ? "active" : ""} aria-current={active ? "page" : undefined} style={active ? { color: "var(--text)" } : undefined}>
                 <Icon size={18} aria-hidden="true" /><span>{item.label}</span>
                 {item.label === "Evidence" || item.label === "Review queue" ? <small>1</small> : null}
               </Link>
@@ -115,7 +116,7 @@ export function WorkspaceShell({ role, children }: { role: WorkspaceRole; childr
           <Link href={role === "organization" ? "/organizations/udaan-learning-foundation" : "/discover"}><BadgeCheck size={17} /> Public indicators <span className="sidebar-status-dot" /></Link>
           <Link href="/how-trust-works"><Compass size={17} /> Methodology</Link>
         </div>
-        <div className="sidebar-callout"><span className="callout-icon"><Sparkles size={17} /></span><strong>Compass is assistive</strong><p>People confirm and review every claim.</p><Link href="/how-trust-works">Read the method <ChevronDown className="flip" size={14} /></Link></div>
+        <div className="sidebar-callout"><span className="callout-icon"><Sparkles size={17} /></span><strong>Compass is assistive</strong><p>People confirm and review every claim.</p><Link href="/how-trust-works" style={{ color: "var(--text)" }}>Read the method <ChevronDown className="flip" size={14} /></Link></div>
         <div className="sidebar-bottom"><Link href="/" aria-label="Open public site"><Home size={18} /><span>Public site</span></Link><Link href="/account" aria-label="Open account"><Settings size={18} /><span>Account</span></Link></div>
       </aside>
       <div className="workspace-body">
@@ -133,7 +134,7 @@ export function WorkspaceShell({ role, children }: { role: WorkspaceRole; childr
         <main className="workspace-main" id="main-content">{children}</main>
       </div>
       <nav className="mobile-bottom-nav" aria-label="Mobile workspace navigation">
-        {nav.slice(0, 4).map((item) => { const Icon = item.icon; return <Link href={item.href} className={isActive(pathname, item.href) ? "active" : ""} key={item.href}><Icon size={19} /><span>{item.label.split(" ")[0]}</span></Link>; })}
+        {nav.slice(0, 4).map((item) => { const Icon = item.icon; const active = isActive(pathname, item.href); return <Link href={item.href} className={active ? "active" : ""} style={active ? { color: "var(--text)" } : undefined} key={item.href}><Icon size={19} /><span>{item.label.split(" ")[0]}</span></Link>; })}
         <Link href="/account" aria-label="More navigation"><Menu size={19} /><span>More</span></Link>
       </nav>
     </div>

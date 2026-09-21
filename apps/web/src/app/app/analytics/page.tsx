@@ -1,7 +1,12 @@
 import { OrganizationAnalytics } from "@/components/community-flows";
+import styles from "./analytics-page.module.css";
 
 export const metadata = { title: "Organization analytics" };
 
 export default function Page() {
-  return <OrganizationAnalytics />;
+  return (
+    <div className={styles.analyticsRoute}>
+      <OrganizationAnalytics />
+    </div>
+  );
 }

@@ -53,6 +53,36 @@ export const demoCauses = [
   },
 ] as const;
 
+export type CorporateMatchingCampaign = {
+  id: string;
+  name: string;
+  matchRatio: string;
+  budgetPaise: number;
+  pledgedPaise: number;
+  capturedPaise: number;
+  startDate: string;
+  endDate: string;
+  eligibleCauseIds: string[];
+  status: "DRAFT" | "PLEDGED" | "CAPTURED";
+  history: string[];
+};
+
+export const corporateMatchingCampaigns: CorporateMatchingCampaign[] = [
+  {
+    id: "matching-learning-kits-2026",
+    name: "Learning kits 2026",
+    matchRatio: "1:1",
+    budgetPaise: 20_000_000,
+    pledgedPaise: 7_450_000,
+    capturedPaise: 0,
+    startDate: "2026-08-01",
+    endDate: "2026-12-31",
+    eligibleCauseIds: ["cause-learning-kits"],
+    status: "PLEDGED",
+    history: ["Campaign created from the corporate workspace fixture."],
+  },
+];
+
 export const initialDonations: Donation[] = [
   {
     id: "donation-demo-1042",

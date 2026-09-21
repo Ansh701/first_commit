@@ -1,3 +1,9 @@
-import { RepositoryContentPage } from "@/components/repository-content-page";
+import { getPublishedSiteContent } from "@/lib/server/content-repository";
+import { OrganizationsPage } from "./organizations-page";
+
 export const metadata = { title: "For organizations" };
-export default function Page() { return <RepositoryContentPage slug="for-organizations" ctaLabel="Start onboarding" ctaHref="/app/onboarding" />; }
+
+export default async function Page() {
+  const page = await getPublishedSiteContent("for-organizations");
+  return <OrganizationsPage page={page} />;
+}

@@ -1,0 +1,50 @@
+.route { overflow: hidden; }
+.hero, .directory, .cta { width: min(1200px, calc(100% - 40px)); margin: 0 auto; }
+.hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: 6rem; align-items: end; padding: 8.5rem 0 6.5rem; }
+.hero h1 { max-width: 850px; margin: 1.1rem 0 1.4rem; font-size: clamp(3.2rem, 6.2vw, 6.3rem); line-height: .94; letter-spacing: -.075em; }
+.hero p:not(.marketing-kicker) { max-width: 690px; color: var(--muted); font-size: 1.18rem; line-height: 1.6; }
+.searchPanel { border-top: 1px solid var(--border); padding-top: 1.15rem; }
+.searchPanel label { display: block; margin-bottom: .7rem; font-size: .74rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.searchField { display: flex; align-items: center; gap: .55rem; border: 1px solid var(--border-strong); border-radius: 10px; padding: .7rem .85rem; background: var(--surface); }
+.searchField svg { flex: 0 0 auto; color: var(--accent); }
+.searchField input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; font-size: .92rem; }
+.searchField button { display: grid; width: 28px; height: 28px; flex: 0 0 auto; place-items: center; border: 0; border-radius: 7px; background: var(--surface-soft); cursor: pointer; }
+.searchPanel > span { display: block; margin-top: .6rem; color: var(--muted); font-size: .78rem; }
+.directory { border-top: 1px solid var(--border); padding: 6.5rem 0 7rem; }
+.directoryHeader { display: flex; justify-content: space-between; align-items: end; gap: 3rem; }
+.directoryHeader h2, .cta h2 { max-width: 750px; margin: .7rem 0 0; font-size: clamp(2.5rem, 5vw, 5rem); line-height: .98; letter-spacing: -.07em; }
+.categoryList { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .45rem; }
+.categoryList button { border: 1px solid var(--border); border-radius: 99px; padding: .55rem .8rem; background: transparent; color: var(--muted); cursor: pointer; font-size: .78rem; font-weight: 800; }
+.categoryList button:hover, .categoryList button.selected { border-color: var(--text); background: var(--text); color: var(--canvas); }
+.resultMeta { margin-top: 3.3rem; color: var(--muted); font-size: .8rem; font-weight: 800; }
+.questions { max-width: 920px; margin-top: .8rem; border-top: 1px solid var(--border); }
+.question { border-bottom: 1px solid var(--border); scroll-margin-top: 2rem; }
+.question summary { display: grid; grid-template-columns: 46px 1fr auto; gap: 1rem; align-items: center; padding: 1.25rem 0; cursor: pointer; list-style: none; }
+.question summary::-webkit-details-marker { display: none; }
+.question summary strong { font-size: 1.1rem; }
+.question summary svg { color: var(--accent); transition: transform 160ms ease; }
+.question[open] summary svg { transform: rotate(180deg); }
+.number { color: var(--accent); font-size: .75rem; font-weight: 900; }
+.answer { display: grid; grid-template-columns: 46px 1fr; gap: 1rem; padding: 0 0 1.5rem; }
+.answer p { grid-column: 2; max-width: 720px; margin: 0; color: var(--muted); line-height: 1.7; }
+.answer a { grid-column: 2; display: inline-flex; align-items: center; gap: .45rem; width: max-content; margin-top: .7rem; color: var(--text); font-size: .84rem; font-weight: 800; }
+.answer a:hover { color: var(--accent); }
+.empty { max-width: 600px; margin-top: .8rem; border: 1px solid var(--border); padding: 2rem; background: var(--surface-soft); }
+.empty strong { font-size: 1.2rem; }
+.empty p { color: var(--muted); }
+.cta { display: flex; justify-content: space-between; align-items: end; gap: 2rem; margin-bottom: 8rem; border-top: 1px solid var(--border); padding-top: 4rem; }
+@media (max-width: 900px) { .hero { gap: 3rem; padding-top: 6rem; } .directoryHeader { display: block; } .categoryList { justify-content: flex-start; margin-top: 2rem; } }
+@media (max-width: 760px) {
+  .hero, .directory, .cta { width: min(100% - 32px, 600px); }
+  .hero { display: block; padding: 5rem 0 4.5rem; }
+  .hero h1 { font-size: clamp(3rem, 14vw, 4.6rem); }
+  .hero p:not(.marketing-kicker) { font-size: 1.05rem; }
+  .searchPanel { margin-top: 4rem; }
+  .directory { padding: 4.5rem 0; }
+  .question summary { grid-template-columns: 30px 1fr auto; gap: .6rem; }
+  .question summary strong { font-size: 1rem; }
+  .answer { grid-template-columns: 30px 1fr; gap: .6rem; }
+  .cta { display: block; margin-bottom: 5rem; padding-top: 3rem; }
+  .cta .button { margin-top: 1.8rem; }
+}
+@media (prefers-reduced-motion: reduce) { .question summary svg { transition: none; } }

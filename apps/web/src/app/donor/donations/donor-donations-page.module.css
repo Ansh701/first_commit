@@ -1,0 +1,235 @@
+.donorDonationsRoute :global(.flow-page) {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.donorDonationsRoute :global(.flow-page-heading) {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0 0 0.25rem;
+}
+
+.donorDonationsRoute :global(.flow-page-heading h1) {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(1.65rem, 2.2vw, 2.35rem);
+  letter-spacing: -0.055em;
+  line-height: 1.05;
+}
+
+.donorDonationsRoute :global(.flow-page-heading p) {
+  max-width: 760px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.donorDonationsRoute :global(.table-toolbar) {
+  display: grid;
+  grid-template-columns: minmax(240px, 1.5fr) repeat(2, minmax(150px, 0.7fr));
+  gap: 0.65rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+}
+
+.donorDonationsRoute :global(.table-toolbar label),
+.donorDonationsRoute :global(.table-toolbar > select) {
+  min-width: 0;
+}
+
+.donorDonationsRoute :global(.table-toolbar label) {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.donorDonationsRoute :global(.table-toolbar svg) {
+  color: var(--muted);
+}
+
+.donorDonationsRoute :global(.table-toolbar input),
+.donorDonationsRoute :global(.table-toolbar select) {
+  width: 100%;
+  min-height: 42px;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.donorDonationsRoute :global(.table-toolbar input:focus),
+.donorDonationsRoute :global(.table-toolbar select:focus) {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.donorDonationsRoute :global(.flow-table-card) {
+  min-width: 0;
+  padding: 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+}
+
+.donorDonationsRoute :global(.responsive-table) {
+  overflow-x: auto;
+}
+
+.donorDonationsRoute :global(.responsive-table table) {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: var(--text);
+  font-size: 0.73rem;
+}
+
+.donorDonationsRoute :global(.responsive-table th),
+.donorDonationsRoute :global(.responsive-table td) {
+  padding: 0.75rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.donorDonationsRoute :global(.responsive-table th) {
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.donorDonationsRoute :global(.responsive-table tr:last-child td) {
+  border-bottom: 0;
+}
+
+.donorDonationsRoute :global(.responsive-table td:first-child) {
+  min-width: 240px;
+}
+
+.donorDonationsRoute :global(.responsive-table td strong),
+.donorDonationsRoute :global(.responsive-table td small) {
+  display: block;
+}
+
+.donorDonationsRoute :global(.responsive-table td strong) {
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.donorDonationsRoute :global(.responsive-table td small) {
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.donorDonationsRoute :global(.empty-flow-state) {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  min-height: 180px;
+  padding: 2rem 1rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.donorDonationsRoute :global(.empty-flow-state strong) {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.donorDonationsRoute :global(.empty-flow-state p) {
+  margin: 0;
+  font-size: 0.76rem;
+}
+
+@media (max-width: 900px) {
+  .donorDonationsRoute :global(.table-toolbar) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .donorDonationsRoute :global(.table-toolbar label) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .donorDonationsRoute :global(.flow-page-heading h1) {
+    font-size: 1.65rem;
+  }
+
+  .donorDonationsRoute :global(.flow-page-heading p) {
+    font-size: 0.78rem;
+  }
+
+  .donorDonationsRoute :global(.table-toolbar) {
+    grid-template-columns: 1fr;
+  }
+
+  .donorDonationsRoute :global(.table-toolbar label) {
+    grid-column: auto;
+  }
+
+  .donorDonationsRoute :global(.responsive-table) {
+    overflow: visible;
+  }
+
+  .donorDonationsRoute :global(.responsive-table table),
+  .donorDonationsRoute :global(.responsive-table tbody),
+  .donorDonationsRoute :global(.responsive-table tr),
+  .donorDonationsRoute :global(.responsive-table td) {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .donorDonationsRoute :global(.responsive-table thead) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .donorDonationsRoute :global(.responsive-table tr) {
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .donorDonationsRoute :global(.responsive-table tr:last-child) {
+    border-bottom: 0;
+  }
+
+  .donorDonationsRoute :global(.responsive-table td) {
+    display: grid;
+    grid-template-columns: minmax(94px, 0.42fr) minmax(0, 1fr);
+    gap: 0.5rem;
+    padding: 0.35rem 0.2rem;
+    border: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .donorDonationsRoute :global(.responsive-table td::before) {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 0.66rem;
+    font-weight: 800;
+  }
+
+  .donorDonationsRoute :global(.responsive-table td:first-child) {
+    min-width: 0;
+  }
+
+  .donorDonationsRoute :global(.responsive-table td:first-child strong),
+  .donorDonationsRoute :global(.responsive-table td:first-child small) {
+    grid-column: 2;
+  }
+}

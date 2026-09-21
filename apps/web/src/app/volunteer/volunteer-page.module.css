@@ -1,0 +1,141 @@
+.volunteerRoute :global(.public-flow-page) {
+  padding-top: clamp(4.5rem, 8vw, 7rem);
+}
+
+.volunteerRoute :global(.public-flow-page > header) {
+  max-width: 980px;
+  margin-bottom: 2.25rem;
+}
+
+.volunteerRoute :global(.public-flow-page > header h1) {
+  max-width: 820px;
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  line-height: 1;
+}
+
+.volunteerRoute :global(.public-flow-page > header > p) {
+  max-width: 680px;
+}
+
+.volunteerRoute :global(.volunteer-public-controls) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  gap: 0.75rem;
+  max-width: 720px;
+  margin-top: 1.4rem;
+}
+
+.volunteerRoute :global(.volunteer-public-controls label) {
+  display: grid;
+  gap: 0.35rem;
+  text-align: left;
+}
+
+.volunteerRoute :global(.volunteer-public-controls label > span) {
+  color: var(--muted);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.volunteerRoute :global(.volunteer-public-controls input),
+.volunteerRoute :global(.volunteer-public-controls select) {
+  min-height: 2.8rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 0.65rem 0.75rem;
+}
+
+.volunteerRoute :global(.opportunity-grid) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.volunteerRoute :global(.opportunity-grid .flow-panel) {
+  display: grid;
+  align-content: start;
+  gap: 0.7rem;
+  min-width: 0;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.volunteerRoute :global(.opportunity-grid .flow-panel > svg) {
+  color: var(--violet);
+}
+
+.volunteerRoute :global(.opportunity-grid .flow-panel > small) {
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 760;
+}
+
+.volunteerRoute :global(.opportunity-grid .flow-panel h2) {
+  margin: 0;
+  max-width: 30rem;
+  font-size: clamp(1.15rem, 2vw, 1.55rem);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
+.volunteerRoute :global(.opportunity-grid .flow-panel p) {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.volunteerRoute :global(.opportunity-grid .flow-panel strong) {
+  margin-top: 0.3rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.76rem;
+}
+
+.volunteerRoute :global(.opportunity-grid .flow-panel .button) {
+  width: fit-content;
+  margin-top: 0.15rem;
+}
+
+.volunteerRoute :global(.volunteer-empty-state) {
+  display: grid;
+  justify-items: start;
+  gap: 0.7rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.volunteerRoute :global(.volunteer-empty-state h2),
+.volunteerRoute :global(.volunteer-empty-state p) {
+  margin: 0;
+}
+
+.volunteerRoute :global(.volunteer-empty-state p) {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+@media (max-width: 760px) {
+  .volunteerRoute :global(.volunteer-public-controls) {
+    grid-template-columns: 1fr;
+  }
+
+  .volunteerRoute :global(.opportunity-grid) {
+    grid-template-columns: 1fr;
+  }
+
+  .volunteerRoute :global(.opportunity-grid .flow-panel .button) {
+    width: 100%;
+  }
+}

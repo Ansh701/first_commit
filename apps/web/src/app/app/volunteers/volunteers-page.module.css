@@ -1,0 +1,238 @@
+.volunteersRoute :global(.flow-page) {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.volunteersRoute :global(.flow-page-heading) {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0 0 0.25rem;
+}
+
+.volunteersRoute :global(.flow-page-heading h1) {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(1.65rem, 2.2vw, 2.35rem);
+  letter-spacing: -0.055em;
+  line-height: 1.05;
+}
+
+.volunteersRoute :global(.flow-page-heading p) {
+  max-width: 720px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.volunteersRoute :global(.flow-panel) {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.volunteersRoute :global(.responsive-table) {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.volunteersRoute :global(.responsive-table table) {
+  width: 100%;
+  min-width: 660px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.volunteersRoute :global(.responsive-table th),
+.volunteersRoute :global(.responsive-table td) {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.volunteersRoute :global(.responsive-table th) {
+  color: var(--muted);
+  font-size: 0.67rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.volunteersRoute :global(.responsive-table td) {
+  color: var(--text);
+  font-size: 0.75rem;
+}
+
+.volunteersRoute :global(.responsive-table tr:last-child td) {
+  border-bottom: 0;
+}
+
+.volunteersRoute :global(.responsive-table th:nth-child(1)),
+.volunteersRoute :global(.responsive-table td:nth-child(1)) {
+  width: 42%;
+}
+
+.volunteersRoute :global(.responsive-table th:nth-child(2)),
+.volunteersRoute :global(.responsive-table td:nth-child(2)) {
+  width: 20%;
+}
+
+.volunteersRoute :global(.responsive-table th:nth-child(3)),
+.volunteersRoute :global(.responsive-table td:nth-child(3)) {
+  width: 16%;
+}
+
+.volunteersRoute :global(.state-badge) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-muted);
+  color: var(--text);
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.volunteersRoute :global(.state-badge.approved),
+.volunteersRoute :global(.state-badge.completed) {
+  border-color: color-mix(in srgb, var(--success) 35%, var(--border));
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.volunteersRoute :global(.state-badge.rejected) {
+  border-color: color-mix(in srgb, var(--danger) 35%, var(--border));
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.volunteersRoute :global(.inline-actions) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.volunteersRoute :global(.inline-actions button) {
+  min-height: 30px;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.volunteersRoute :global(.inline-actions button:hover),
+.volunteersRoute :global(.inline-actions button:focus-visible) {
+  border-color: var(--primary);
+  background: var(--surface-muted);
+}
+
+.volunteersRoute :global(.empty-flow-state) {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  min-height: 170px;
+  padding: 2.4rem 1.2rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.volunteersRoute :global(.empty-flow-state svg) {
+  color: var(--primary);
+}
+
+.volunteersRoute :global(.empty-flow-state strong) {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.volunteersRoute :global(.empty-flow-state p) {
+  max-width: 360px;
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 600px) {
+  .volunteersRoute :global(.flow-page-heading h1) {
+    font-size: 1.65rem;
+  }
+
+  .volunteersRoute :global(.flow-page-heading p) {
+    font-size: 0.78rem;
+  }
+
+  .volunteersRoute :global(.responsive-table) {
+    overflow: visible;
+  }
+
+  .volunteersRoute :global(.responsive-table table),
+  .volunteersRoute :global(.responsive-table tbody),
+  .volunteersRoute :global(.responsive-table tr),
+  .volunteersRoute :global(.responsive-table td) {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .volunteersRoute :global(.responsive-table table) {
+    min-width: 0;
+  }
+
+  .volunteersRoute :global(.responsive-table thead) {
+    display: none;
+  }
+
+  .volunteersRoute :global(.responsive-table tr) {
+    padding: 0.7rem 0.95rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .volunteersRoute :global(.responsive-table tr:last-child) {
+    border-bottom: 0;
+  }
+
+  .volunteersRoute :global(.responsive-table td:nth-child(n)) {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 0.55rem;
+    align-items: center;
+    width: 100%;
+    padding: 0.35rem 0;
+    border: 0;
+    font-size: 0.74rem;
+  }
+
+  .volunteersRoute :global(.responsive-table td:nth-child(n)::before) {
+    color: var(--muted);
+    font-size: 0.62rem;
+    font-weight: 850;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .volunteersRoute :global(.responsive-table td:nth-child(1)::before) {
+    content: "Opportunity";
+  }
+
+  .volunteersRoute :global(.responsive-table td:nth-child(2)::before) {
+    content: "Applicant";
+  }
+
+  .volunteersRoute :global(.responsive-table td:nth-child(3)::before) {
+    content: "Status";
+  }
+
+  .volunteersRoute :global(.responsive-table td:nth-child(4)::before) {
+    align-self: start;
+    content: "Action";
+  }
+}

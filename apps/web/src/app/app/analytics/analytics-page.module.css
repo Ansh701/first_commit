@@ -1,0 +1,232 @@
+.analyticsRoute :global(.flow-page) {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.analyticsRoute :global(.flow-page-heading) {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  align-items: end;
+  margin: 0 0 0.25rem;
+}
+
+.analyticsRoute :global(.flow-page-heading h1) {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(1.65rem, 2.2vw, 2.35rem);
+  letter-spacing: -0.055em;
+  line-height: 1.05;
+}
+
+.analyticsRoute :global(.flow-page-heading p) {
+  max-width: 720px;
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.analyticsRoute :global(.analytics-header-actions) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  align-items: end;
+}
+
+.analyticsRoute :global(.analytics-range) {
+  display: grid;
+  gap: 0.3rem;
+  color: var(--muted);
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.analyticsRoute :global(.analytics-range select) {
+  min-height: 42px;
+  padding: 0.55rem 2rem 0.55rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+}
+
+.analyticsRoute :global(.analytics-range select:focus) {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.analyticsRoute :global(.summary-stat-grid) {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.analyticsRoute :global(.summary-stat-grid > article) {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+}
+
+.analyticsRoute :global(.summary-stat-grid strong) {
+  color: var(--text);
+  font-size: 1.5rem;
+  letter-spacing: -0.05em;
+}
+
+.analyticsRoute :global(.summary-stat-grid span) {
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+
+.analyticsRoute :global(.flow-panel) {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.analyticsRoute :global(.flow-panel-head) {
+  min-height: 74px;
+  padding: 1rem 1.15rem;
+}
+
+.analyticsRoute :global(.flow-panel-head small) {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.analyticsRoute :global(.flow-panel-head h2) {
+  color: var(--text);
+  font-size: 1.05rem;
+}
+
+.analyticsRoute :global(.analytics-bars) {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem 1.15rem 1.2rem;
+}
+
+.analyticsRoute :global(.analytics-bar) {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.analyticsRoute :global(.analytics-bar-copy) {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: baseline;
+}
+
+.analyticsRoute :global(.analytics-bar-copy strong) {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.analyticsRoute :global(.analytics-bar-copy span) {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.analyticsRoute :global(.analytics-bar-track) {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--surface-muted);
+}
+
+.analyticsRoute :global(.analytics-bar-track i) {
+  display: block;
+  height: 100%;
+  min-width: 5px;
+  border-radius: inherit;
+  background: var(--primary);
+}
+
+.analyticsRoute :global(.empty-flow-state) {
+  display: grid;
+  justify-items: center;
+  gap: 0.55rem;
+  min-height: 160px;
+  padding: 2rem 1.2rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.analyticsRoute :global(.empty-flow-state strong) {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.analyticsRoute :global(.empty-flow-state p) {
+  max-width: 390px;
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 920px) {
+  .analyticsRoute :global(.flow-page-heading) {
+    display: grid;
+    align-items: start;
+  }
+
+  .analyticsRoute :global(.analytics-header-actions) {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 600px) {
+  .analyticsRoute :global(.flow-page-heading h1) {
+    font-size: 1.65rem;
+  }
+
+  .analyticsRoute :global(.flow-page-heading p) {
+    font-size: 0.78rem;
+  }
+
+  .analyticsRoute :global(.analytics-header-actions) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: end;
+    width: 100%;
+  }
+
+  .analyticsRoute :global(.analytics-header-actions .button) {
+    width: 100%;
+    min-width: 0;
+    padding-inline: 0.65rem;
+  }
+
+  .analyticsRoute :global(.summary-stat-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .analyticsRoute :global(.summary-stat-grid > article) {
+    padding: 0.85rem;
+  }
+
+  .analyticsRoute :global(.analytics-bar-copy) {
+    align-items: start;
+  }
+
+  .analyticsRoute :global(.analytics-bar-copy strong) {
+    white-space: normal;
+  }
+}

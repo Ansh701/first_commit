@@ -1,0 +1,17 @@
+.profileHero { position: relative; isolation: isolate; overflow: hidden; }
+.cover { position: absolute; z-index: -1; inset: 0; overflow: hidden; opacity: .09; filter: grayscale(1) blur(1px); }
+.cover::after { position: absolute; inset: 0; background: linear-gradient(90deg, var(--surface) 0%, color-mix(in srgb, var(--surface) 72%, transparent) 100%); content: ""; }
+.cover img { object-fit: cover; object-position: center; }
+.heroLinks { display: flex; flex-wrap: wrap; gap: .8rem 1rem; margin-top: .8rem; }
+.heroLinks a { display: inline-flex; align-items: center; gap: .3rem; color: var(--text); font-size: .75rem; font-weight: 800; }
+.heroLinks a:hover { color: var(--accent); }
+.heroActions { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1rem; }
+.heroActions button { min-height: 36px; padding: .5rem .75rem; font-size: .78rem; }
+.actionStatus { display: inline-flex; gap: .35rem; align-items: center; margin-top: .65rem; color: var(--muted); font-size: .7rem; }
+.actionStatus svg { color: var(--accent); }
+.participationGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; }
+.participationGrid > div { display: grid; align-content: start; gap: .55rem; min-height: 150px; padding: 1rem; }
+.participationGrid svg { color: var(--accent); }
+.participationGrid strong { font-size: .9rem; }
+.participationGrid p { margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.5; }
+@media (max-width: 720px) { .participationGrid { grid-template-columns: 1fr; } .participationGrid > div { min-height: 0; } }

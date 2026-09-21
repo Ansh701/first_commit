@@ -1,0 +1,275 @@
+.donorItemsRoute :global(.flow-page) {
+  gap: 1.5rem;
+}
+
+.donorItemsRoute :global(.flow-page-heading) {
+  align-items: center;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.donorItemsRoute :global(.flow-page-heading h1) {
+  max-width: 560px;
+}
+
+.donorItemsRoute :global(.flow-page-heading p) {
+  max-width: 620px;
+}
+
+.donorItemsRoute :global(.donor-items-summary) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.donorItemsRoute :global(.donor-items-summary article) {
+  display: grid;
+  gap: 0.22rem;
+  min-width: 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface-soft) 72%, var(--surface));
+}
+
+.donorItemsRoute :global(.donor-items-summary small),
+.donorItemsRoute :global(.donor-items-summary span) {
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.donorItemsRoute :global(.donor-items-summary strong) {
+  font-size: 1.45rem;
+  letter-spacing: -0.04em;
+}
+
+.donorItemsRoute :global(.donor-items-toolbar) {
+  display: flex;
+  align-items: end;
+  gap: 0.8rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.donorItemsRoute :global(.donor-items-toolbar label) {
+  display: grid;
+  gap: 0.35rem;
+  min-width: min(360px, 100%);
+}
+
+.donorItemsRoute :global(.donor-items-toolbar label span) {
+  color: var(--muted);
+  font-size: 0.65rem;
+  font-weight: 760;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.donorItemsRoute :global(.donor-items-toolbar input),
+.donorItemsRoute :global(.donor-items-toolbar select) {
+  min-height: 2.45rem;
+  border: 1px solid var(--border-strong, var(--border));
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 0.55rem 0.7rem;
+}
+
+.donorItemsRoute :global(.donor-items-result-count) {
+  margin-left: auto;
+  padding-bottom: 0.65rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.donorItemsRoute :global(.donor-items-list) {
+  display: grid;
+  grid-template-columns: minmax(0, 840px);
+  gap: 1rem;
+}
+
+.donorItemsRoute :global(.donor-item-card) {
+  display: grid;
+  align-content: start;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.donorItemsRoute :global(.donor-item-card .flow-panel-head) {
+  margin-bottom: 0;
+}
+
+.donorItemsRoute :global(.donor-item-card .flow-panel-head h2) {
+  max-width: 28rem;
+}
+
+.donorItemsRoute :global(.donor-item-organization) {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.donorItemsRoute :global(.donor-item-details) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 0;
+}
+
+.donorItemsRoute :global(.donor-item-details div) {
+  min-width: 0;
+  padding: 0.65rem 0.7rem;
+  border-radius: 10px;
+  background: var(--surface-soft);
+}
+
+.donorItemsRoute :global(.donor-item-details dt) {
+  color: var(--muted);
+  font-size: 0.63rem;
+}
+
+.donorItemsRoute :global(.donor-item-details dd) {
+  margin: 0.2rem 0 0;
+  color: var(--text);
+  font-size: 0.74rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.donorItemsRoute :global(.donor-item-notes) {
+  margin: 0;
+  padding: 0.7rem 0.8rem;
+  border-left: 3px solid var(--accent, var(--violet));
+  background: color-mix(in srgb, var(--surface-soft) 65%, var(--surface));
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.donorItemsRoute :global(.donor-item-notes strong) {
+  color: var(--text);
+}
+
+.donorItemsRoute :global(.donor-item-card-footer) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.2rem;
+  border-top: 1px solid var(--border);
+}
+
+.donorItemsRoute :global(.donor-item-card-footer a) {
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 760;
+  text-decoration: underline;
+  text-underline-offset: 0.18rem;
+}
+
+.donorItemsRoute :global(.donor-item-cancel) {
+  color: var(--danger);
+}
+
+.donorItemsRoute :global(.donor-items-empty) {
+  display: grid;
+  justify-items: start;
+  gap: 0.7rem;
+  max-width: 720px;
+  padding: 1.5rem;
+}
+
+.donorItemsRoute :global(.donor-items-empty h2),
+.donorItemsRoute :global(.donor-items-empty p) {
+  margin: 0;
+}
+
+.donorItemsRoute :global(.donor-items-empty p) {
+  max-width: 560px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.donorItemsRoute :global(.donor-items-empty > div) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+}
+
+@media (max-width: 900px) {
+  .donorItemsRoute :global(.donor-items-list) {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1100px) {
+  .donorItemsRoute :global(.donor-items-toolbar) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .donorItemsRoute :global(.donor-items-toolbar label) {
+    min-width: 0;
+  }
+
+  .donorItemsRoute :global(.donor-items-result-count) {
+    grid-column: 1 / -1;
+    margin-left: 0;
+    padding-bottom: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .donorItemsRoute :global(.flow-page-heading) {
+    align-items: start;
+  }
+
+  .donorItemsRoute :global(.flow-page-heading .button) {
+    width: 100%;
+  }
+
+  .donorItemsRoute :global(.donor-items-summary) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .donorItemsRoute :global(.donor-items-summary article) {
+    padding: 0.7rem 0.55rem;
+  }
+
+  .donorItemsRoute :global(.donor-items-summary strong) {
+    font-size: 1.2rem;
+  }
+
+  .donorItemsRoute :global(.donor-items-summary small),
+  .donorItemsRoute :global(.donor-items-summary span) {
+    font-size: 0.58rem;
+  }
+
+  .donorItemsRoute :global(.donor-items-toolbar) {
+    display: grid;
+    align-items: stretch;
+  }
+
+  .donorItemsRoute :global(.donor-items-toolbar label) {
+    min-width: 0;
+  }
+
+  .donorItemsRoute :global(.donor-items-result-count) {
+    margin-left: 0;
+    padding-bottom: 0;
+  }
+
+  .donorItemsRoute :global(.donor-item-details) {
+    grid-template-columns: 1fr;
+  }
+
+  .donorItemsRoute :global(.donor-item-card-footer) {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

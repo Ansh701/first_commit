@@ -46,6 +46,12 @@ const queueCases = [
 export function OrganizationVerificationQueue() {
   const [filter, setFilter] = useState("ALL");
   const [query, setQuery] = useState("");
+  const attentionCount = queueCases.filter((item) =>
+    ["PENDING", "CHANGES_REQUESTED"].includes(item.status),
+  ).length;
+  const approvedCount = queueCases.filter(
+    (item) => item.status === "APPROVED",
+  ).length;
   const filtered = queueCases.filter(
     (item) =>
       (filter === "ALL" || item.status === filter) &&
@@ -65,10 +71,10 @@ export function OrganizationVerificationQueue() {
         </div>
         <div className="metric-pair">
           <span>
-            <strong>2</strong>need attention
+            <strong>{attentionCount}</strong> need attention
           </span>
           <span>
-            <strong>1</strong>approved
+            <strong>{approvedCount}</strong> approved
           </span>
         </div>
       </header>
@@ -110,18 +116,20 @@ export function OrganizationVerificationQueue() {
           <tbody>
             {filtered.map((item) => (
               <tr key={item.id}>
-                <td>
+                <td data-label="Organization">
                   <strong>{item.name}</strong>
                   <small>{item.type}</small>
                 </td>
-                <td>{item.submitted}</td>
-                <td>{item.pendingDocuments} awaiting decisions</td>
-                <td>
+                <td data-label="Submitted">{item.submitted}</td>
+                <td data-label="Documents">
+                  {item.pendingDocuments} awaiting decisions
+                </td>
+                <td data-label="Status">
                   <span className={`state-badge ${item.status.toLowerCase()}`}>
                     {item.status.replaceAll("_", " ")}
                   </span>
                 </td>
-                <td>
+                <td data-label="Action">
                   <Link
                     className="button button-secondary button-small"
                     href={`/admin/organizations/${item.id}`}
@@ -184,6 +192,14 @@ export function OrganizationVerificationDetail() {
       return;
     }
     if (!selected) return;
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm(
+        `Record ${decision.replaceAll("_", " ").toLowerCase()} for ${selected.label}?`,
+      )
+    ) {
+      return;
+    }
     decideDocument(selected.id, decision, reason);
     setMessage(
       `Decision recorded: ${decision.replaceAll("_", " ").toLowerCase()}.`,
@@ -321,21 +337,46 @@ export function OrganizationVerificationDetail() {
           <div className="organization-actions">
             <strong>Organization decision</strong>
             <button
-              onClick={() => decideOrganization("APPROVED", internalNote)}
+              onClick={() => {
+                if (
+                  typeof window === "undefined" ||
+                  window.confirm(
+                    "Approve this organization for public projection? This records a consequential platform decision.",
+                  )
+                ) {
+                  decideOrganization("APPROVED", internalNote);
+                }
+              }}
               type="button"
             >
               Approve organization
             </button>
             <button
-              onClick={() => decideOrganization("SUSPENDED", internalNote)}
+              onClick={() => {
+                if (
+                  typeof window === "undefined" ||
+                  window.confirm(
+                    "Suspend this organization? This changes its platform status.",
+                  )
+                ) {
+                  decideOrganization("SUSPENDED", internalNote);
+                }
+              }}
               type="button"
             >
               Suspend
             </button>
             <button
-              onClick={() =>
-                decideOrganization("IN_REVIEW", "Restored by platform admin")
-              }
+              onClick={() => {
+                if (
+                  typeof window === "undefined" ||
+                  window.confirm(
+                    "Restore this organization to review? Its current status will be replaced.",
+                  )
+                ) {
+                  decideOrganization("IN_REVIEW", "Restored by platform admin");
+                }
+              }}
               type="button"
             >
               <ArchiveRestore size={15} /> Restore to review

@@ -86,11 +86,15 @@ export function DonorHome() {
     .filter((donation) =>
       ["CAPTURED", "PARTIALLY_REFUNDED"].includes(donation.status),
     )
-    .reduce(
-      (total, donation) =>
-        total + donation.amountPaise - donation.refundedPaise,
-      0,
-    );
+      .reduce(
+        (total, donation) =>
+          total + donation.amountPaise - donation.refundedPaise,
+        0,
+      );
+  const highlightedCauses = causes.filter(
+    (cause) =>
+      followedCauses.includes(cause.id) || bookmarkedCauses.includes(cause.id),
+  );
 
   return (
     <div className="flow-page">
@@ -129,6 +133,68 @@ export function DonorHome() {
           <strong>{itemPledges.length}</strong>
         </article>
       </div>
+      <section className="donor-home-next-steps" aria-label="Donor next steps">
+        <div className="flow-panel donor-home-next-action">
+          <div className="flow-panel-head">
+            <div>
+              <small>Suggested next step</small>
+              <h2>Keep your giving trail together</h2>
+            </div>
+            <ShieldCheck size={21} />
+          </div>
+          <p>
+            Review the evidence trail behind a cause, then choose a contribution
+            that fits your intent. Your receipts and item pledges stay separate
+            and easy to revisit.
+          </p>
+          <div className="donor-home-actions">
+            <Link className="button button-primary" href="/causes">
+              Explore confirmed causes <ArrowRight size={16} />
+            </Link>
+            <Link className="button button-secondary" href="/donor/donations">
+              View receipts
+            </Link>
+            <Link className="button button-secondary" href="/donor/items">
+              Track item pledges
+            </Link>
+          </div>
+        </div>
+        <div className="flow-panel donor-home-saved">
+          <div className="flow-panel-head">
+            <div>
+              <small>Saved for later</small>
+              <h2>Causes you follow</h2>
+            </div>
+            <Bookmark size={21} />
+          </div>
+          {highlightedCauses.length ? (
+            <div className="donor-home-cause-list">
+              {highlightedCauses.slice(0, 3).map((cause) => {
+                const progress = Math.min(
+                  100,
+                  Math.round((cause.raisedPaise / cause.targetPaise) * 100),
+                );
+                return (
+                  <Link href={`/causes/${cause.slug}`} key={cause.id}>
+                    <span>
+                      <strong>{cause.title}</strong>
+                      <small>{cause.organization}</small>
+                    </span>
+                    <i aria-hidden="true">
+                      <b style={{ width: `${progress}%` }} />
+                    </i>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="donor-home-empty-copy">
+              Save a cause while you browse and it will appear here for an
+              easier next visit.
+            </p>
+          )}
+        </div>
+      </section>
       <section className="flow-panel">
         <div className="flow-panel-head">
           <div>
@@ -178,20 +244,20 @@ function DonationTable({
             );
             return (
               <tr key={donation.id}>
-                <td>
+                <td data-label="Donation">
                   <strong>{cause?.title ?? donation.causeId}</strong>
                   <small>{cause?.organization}</small>
                 </td>
-                <td>
+                <td data-label="Date">
                   {new Date(donation.createdAt).toLocaleDateString("en-IN")}
                 </td>
-                <td>{formatPaise(donation.amountPaise)}</td>
-                <td>{formatPaise(donation.platformFeePaise)}</td>
-                <td>{formatPaise(donation.netOrganizationPaise)}</td>
-                <td>
+                <td data-label="Gross">{formatPaise(donation.amountPaise)}</td>
+                <td data-label="Platform fee">{formatPaise(donation.platformFeePaise)}</td>
+                <td data-label="Net">{formatPaise(donation.netOrganizationPaise)}</td>
+                <td data-label="Status">
                   <DonationStatus donation={donation} />
                 </td>
-                <td>
+                <td data-label={donorView ? "Details" : "Transfer"}>
                   {donorView ? (
                     <Link href={`/donor/donations/${donation.id}`}>
                       Details
@@ -213,13 +279,21 @@ export function DonorDonationHistory() {
   const { donations, causes } = useProductDemo();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("ALL");
+  const [range, setRange] = useState("ALL");
   const filtered = donations.filter((donation) => {
     const cause = causes.find((item) => item.id === donation.causeId);
+    const ageDays = Math.floor(
+      (Date.now() - new Date(donation.createdAt).getTime()) / 86_400_000,
+    );
     return (
       (status === "ALL" || donation.status === status) &&
       `${cause?.title} ${cause?.organization} ${donation.razorpayReference}`
         .toLowerCase()
-        .includes(query.toLowerCase())
+        .includes(query.toLowerCase()) &&
+      (range === "ALL" ||
+        (range === "30" && ageDays <= 30) ||
+        (range === "90" && ageDays <= 90) ||
+        (range === "365" && ageDays <= 365))
     );
   });
   return (
@@ -248,12 +322,13 @@ export function DonorDonationHistory() {
         </button>
       </header>
       <div className="table-toolbar">
-        <label>
-          <Search size={16} />
-          <input
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search cause or reference"
-            value={query}
+          <label>
+            <Search size={16} />
+            <input
+              aria-label="Search cause or reference"
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search cause or reference"
+              value={query}
           />
         </label>
         <select
@@ -268,9 +343,37 @@ export function DonorDonationHistory() {
           <option value="PARTIALLY_REFUNDED">Partially refunded</option>
           <option value="REFUNDED">Refunded</option>
         </select>
+        <select
+          aria-label="Filter donation date range"
+          onChange={(event) => setRange(event.target.value)}
+          value={range}
+        >
+          <option value="ALL">All time</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
+          <option value="365">Last year</option>
+        </select>
       </div>
       <section className="flow-table-card">
-        <DonationTable donations={filtered} donorView causes={causes} />
+        {filtered.length ? (
+          <DonationTable donations={filtered} donorView causes={causes} />
+        ) : (
+          <div className="empty-flow-state">
+            <strong>No donation records match these filters</strong>
+            <p>Try a broader search, date range, or payment status.</p>
+            <button
+              className="button button-secondary"
+              onClick={() => {
+                setQuery("");
+                setRange("ALL");
+                setStatus("ALL");
+              }}
+              type="button"
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
       </section>
     </div>
   );
@@ -418,8 +521,25 @@ export function OrganizationDonationLedger({
 }) {
   const { donations, causes, causeProgress } = useProductDemo();
   const [status, setStatus] = useState("ALL");
+  const [query, setQuery] = useState("");
+  const [range, setRange] = useState("ALL");
   const filtered = donations.filter(
-    (donation) => status === "ALL" || donation.status === status,
+    (donation) => {
+      const cause = causes.find((item) => item.id === donation.causeId);
+      const matchesStatus = status === "ALL" || donation.status === status;
+      const matchesQuery = `${cause?.title ?? ""} ${cause?.organization ?? ""} ${donation.id} ${donation.razorpayReference}`
+        .toLowerCase()
+        .includes(query.trim().toLowerCase());
+      const ageDays = Math.floor(
+        (Date.now() - new Date(donation.createdAt).getTime()) / 86_400_000,
+      );
+      const matchesRange =
+        range === "ALL" ||
+        (range === "30" && ageDays <= 30) ||
+        (range === "90" && ageDays <= 90) ||
+        (range === "365" && ageDays <= 365);
+      return matchesStatus && matchesQuery && matchesRange;
+    },
   );
   const captured = donations.filter((donation) =>
     ["CAPTURED", "PARTIALLY_REFUNDED"].includes(donation.status),
@@ -492,35 +612,79 @@ export function OrganizationDonationLedger({
           </strong>
         </article>
       </div>
-      <div
-        className="simple-chart"
-        aria-label="Donation volume chart"
-        role="img"
-      >
-        <i style={{ height: "44%" }} />
-        <i style={{ height: "67%" }} />
-        <i style={{ height: "51%" }} />
-        <i style={{ height: "82%" }} />
-        <i style={{ height: "72%" }} />
-        <i style={{ height: "94%" }} />
+      <div className="simple-chart" aria-label="Captured donation amounts" role="img">
+        {captured.length ? (
+          captured.slice(0, 6).map((donation) => {
+            const maxAmount = Math.max(
+              ...captured.map((entry) => entry.amountPaise),
+              1,
+            );
+            return (
+              <i
+                key={donation.id}
+                style={{ height: `${Math.max(20, (donation.amountPaise / maxAmount) * 100)}%` }}
+              />
+            );
+          })
+        ) : (
+          <span>No captured donation amounts in this view.</span>
+        )}
       </div>
       <div className="table-toolbar">
         <span>Fee rate in fixture: exactly 0.25% · 25 basis points</span>
-        <select
-          aria-label="Filter ledger status"
-          value={status}
-          onChange={(event) => setStatus(event.target.value)}
-        >
-          <option value="ALL">All payments</option>
-          <option value="CAPTURED">Captured</option>
-          <option value="PENDING">Pending</option>
-          <option value="FAILED">Failed</option>
-          <option value="PARTIALLY_REFUNDED">Partially refunded</option>
-          <option value="REFUNDED">Refunded</option>
-        </select>
+        <div className="ledger-filters">
+          <label>
+            <span>Search donations</span>
+            <input
+              aria-label="Search donations"
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Cause, organization, or ID"
+              type="search"
+              value={query}
+            />
+          </label>
+          <label>
+            <span>Date range</span>
+            <select aria-label="Filter ledger date range" onChange={(event) => setRange(event.target.value)} value={range}>
+              <option value="ALL">All time</option>
+              <option value="30">Last 30 days</option>
+              <option value="90">Last 90 days</option>
+              <option value="365">Last year</option>
+            </select>
+          </label>
+          <label>
+            <span>Status</span>
+            <select aria-label="Filter ledger status" onChange={(event) => setStatus(event.target.value)} value={status}>
+              <option value="ALL">All payments</option>
+              <option value="CAPTURED">Captured</option>
+              <option value="PENDING">Pending</option>
+              <option value="FAILED">Failed</option>
+              <option value="PARTIALLY_REFUNDED">Partially refunded</option>
+              <option value="REFUNDED">Refunded</option>
+            </select>
+          </label>
+        </div>
       </div>
       <section className="flow-table-card">
-      <DonationTable donations={filtered} causes={causes} />
+        {filtered.length ? (
+          <DonationTable donations={filtered} causes={causes} />
+        ) : (
+          <div className="empty-flow-state">
+            <strong>No donations match these filters</strong>
+            <p>Try a broader search, date range, or payment status.</p>
+            <button
+              className="button button-secondary"
+              onClick={() => {
+                setQuery("");
+                setRange("ALL");
+                setStatus("ALL");
+              }}
+              type="button"
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
       </section>
     </div>
   );

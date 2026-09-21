@@ -1,0 +1,589 @@
+.organizationsRoute :global(.flow-page) {
+  gap: 1.4rem;
+}
+
+.organizationsRoute :global(.flow-page-heading) {
+  align-items: center;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.organizationsRoute :global(.flow-page-heading h1) {
+  max-width: 650px;
+}
+
+.organizationsRoute :global(.flow-page-heading p) {
+  max-width: 760px;
+}
+
+.organizationsRoute :global(.metric-pair) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: stretch;
+}
+
+.organizationsRoute :global(.metric-pair span) {
+  display: grid;
+  gap: 0.12rem;
+  min-width: 120px;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-size: 0.66rem;
+  white-space: nowrap;
+}
+
+.organizationsRoute :global(.metric-pair strong) {
+  color: var(--text);
+  font-size: 1.15rem;
+}
+
+.organizationsRoute :global(.table-toolbar) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.organizationsRoute :global(.table-toolbar > label) {
+  display: flex;
+  width: 100%;
+  min-height: 2.5rem;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--border-strong, var(--border));
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.organizationsRoute :global(.table-toolbar > label input) {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+}
+
+.organizationsRoute :global(.table-toolbar select) {
+  min-height: 2.5rem;
+  min-width: 170px;
+  border: 1px solid var(--border-strong, var(--border));
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 0 0.7rem;
+}
+
+.organizationsRoute :global(.flow-table-card) {
+  overflow: hidden;
+}
+
+.organizationsRoute :global(.flow-table-card table) {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.organizationsRoute :global(.flow-table-card th),
+.organizationsRoute :global(.flow-table-card td) {
+  padding: 0.75rem 0.7rem;
+  overflow-wrap: anywhere;
+}
+
+.organizationsRoute :global(.flow-table-card th:first-child),
+.organizationsRoute :global(.flow-table-card td:first-child) {
+  width: 30%;
+}
+
+.organizationsRoute :global(.flow-table-card th:nth-child(2)),
+.organizationsRoute :global(.flow-table-card td:nth-child(2)) {
+  width: 17%;
+}
+
+.organizationsRoute :global(.flow-table-card th:nth-child(3)),
+.organizationsRoute :global(.flow-table-card td:nth-child(3)) {
+  width: 20%;
+}
+
+.organizationsRoute :global(.flow-table-card th:nth-child(4)),
+.organizationsRoute :global(.flow-table-card td:nth-child(4)) {
+  width: 19%;
+}
+
+.organizationsRoute :global(.flow-table-card th:last-child),
+.organizationsRoute :global(.flow-table-card td:last-child) {
+  width: 14%;
+}
+
+.organizationsRoute :global(.flow-table-card td strong),
+.organizationsRoute :global(.flow-table-card td small) {
+  display: block;
+}
+
+.organizationsRoute :global(.flow-table-card td small) {
+  margin-top: 0.18rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.organizationsRoute :global(.button-small) {
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) and (min-width: 701px) {
+  .organizationsRoute :global(.flow-table-card th:first-child),
+  .organizationsRoute :global(.flow-table-card td:first-child) {
+    width: 29%;
+  }
+
+  .organizationsRoute :global(.flow-table-card th:nth-child(2)),
+  .organizationsRoute :global(.flow-table-card td:nth-child(2)) {
+    width: 17%;
+  }
+
+  .organizationsRoute :global(.flow-table-card th:nth-child(3)),
+  .organizationsRoute :global(.flow-table-card td:nth-child(3)) {
+    width: 19%;
+  }
+
+  .organizationsRoute :global(.flow-table-card th:nth-child(4)),
+  .organizationsRoute :global(.flow-table-card td:nth-child(4)) {
+    width: 19%;
+  }
+
+  .organizationsRoute :global(.flow-table-card th:last-child),
+  .organizationsRoute :global(.flow-table-card td:last-child) {
+    width: 16%;
+  }
+}
+
+@media (max-width: 900px) {
+  .organizationsRoute :global(.flow-page-heading) {
+    align-items: start;
+  }
+
+  .organizationsRoute :global(.metric-pair) {
+    width: 100%;
+  }
+}
+
+@media (max-width: 700px) {
+  .organizationsRoute :global(.table-toolbar) {
+    grid-template-columns: 1fr;
+  }
+
+  .organizationsRoute :global(.table-toolbar select) {
+    width: 100%;
+  }
+
+  .organizationsRoute :global(.flow-table-card table),
+  .organizationsRoute :global(.flow-table-card tbody),
+  .organizationsRoute :global(.flow-table-card tr),
+  .organizationsRoute :global(.flow-table-card td) {
+    display: block;
+    width: 100% !important;
+  }
+
+  .organizationsRoute :global(.flow-table-card thead) {
+    display: none;
+  }
+
+  .organizationsRoute :global(.flow-table-card tr) {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .organizationsRoute :global(.flow-table-card tr:last-child) {
+    border-bottom: 0;
+  }
+
+  .organizationsRoute :global(.flow-table-card td) {
+    display: grid;
+    grid-template-columns: minmax(5.2rem, 31%) 1fr;
+    gap: 0.7rem;
+    align-items: start;
+    padding: 0.4rem 0.75rem;
+    border: 0;
+  }
+
+  .organizationsRoute :global(.flow-table-card td::before) {
+    color: var(--muted);
+    content: attr(data-label);
+    font-size: 0.62rem;
+    font-weight: 760;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .organizationsRoute :global(.flow-table-card td > *) {
+    min-width: 0;
+  }
+
+  .organizationsRoute :global(.button-small) {
+    width: fit-content;
+  }
+}
+
+@media (max-width: 480px) {
+  .organizationsRoute :global(.flow-page-heading .metric-pair) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .organizationsRoute :global(.metric-pair span) {
+    min-width: 0;
+  }
+}
+
+.organizationDetailRoute :global(.flow-page) {
+  gap: 1.3rem;
+}
+
+.organizationDetailRoute :global(.flow-page-heading) {
+  align-items: center;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.organizationDetailRoute :global(.flow-page-heading > div:first-child) {
+  max-width: 760px;
+}
+
+.organizationDetailRoute :global(.back-link) {
+  display: inline-flex;
+  margin-bottom: 0.8rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 760;
+  text-decoration: none;
+}
+
+.organizationDetailRoute :global(.admin-review-grid) {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.78fr) minmax(260px, 0.95fr) minmax(360px, 1.25fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.organizationDetailRoute :global(.admin-review-grid > *) {
+  min-width: 0;
+}
+
+.organizationDetailRoute :global(.document-list-panel),
+.organizationDetailRoute :global(.secure-preview-panel),
+.organizationDetailRoute :global(.decision-panel),
+.organizationDetailRoute :global(.review-history-panel) {
+  min-width: 0;
+}
+
+.organizationDetailRoute :global(.document-list-panel) {
+  padding: 0;
+  overflow: hidden;
+}
+
+.organizationDetailRoute :global(.document-list-panel .flow-panel-head),
+.organizationDetailRoute :global(.decision-panel .flow-panel-head),
+.organizationDetailRoute :global(.review-history-panel .flow-panel-head) {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.organizationDetailRoute :global(.document-review-list) {
+  display: grid;
+}
+
+.organizationDetailRoute :global(.document-review-list button) {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.65rem;
+  align-items: start;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+}
+
+.organizationDetailRoute :global(.document-review-list button:last-child) {
+  border-bottom: 0;
+}
+
+.organizationDetailRoute :global(.document-review-list button.active) {
+  background: var(--surface-soft);
+  box-shadow: inset 3px 0 var(--accent, var(--violet));
+}
+
+.organizationDetailRoute :global(.document-review-list button > span) {
+  display: grid;
+  gap: 0.22rem;
+  min-width: 0;
+}
+
+.organizationDetailRoute :global(.document-review-list strong) {
+  font-size: 0.76rem;
+  overflow-wrap: anywhere;
+}
+
+.organizationDetailRoute :global(.document-review-list small) {
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+.organizationDetailRoute :global(.secure-preview-panel) {
+  display: grid;
+  align-content: start;
+  min-height: 260px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.organizationDetailRoute :global(.secure-preview-head) {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.organizationDetailRoute :global(.secure-preview-head > span),
+.organizationDetailRoute :global(.secure-preview-head > button) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.organizationDetailRoute :global(.secure-preview-head > button) {
+  border: 0;
+  background: transparent;
+  color: var(--violet);
+  font-weight: 760;
+  text-align: right;
+}
+
+.organizationDetailRoute :global(.preview-closed-state) {
+  display: grid;
+  justify-items: start;
+  gap: 0.45rem;
+  padding: 1.3rem 1rem;
+}
+
+.organizationDetailRoute :global(.preview-closed-state svg) {
+  color: var(--violet);
+}
+
+.organizationDetailRoute :global(.preview-closed-state strong) {
+  font-size: 0.82rem;
+}
+
+.organizationDetailRoute :global(.preview-closed-state p) {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.organizationDetailRoute :global(.synthetic-document-preview) {
+  min-height: 280px;
+  margin: 1rem;
+  padding: 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-soft);
+}
+
+.organizationDetailRoute :global(.decision-panel) {
+  padding: 0;
+  overflow: hidden;
+}
+
+.organizationDetailRoute :global(.decision-panel > .expiry-line),
+.organizationDetailRoute :global(.decision-panel > .flow-field),
+.organizationDetailRoute :global(.decision-panel > .inline-result),
+.organizationDetailRoute :global(.decision-panel > .decision-actions),
+.organizationDetailRoute :global(.decision-panel > .organization-actions) {
+  margin-right: 1.1rem;
+  margin-left: 1.1rem;
+}
+
+.organizationDetailRoute :global(.decision-panel > .expiry-line) {
+  margin-top: 1rem;
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.organizationDetailRoute :global(.decision-panel .flow-field) {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 1rem;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.organizationDetailRoute :global(.decision-panel .flow-field > span) {
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 760;
+}
+
+.organizationDetailRoute :global(.decision-panel textarea) {
+  width: 100%;
+  min-height: 5rem;
+  resize: vertical;
+  border: 1px solid var(--border-strong, var(--border));
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 0.7rem;
+}
+
+.organizationDetailRoute :global(.decision-panel .flow-field small) {
+  color: var(--muted);
+  font-size: 0.62rem;
+}
+
+.organizationDetailRoute :global(.decision-actions) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.organizationDetailRoute :global(.decision-actions button),
+.organizationDetailRoute :global(.organization-actions button) {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-soft);
+  color: var(--text);
+  font-size: 0.67rem;
+  font-weight: 760;
+  text-align: center;
+}
+
+.organizationDetailRoute :global(.organization-actions) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  padding: 1rem 0 1.1rem;
+  border-top: 1px solid var(--border);
+}
+
+.organizationDetailRoute :global(.organization-actions strong) {
+  grid-column: 1 / -1;
+  font-size: 0.72rem;
+}
+
+.organizationDetailRoute :global(.organization-actions button:first-of-type) {
+  border-color: color-mix(in srgb, var(--success) 35%, var(--border));
+}
+
+.organizationDetailRoute :global(.organization-actions button:nth-of-type(2)) {
+  border-color: color-mix(in srgb, var(--danger) 35%, var(--border));
+}
+
+.organizationDetailRoute :global(.review-history-panel) {
+  padding: 0;
+  overflow: hidden;
+}
+
+.organizationDetailRoute :global(.review-history-panel .timeline-list) {
+  padding: 1rem 1.1rem;
+}
+
+.organizationDetailRoute :global(.review-history-panel .timeline-list article) {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.7rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.organizationDetailRoute :global(.review-history-panel .timeline-list article:last-child) {
+  border-bottom: 0;
+}
+
+.organizationDetailRoute :global(.review-history-panel .timeline-list article > div) {
+  min-width: 0;
+}
+
+.organizationDetailRoute :global(.review-history-panel .timeline-list strong) {
+  font-size: 0.76rem;
+}
+
+.organizationDetailRoute :global(.review-history-panel .timeline-list p),
+.organizationDetailRoute :global(.review-history-panel .timeline-list small) {
+  display: block;
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 1180px) {
+  .organizationDetailRoute :global(.admin-review-grid) {
+    grid-template-columns: minmax(220px, 0.9fr) minmax(320px, 1.1fr);
+  }
+
+  .organizationDetailRoute :global(.document-list-panel) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .organizationDetailRoute :global(.flow-page-heading) {
+    align-items: start;
+  }
+
+  .organizationDetailRoute :global(.flow-page-heading > .state-badge) {
+    margin-top: 0.2rem;
+  }
+
+  .organizationDetailRoute :global(.admin-review-grid) {
+    grid-template-columns: 1fr;
+  }
+
+  .organizationDetailRoute :global(.document-list-panel),
+  .organizationDetailRoute :global(.secure-preview-panel),
+  .organizationDetailRoute :global(.decision-panel) {
+    grid-column: auto;
+  }
+
+  .organizationDetailRoute :global(.secure-preview-head) {
+    flex-direction: column;
+  }
+
+  .organizationDetailRoute :global(.secure-preview-head > button) {
+    text-align: left;
+  }
+
+  .organizationDetailRoute :global(.decision-actions),
+  .organizationDetailRoute :global(.organization-actions) {
+    grid-template-columns: 1fr;
+  }
+
+  .organizationDetailRoute :global(.organization-actions strong) {
+    grid-column: auto;
+  }
+}

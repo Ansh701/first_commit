@@ -1,0 +1,211 @@
+.adminRoute :global(.flow-page) {
+  gap: 1.45rem;
+}
+
+.adminRoute :global(.flow-page-heading) {
+  align-items: center;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.adminRoute :global(.flow-page-heading h1) {
+  max-width: 680px;
+}
+
+.adminRoute :global(.flow-page-heading p) {
+  max-width: 760px;
+}
+
+.adminRoute :global(.admin-overview-kpis) {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.adminRoute :global(.admin-overview-kpis article) {
+  display: grid;
+  gap: 0.35rem;
+  min-height: 112px;
+  align-content: center;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.adminRoute :global(.admin-overview-kpis article > svg) {
+  color: var(--violet);
+}
+
+.adminRoute :global(.admin-overview-kpis article > span) {
+  color: var(--muted);
+  font-size: 0.67rem;
+}
+
+.adminRoute :global(.admin-overview-kpis article > strong) {
+  font-size: clamp(1.1rem, 2vw, 1.55rem);
+  letter-spacing: -0.04em;
+}
+
+.adminRoute :global(.admin-overview-grid) {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  gap: 1rem;
+}
+
+.adminRoute :global(.admin-attention-list),
+.adminRoute :global(.admin-review-list) {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.adminRoute :global(.admin-attention-list a) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.adminRoute :global(.admin-attention-list a:first-child) {
+  border-top: 0;
+}
+
+.adminRoute :global(.admin-attention-list a > span:first-child) {
+  display: grid;
+  gap: 0.22rem;
+}
+
+.adminRoute :global(.admin-attention-list strong),
+.adminRoute :global(.admin-review-list strong) {
+  font-size: 0.78rem;
+}
+
+.adminRoute :global(.admin-attention-list small),
+.adminRoute :global(.admin-review-list small) {
+  color: var(--muted);
+  font-size: 0.67rem;
+}
+
+.adminRoute :global(.admin-attention-list a > span:last-child) {
+  color: var(--violet);
+  font-size: 0.68rem;
+  font-weight: 760;
+  white-space: nowrap;
+}
+
+.adminRoute :global(.admin-review-list > div) {
+  display: grid;
+  gap: 0.2rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.adminRoute :global(.admin-review-list > div:last-child) {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.adminRoute :global(.admin-review-list p) {
+  margin: 0.15rem 0 0;
+  color: var(--text);
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+.adminRoute :global(.admin-activity-panel) {
+  scroll-margin-top: 1.5rem;
+}
+
+.adminRoute :global(.admin-activity-list) {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.adminRoute :global(.admin-activity-list > div) {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 0.7rem;
+  padding: 0.7rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.adminRoute :global(.admin-activity-list > div svg) {
+  margin-top: 0.1rem;
+  color: var(--violet);
+}
+
+.adminRoute :global(.admin-activity-list > div > span) {
+  display: grid;
+  gap: 0.22rem;
+}
+
+.adminRoute :global(.admin-activity-list strong) {
+  font-size: 0.76rem;
+}
+
+.adminRoute :global(.admin-activity-list small) {
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+.adminRoute :global(.admin-activity-list em) {
+  color: var(--muted);
+  font-size: 0.64rem;
+  font-style: normal;
+  white-space: nowrap;
+}
+
+.adminRoute :global(.admin-empty-copy) {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .adminRoute :global(.admin-overview-kpis) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .adminRoute :global(.admin-overview-grid) {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .adminRoute :global(.flow-page-heading) {
+    align-items: start;
+  }
+
+  .adminRoute :global(.flow-page-heading .button) {
+    width: 100%;
+  }
+
+  .adminRoute :global(.admin-overview-kpis) {
+    gap: 0.55rem;
+  }
+
+  .adminRoute :global(.admin-overview-kpis article) {
+    min-height: 96px;
+    padding: 0.75rem;
+  }
+
+  .adminRoute :global(.admin-attention-list a) {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .adminRoute :global(.admin-activity-list > div) {
+    grid-template-columns: auto 1fr;
+  }
+
+  .adminRoute :global(.admin-activity-list em) {
+    grid-column: 2;
+  }
+}

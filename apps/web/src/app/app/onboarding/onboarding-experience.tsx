@@ -39,7 +39,9 @@ type FieldOptions = {
 
 function normalizePhone(countryCode: string, phone: string) {
   const digits = phone.replace(/\D/g, "");
-  return digits ? `+${countryCode}${digits}` : "";
+  const code = countryCode.replace(/\D/g, "");
+  const nationalNumber = digits.startsWith(code) ? digits.slice(code.length) : digits;
+  return nationalNumber ? `+${code}${nationalNumber}` : "";
 }
 
 export function OnboardingExperience() {
@@ -68,10 +70,14 @@ export function OnboardingExperience() {
     const initial = values[name] ?? "";
     const error = fieldErrors[name];
     const length = lengths[name] ?? initial.length;
+    const updateLength = (event: FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const nextLength = event.currentTarget.value.length;
+      setLengths((current) => ({ ...current, [name]: nextLength }));
+    };
     const control = options.textarea ? (
-      <textarea key={activeKey} defaultValue={initial} name={name} rows={4} maxLength={options.maxLength} placeholder={options.placeholder} required={options.required} aria-invalid={Boolean(error)} onInput={(event) => setLengths((current) => ({ ...current, [name]: event.currentTarget.value.length }))} />
+      <textarea key={activeKey} defaultValue={initial} name={name} rows={4} maxLength={options.maxLength} placeholder={options.placeholder} required={options.required} aria-invalid={Boolean(error)} onInput={updateLength} />
     ) : (
-      <input key={activeKey} defaultValue={initial} name={name} type={options.type ?? "text"} inputMode={options.inputMode} maxLength={options.maxLength} placeholder={options.placeholder} required={options.required} aria-invalid={Boolean(error)} onInput={(event) => setLengths((current) => ({ ...current, [name]: event.currentTarget.value.length }))} />
+      <input key={activeKey} defaultValue={initial} name={name} type={options.type ?? "text"} inputMode={options.inputMode} maxLength={options.maxLength} placeholder={options.placeholder} required={options.required} aria-invalid={Boolean(error)} onInput={updateLength} />
     );
     return <label className={`${styles.field} ${error ? styles.fieldInvalid : ""}`} key={name}><span>{label}{options.required ? <b aria-hidden="true">*</b> : null}</span>{control}<small className={styles.fieldMeta}><span>{error ?? options.hint ?? " "}</span>{options.maxLength ? <span>{length}/{options.maxLength}</span> : null}</small></label>;
   }
@@ -145,7 +151,7 @@ export function OnboardingExperience() {
   }
 
   const formContent = (() => {
-    if (active.id === "ACCOUNT") return <div className={styles.formGrid}>{field("contactName", "Primary contact name", { required: true, placeholder: "Name of the person responsible for this profile" })}{field("contactEmail", "Contact email", { required: true, type: "email", inputMode: "email", placeholder: "name@organization.org" })}<div className={styles.phoneGroup}><label className={styles.field}><span>Country calling code<b aria-hidden="true">*</b></span><select defaultValue={values.phoneCountryCode ?? "91"} name="phoneCountryCode" aria-label="Country calling code">{countryCodes.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>{field("contactPhone", "Phone number", { required: true, type: "tel", inputMode: "tel", placeholder: "98765 43210" })}</div></div>;
+    if (active.id === "ACCOUNT") return <div className={styles.formGrid}>{field("contactName", "Primary contact name", { required: true, placeholder: "Name of the person responsible for this profile" })}{field("contactEmail", "Contact email", { required: true, type: "email", inputMode: "email", placeholder: "name@organization.org" })}<div className={styles.phoneGroup}><label className={styles.field}><span>Country calling code<b aria-hidden="true">*</b></span><select defaultValue={values.phoneCountryCode ?? "91"} name="phoneCountryCode" aria-label="Country calling code">{countryCodes.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>{field("contactPhone", "Contact phone", { required: true, type: "tel", inputMode: "tel", placeholder: "98765 43210" })}</div></div>;
     if (active.id === "ORGANIZATION") return <div className={styles.formGrid}>{field("organizationName", "Organization name", { required: true, maxLength: 100, placeholder: "Public organization name" })}{field("slug", "Public profile slug", { required: true, maxLength: 70, hint: "Lowercase letters, numbers, and hyphens only.", placeholder: "your-organization" })}{field("organizationType", "Organization type", { required: true, placeholder: "Section 8 company, trust, society…" })}{field("mission", "Mission", { required: true, maxLength: 220, textarea: true, placeholder: "What dependable change does your organization work toward?" })}{field("description", "Description", { maxLength: 600, textarea: true, placeholder: "Add the context people need before they explore causes." })}</div>;
     if (active.id === "LOCATION") return <div className={styles.formGrid}>{selectField("country", "Country", { required: true, items: [{ value: "India", label: "India" }, { value: "United States", label: "United States" }, { value: "United Kingdom", label: "United Kingdom" }] })}{selectField("state", "State or region", { required: true, items: [{ value: "Maharashtra", label: "Maharashtra" }, { value: "Karnataka", label: "Karnataka" }, { value: "Delhi", label: "Delhi" }] })}{field("city", "City", { required: true, placeholder: "Pune" })}{field("address", "Registered address", { maxLength: 240, textarea: true, placeholder: "Registered office or public service address" })}{field("serviceRegions", "Service regions", { maxLength: 180, hint: "Separate regions with commas.", placeholder: "Pune, Satara" })}{field("causes", "Cause categories", { required: true, maxLength: 140, hint: "Separate categories with commas.", placeholder: "Education, Youth, Community learning" })}</div>;
     if (active.id === "SOCIAL") return <div className={styles.formGrid}>{field("website", "Website", { type: "url", inputMode: "url", placeholder: "https://organization.org" })}{field("publicEmail", "Public contact email", { type: "email", inputMode: "email", placeholder: "hello@organization.org" })}{field("linkedin", "LinkedIn", { type: "url", inputMode: "url", placeholder: "https://linkedin.com/company/…" })}{field("instagram", "Instagram", { type: "url", inputMode: "url", placeholder: "https://instagram.com/…" })}</div>;

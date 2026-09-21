@@ -1,3 +1,9 @@
-import { RepositoryContentPage } from "@/components/repository-content-page";
+import { getPublishedSiteContent } from "@/lib/server/content-repository";
+import { HowTrustExperience } from "./how-trust-experience";
+
 export const metadata = { title: "How it works" };
-export default function Page() { return <RepositoryContentPage slug="how-trust-works" ctaLabel="Open the product demo" ctaHref="/demo" />; }
+
+export default async function Page() {
+  const page = await getPublishedSiteContent("how-trust-works");
+  return <HowTrustExperience page={page} />;
+}

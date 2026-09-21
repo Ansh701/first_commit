@@ -1,3 +1,9 @@
-import { RepositoryContentPage } from "@/components/repository-content-page";
+import { getPublishedSiteContent } from "@/lib/server/content-repository";
+import { FaqExperience } from "./faq-experience";
+
 export const metadata = { title: "FAQ" };
-export default function Page() { return <RepositoryContentPage slug="faq" ctaLabel="Open help" ctaHref="/help" />; }
+
+export default async function Page() {
+  const page = await getPublishedSiteContent("faq");
+  return <FaqExperience page={page} />;
+}

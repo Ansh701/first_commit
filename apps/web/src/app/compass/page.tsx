@@ -1,3 +1,11 @@
-import { RepositoryContentPage } from "@/components/repository-content-page";
+import { getPublishedSiteContent } from "@/lib/server/content-repository";
+import { getCompassCandidateClaims } from "@/lib/server/compass-repository";
+import { CompassExperience } from "./compass-experience";
+
 export const metadata = { title: "Compass" };
-export default function Page() { return <RepositoryContentPage slug="compass" ctaLabel="Open the evidence demo" ctaHref="/demo" />; }
+
+export default async function Page() {
+  const page = await getPublishedSiteContent("compass");
+  const claims = await getCompassCandidateClaims();
+  return <CompassExperience page={page} claims={claims} />;
+}

@@ -1,0 +1,299 @@
+.donationsRoute :global(.flow-page) {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.donationsRoute :global(.flow-page-heading) {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0 0 0.25rem;
+}
+
+.donationsRoute :global(.flow-page-heading h1) {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(1.65rem, 2.2vw, 2.35rem);
+  letter-spacing: -0.055em;
+  line-height: 1.05;
+}
+
+.donationsRoute :global(.flow-page-heading p) {
+  max-width: 760px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.donationsRoute :global(.summary-stat-grid) {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.donationsRoute :global(.summary-stat-grid article) {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 0.55rem;
+  align-content: start;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+}
+
+.donationsRoute :global(.summary-stat-grid svg) {
+  grid-row: span 2;
+  color: var(--primary);
+}
+
+.donationsRoute :global(.summary-stat-grid span) {
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.donationsRoute :global(.summary-stat-grid strong) {
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.donationsRoute :global(.simple-chart) {
+  display: flex;
+  align-items: end;
+  gap: 0.55rem;
+  min-height: 84px;
+  padding: 0.85rem 1rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+}
+
+.donationsRoute :global(.simple-chart i) {
+  display: block;
+  flex: 1 1 0;
+  min-width: 1rem;
+  border-radius: 0.35rem 0.35rem 0 0;
+  background: var(--primary);
+}
+
+.donationsRoute :global(.simple-chart span) {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.donationsRoute :global(.table-toolbar) {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.donationsRoute :global(.ledger-filters) {
+  display: grid;
+  grid-template-columns: minmax(240px, 1.5fr) repeat(2, minmax(150px, 0.7fr));
+  gap: 0.65rem;
+}
+
+.donationsRoute :global(.ledger-filters label) {
+  display: grid;
+  gap: 0.3rem;
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.donationsRoute :global(.ledger-filters input),
+.donationsRoute :global(.ledger-filters select) {
+  width: 100%;
+  min-height: 40px;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.donationsRoute :global(.ledger-filters input:focus),
+.donationsRoute :global(.ledger-filters select:focus) {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.donationsRoute :global(.flow-table-card) {
+  min-width: 0;
+  padding: 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+}
+
+.donationsRoute :global(.responsive-table) {
+  overflow-x: auto;
+}
+
+.donationsRoute :global(.responsive-table table) {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: separate;
+  border-spacing: 0;
+  color: var(--text);
+  font-size: 0.73rem;
+}
+
+.donationsRoute :global(.responsive-table th),
+.donationsRoute :global(.responsive-table td) {
+  padding: 0.75rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.donationsRoute :global(.responsive-table th) {
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.donationsRoute :global(.responsive-table tr:last-child td) {
+  border-bottom: 0;
+}
+
+.donationsRoute :global(.responsive-table td:first-child) {
+  min-width: 240px;
+}
+
+.donationsRoute :global(.responsive-table td strong),
+.donationsRoute :global(.responsive-table td small) {
+  display: block;
+}
+
+.donationsRoute :global(.responsive-table td strong) {
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.donationsRoute :global(.responsive-table td small) {
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.donationsRoute :global(.empty-flow-state) {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  min-height: 180px;
+  padding: 2rem 1rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.donationsRoute :global(.empty-flow-state strong) {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.donationsRoute :global(.empty-flow-state p) {
+  margin: 0;
+  font-size: 0.76rem;
+}
+
+@media (max-width: 980px) {
+  .donationsRoute :global(.summary-stat-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .donationsRoute :global(.ledger-filters) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .donationsRoute :global(.ledger-filters label:first-child) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .donationsRoute :global(.flow-page-heading h1) {
+    font-size: 1.65rem;
+  }
+
+  .donationsRoute :global(.flow-page-heading p) {
+    font-size: 0.78rem;
+  }
+
+  .donationsRoute :global(.summary-stat-grid) {
+    grid-template-columns: 1fr;
+  }
+
+  .donationsRoute :global(.ledger-filters) {
+    grid-template-columns: 1fr;
+  }
+
+  .donationsRoute :global(.ledger-filters label:first-child) {
+    grid-column: auto;
+  }
+
+  .donationsRoute :global(.responsive-table) {
+    overflow: visible;
+  }
+
+  .donationsRoute :global(.responsive-table table),
+  .donationsRoute :global(.responsive-table tbody),
+  .donationsRoute :global(.responsive-table tr),
+  .donationsRoute :global(.responsive-table td) {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .donationsRoute :global(.responsive-table thead) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .donationsRoute :global(.responsive-table tr) {
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .donationsRoute :global(.responsive-table tr:last-child) {
+    border-bottom: 0;
+  }
+
+  .donationsRoute :global(.responsive-table td) {
+    display: grid;
+    grid-template-columns: minmax(94px, 0.42fr) minmax(0, 1fr);
+    gap: 0.5rem;
+    padding: 0.35rem 0.2rem;
+    border: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .donationsRoute :global(.responsive-table td::before) {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 0.66rem;
+    font-weight: 800;
+  }
+
+  .donationsRoute :global(.responsive-table td:first-child) {
+    display: grid;
+    min-width: 0;
+  }
+
+  .donationsRoute :global(.responsive-table td:first-child strong),
+  .donationsRoute :global(.responsive-table td:first-child small) {
+    grid-column: 2;
+  }
+}
