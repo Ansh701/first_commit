@@ -183,7 +183,7 @@ export class InsipsStack extends Stack {
     });
     const productDatabase = new rds.DatabaseCluster(this, "ProductDatabase", {
       engine: rds.DatabaseClusterEngine.auroraPostgres({
-        version: rds.AuroraPostgresEngineVersion.VER_16_4,
+        version: rds.AuroraPostgresEngineVersion.VER_16_8,
       }),
       writer: rds.ClusterInstance.serverlessV2("writer", {
         publiclyAccessible: false,
@@ -477,10 +477,11 @@ export class InsipsStack extends Stack {
       "DatabaseMigrationProvider",
       { onEventHandler: databaseMigration },
     );
-    new CustomResource(this, "ProductDatabaseSchema", {
+    const productDatabaseSchema = new CustomResource(this, "ProductDatabaseSchema", {
       serviceToken: migrationProvider.serviceToken,
       properties: { migration: "001_product_core,002_content_foundation,003_content_seed,004_site_content_seed" },
     });
+    productDatabaseSchema.node.addDependency(productDatabase);
 
     const startExtraction = new lambdaNode.NodejsFunction(
       this,
@@ -709,6 +710,13 @@ export class InsipsStack extends Stack {
 
     const apiFunction = new lambdaNode.NodejsFunction(this, "ApiFunction", {
       ...commonLambdaProps,
+      // Razorpay currently ships as CommonJS and uses Node built-in modules
+      // through require(). Keep this function in CommonJS so the bundled
+      // payment adapter can initialize on Lambda's Node.js runtime.
+      bundling: {
+        ...commonLambdaProps.bundling,
+        format: lambdaNode.OutputFormat.CJS,
+      },
       logGroup: new logs.LogGroup(this, "ApiLogs", {
         retention: logs.RetentionDays.ONE_WEEK,
         removalPolicy: RemovalPolicy.DESTROY,
@@ -758,6 +766,7 @@ export class InsipsStack extends Stack {
     razorpaySecret.grantRead(razorpayWebhookFunction);
 
     const api = new apigwv2.CfnApi(this, "HttpApi", {
+      name: `insips-${props.environment}-api`,
       protocolType: "HTTP",
       corsConfiguration: {
         allowCredentials: true,

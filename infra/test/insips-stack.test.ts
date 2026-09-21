@@ -61,15 +61,39 @@ describe("INSIPS infrastructure controls", { timeout: 30_000 }, () => {
     result.hasResourceProperties("AWS::RDS::DBCluster", {
       DatabaseName: "insips",
       Engine: "aurora-postgresql",
+      EngineVersion: "16.8",
       StorageEncrypted: true,
       EnableHttpEndpoint: true,
     });
+  });
+
+  it("waits for the database cluster before running schema migrations", () => {
+    const resources = template().toJSON().Resources as Record<
+      string,
+      { Type?: string; DependsOn?: string | string[] }
+    >;
+    const migration = resources.ProductDatabaseSchema;
+    const dependencies = Array.isArray(migration?.DependsOn)
+      ? migration.DependsOn
+      : migration?.DependsOn
+        ? [migration.DependsOn]
+        : [];
+
+    expect(dependencies.some((dependency) => /^ProductDatabase/.test(dependency))).toBe(
+      true,
+    );
   });
 
   it("exposes a dedicated unsigned Razorpay route backed by signature verification", () => {
     template().hasResourceProperties("AWS::ApiGatewayV2::Route", {
       RouteKey: "POST /webhooks/razorpay",
       AuthorizationType: "NONE",
+    });
+  });
+
+  it("gives the HTTP API a stable valid service name", () => {
+    template().hasResourceProperties("AWS::ApiGatewayV2::Api", {
+      Name: "insips-test-api",
     });
   });
 
