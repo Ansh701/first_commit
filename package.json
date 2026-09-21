@@ -18,6 +18,7 @@
     "format": "pnpm exec prettier --write ."
   },
   "devDependencies": {
+    "next": "15.5.25",
     "prettier": "3.6.2"
   }
 }
