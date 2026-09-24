@@ -1,3 +1,9 @@
-import { RepositoryContentPage } from "@/components/repository-content-page";
+import { getPublishedSiteContent } from "@/lib/server/content-repository";
+import { CsrTeamsPage } from "./csr-teams-page";
+
 export const metadata = { title: "For CSR teams" };
-export default function Page() { return <RepositoryContentPage slug="for-csr-teams" ctaLabel="Open CSR discovery" ctaHref="/csr/discover" />; }
+
+export default async function Page() {
+  const page = await getPublishedSiteContent("for-csr-teams");
+  return <CsrTeamsPage page={page} />;
+}

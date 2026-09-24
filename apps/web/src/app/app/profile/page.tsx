@@ -1,13 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, Save } from "lucide-react";
 import { useDemo } from "@/components/demo-provider";
 import { StatusPill } from "@/components/status-pill";
+import styles from "./profile-page.module.css";
+
+const initialSummary =
+  "Community-led learning centers helping first-generation students build foundational literacy and stay in school.";
 
 export default function OrganizationProfilePage() {
   const { saveProfile } = useDemo();
   const [saved, setSaved] = useState(true);
+  const [summaryLength, setSummaryLength] = useState(initialSummary.length);
+
+  useEffect(() => {
+    const previousOverflowX = document.body.style.overflowX;
+    const previousDocumentOverflowX = document.documentElement.style.overflowX;
+    const mobileNav = document.querySelector<HTMLElement>(".mobile-bottom-nav");
+    const previousMobileNavOverflowX = mobileNav?.style.overflowX;
+    document.body.style.overflowX = "clip";
+    document.documentElement.style.overflowX = "clip";
+    if (mobileNav) mobileNav.style.overflowX = "auto";
+    return () => {
+      document.body.style.overflowX = previousOverflowX;
+      document.documentElement.style.overflowX = previousDocumentOverflowX;
+      if (mobileNav)
+        mobileNav.style.overflowX = previousMobileNavOverflowX ?? "";
+    };
+  }, []);
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -16,7 +37,7 @@ export default function OrganizationProfilePage() {
   }
 
   return (
-    <>
+    <div className={styles.page}>
       <header className="page-heading">
         <div>
           <StatusPill tone="approved">Profile ready</StatusPill>
@@ -30,10 +51,10 @@ export default function OrganizationProfilePage() {
           <span className="button button-ghost" role="status">
             {saved ? (
               <>
-                <Check size={16} /> Saved
+                <Check size={16} /> Profile saved
               </>
             ) : (
-              "Unsaved changes"
+              "Unsaved profile changes"
             )}
           </span>
         </div>
@@ -41,7 +62,12 @@ export default function OrganizationProfilePage() {
       <form
         className="panel"
         onSubmit={onSubmit}
-        onChange={() => setSaved(false)}
+        onChange={(event) => {
+          setSaved(false);
+          if (event.target instanceof HTMLTextAreaElement) {
+            setSummaryLength(event.target.value.length);
+          }
+        }}
       >
         <div className="panel-body">
           <section className="form-section" aria-labelledby="identity-section">
@@ -84,12 +110,12 @@ export default function OrganizationProfilePage() {
                   id="summary"
                   name="summary"
                   maxLength={360}
-                  defaultValue="Community-led learning centers helping first-generation students build foundational literacy and stay in school."
+                  defaultValue={initialSummary}
                   required
                 />
                 <span className="field-hint">
                   <span>40–360 characters</span>
-                  <span>115 / 360</span>
+                  <span>{summaryLength} / 360</span>
                 </span>
               </div>
             </div>
@@ -175,6 +201,6 @@ export default function OrganizationProfilePage() {
           </button>
         </div>
       </form>
-    </>
+    </div>
   );
 }

@@ -11,19 +11,27 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useDemo } from "@/components/demo-provider";
+import { useProductDemo } from "@/components/product-demo-provider";
 import { StatusPill } from "@/components/status-pill";
+import styles from "./app-page.module.css";
 
 export default function OrganizationOverviewPage() {
-  const { suggestions, submissionStatus } = useDemo();
+  const { claims, review, suggestions, submissionStatus } = useDemo();
+  const { verificationDocuments } = useProductDemo();
   const accepted = Object.values(suggestions).filter(
     (value) => value === "accepted",
   ).length;
+  const approvedIndicators = claims.filter(
+    (claim) => review[claim.id] === "approved",
+  ).length;
+  const evidenceLabel =
+    verificationDocuments[0]?.label ?? "No evidence document yet";
   const suggestionsDone = accepted > 0;
   const submitted = submissionStatus !== "draft";
   const complete = 2 + Number(suggestionsDone) + Number(submitted);
 
   return (
-    <>
+    <div className={styles.page}>
       <div className="notice-bar" role="status">
         <Sparkles size={17} aria-hidden="true" />
         <span>
@@ -36,8 +44,8 @@ export default function OrganizationOverviewPage() {
           <StatusPill tone="pending">Organization admin</StatusPill>
           <h1>Good afternoon, Nisha.</h1>
           <p>
-            One useful next step: review the three candidate fields Compass
-            found in your synthetic CSR-1 document.
+            One useful next step: review the {claims.length} candidate fields
+            Compass found in your evidence.
           </p>
         </div>
         <div className="page-actions">
@@ -49,7 +57,7 @@ export default function OrganizationOverviewPage() {
           </Link>
           <Link
             className="button button-primary"
-            href="/app/evidence/demo-csr-1"
+            href="/app/evidence/verify-registration"
           >
             Review suggestions <ArrowRight size={16} />
           </Link>
@@ -82,7 +90,9 @@ export default function OrganizationOverviewPage() {
                   <strong>Complete organization profile</strong>
                   <small>Public description and focus areas are ready</small>
                 </span>
-                <Link href="/app/profile">Edit</Link>
+                <Link href="/app/profile" style={{ color: "var(--accent)" }}>
+                  Edit
+                </Link>
               </div>
               <div className="checklist-item done">
                 <span className="check-icon">
@@ -90,9 +100,11 @@ export default function OrganizationOverviewPage() {
                 </span>
                 <span>
                   <strong>Add one evidence document</strong>
-                  <small>Synthetic_CSR-1_Certificate.pdf</small>
+                  <small>{evidenceLabel}</small>
                 </span>
-                <Link href="/app/evidence">View</Link>
+                <Link href="/app/evidence" style={{ color: "var(--accent)" }}>
+                  View
+                </Link>
               </div>
               <div
                 className={`checklist-item ${suggestionsDone ? "done" : "current"}`}
@@ -109,10 +121,13 @@ export default function OrganizationOverviewPage() {
                   <small>
                     {accepted
                       ? `${accepted} candidate ${accepted === 1 ? "field" : "fields"} confirmed`
-                      : "3 candidate fields need a human decision"}
+                      : `${claims.length} candidate ${claims.length === 1 ? "field" : "fields"} need a human decision`}
                   </small>
                 </span>
-                <Link href="/app/evidence/demo-csr-1">
+                <Link
+                  href="/app/evidence/verify-registration"
+                  style={{ color: "var(--accent)" }}
+                >
                   {suggestionsDone ? "Review" : "Continue"}
                 </Link>
               </div>
@@ -129,7 +144,12 @@ export default function OrganizationOverviewPage() {
                   </small>
                 </span>
                 {suggestionsDone && !submitted ? (
-                  <Link href="/app/submission">Submit</Link>
+                  <Link
+                    href="/app/submission"
+                    style={{ color: "var(--accent)" }}
+                  >
+                    Submit
+                  </Link>
                 ) : (
                   <span />
                 )}
@@ -140,18 +160,25 @@ export default function OrganizationOverviewPage() {
           <div className="stat-grid" aria-label="Workspace summary">
             <div className="stat-card">
               <span>Evidence documents</span>
-              <strong>1</strong>
-              <small>synthetic PDF</small>
+              <strong>{verificationDocuments.length}</strong>
+              <small>
+                {verificationDocuments.length === 1 ? "document" : "documents"}{" "}
+                in workspace
+              </small>
             </div>
             <div className="stat-card">
               <span>Candidate fields</span>
-              <strong>3</strong>
+              <strong>{claims.length}</strong>
               <small>{accepted} confirmed</small>
             </div>
             <div className="stat-card">
               <span>Public indicators</span>
-              <strong>1</strong>
-              <small>approved & current</small>
+              <strong>{approvedIndicators}</strong>
+              <small>
+                {approvedIndicators === 1
+                  ? "approved indicator"
+                  : "approved indicators"}
+              </small>
             </div>
           </div>
         </div>
@@ -173,29 +200,29 @@ export default function OrganizationOverviewPage() {
                   </span>
                   <span>
                     <strong>Safety check passed</strong>
-                    <p>Synthetic pre-scanned fixture</p>
+                    <p>Evidence is cleared for processing</p>
                   </span>
-                  <time>12:42</time>
+                  <StatusPill tone="approved">Complete</StatusPill>
                 </div>
                 <div className="activity-row">
                   <span className="activity-icon">
                     <FileSearch size={17} />
                   </span>
                   <span>
-                    <strong>2 pages extracted</strong>
-                    <p>Page references preserved</p>
+                    <strong>Evidence extracted</strong>
+                    <p>Source references preserved</p>
                   </span>
-                  <time>12:43</time>
+                  <StatusPill tone="approved">Complete</StatusPill>
                 </div>
                 <div className="activity-row">
                   <span className="activity-icon">
                     <Sparkles size={17} />
                   </span>
                   <span>
-                    <strong>Compass prepared 3 fields</strong>
+                    <strong>Compass prepared {claims.length} fields</strong>
                     <p>Human confirmation required</p>
                   </span>
-                  <time>12:44</time>
+                  <StatusPill tone="pending">Review</StatusPill>
                 </div>
               </div>
             </div>
@@ -222,6 +249,6 @@ export default function OrganizationOverviewPage() {
           </section>
         </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -1,6 +1,10 @@
 "use client";
 
-import { calculateDonationBreakdown, type Donation, type PublicCause } from "@insips/contracts";
+import {
+  calculateDonationBreakdown,
+  type Donation,
+  type PublicCause,
+} from "@insips/contracts";
 import {
   ArrowRight,
   Bookmark,
@@ -17,10 +21,12 @@ import {
   Share2,
   ShieldCheck,
   WalletCards,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import QRCode from "qrcode";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import detailStyles from "./donation-detail.module.css";
 import { useProductDemo } from "./product-demo-provider";
 
 const money = new Intl.NumberFormat("en-IN", {
@@ -86,18 +92,18 @@ export function DonorHome() {
     .filter((donation) =>
       ["CAPTURED", "PARTIALLY_REFUNDED"].includes(donation.status),
     )
-      .reduce(
-        (total, donation) =>
-          total + donation.amountPaise - donation.refundedPaise,
-        0,
-      );
+    .reduce(
+      (total, donation) =>
+        total + donation.amountPaise - donation.refundedPaise,
+      0,
+    );
   const highlightedCauses = causes.filter(
     (cause) =>
       followedCauses.includes(cause.id) || bookmarkedCauses.includes(cause.id),
   );
 
   return (
-    <div className="flow-page">
+    <div className={`${detailStyles.page} flow-page`}>
       <header className="flow-page-heading">
         <div>
           <span className="fixture-chip">Individual donor · test data</span>
@@ -203,7 +209,11 @@ export function DonorHome() {
           </div>
           <Link href="/donor/donations">View all</Link>
         </div>
-        <DonationTable donations={donations.slice(0, 4)} donorView causes={causes} />
+        <DonationTable
+          donations={donations.slice(0, 4)}
+          donorView
+          causes={causes}
+        />
       </section>
     </div>
   );
@@ -212,10 +222,14 @@ export function DonorHome() {
 function DonationTable({
   donations,
   donorView = false,
+  adminView = false,
+  onSelect,
   causes,
 }: {
   donations: Donation[];
   donorView?: boolean;
+  adminView?: boolean;
+  onSelect?: (donationId: string) => void;
   causes: ReadonlyArray<{ id: string; title: string; organization: string }>;
 }) {
   return (
@@ -234,14 +248,13 @@ function DonationTable({
             <th>Fee</th>
             <th>Net</th>
             <th>Status</th>
-            <th />
+            <th>{adminView ? "Transfer" : ""}</th>
+            {adminView ? <th>Details</th> : null}
           </tr>
         </thead>
         <tbody>
           {donations.map((donation) => {
-            const cause = causes.find(
-              (item) => item.id === donation.causeId,
-            );
+            const cause = causes.find((item) => item.id === donation.causeId);
             return (
               <tr key={donation.id}>
                 <td data-label="Donation">
@@ -252,8 +265,12 @@ function DonationTable({
                   {new Date(donation.createdAt).toLocaleDateString("en-IN")}
                 </td>
                 <td data-label="Gross">{formatPaise(donation.amountPaise)}</td>
-                <td data-label="Platform fee">{formatPaise(donation.platformFeePaise)}</td>
-                <td data-label="Net">{formatPaise(donation.netOrganizationPaise)}</td>
+                <td data-label="Platform fee">
+                  {formatPaise(donation.platformFeePaise)}
+                </td>
+                <td data-label="Net">
+                  {formatPaise(donation.netOrganizationPaise)}
+                </td>
                 <td data-label="Status">
                   <DonationStatus donation={donation} />
                 </td>
@@ -266,6 +283,17 @@ function DonationTable({
                     donation.transferStatus.replaceAll("_", " ")
                   )}
                 </td>
+                {adminView ? (
+                  <td data-label="Details">
+                    <button
+                      className="ledger-detail-button"
+                      type="button"
+                      onClick={() => onSelect?.(donation.id)}
+                    >
+                      Inspect
+                    </button>
+                  </td>
+                ) : null}
               </tr>
             );
           })}
@@ -322,13 +350,13 @@ export function DonorDonationHistory() {
         </button>
       </header>
       <div className="table-toolbar">
-          <label>
-            <Search size={16} />
-            <input
-              aria-label="Search cause or reference"
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search cause or reference"
-              value={query}
+        <label>
+          <Search size={16} />
+          <input
+            aria-label="Search cause or reference"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search cause or reference"
+            value={query}
           />
         </label>
         <select
@@ -433,8 +461,8 @@ export function DonationDetail({ donationId }: { donationId: string }) {
         </div>
         <DonationStatus donation={donation} />
       </header>
-      <div className="detail-card-grid">
-        <section className="flow-panel receipt-card">
+      <div className={detailStyles.grid}>
+        <section className={`${detailStyles.card} flow-panel receipt-card`}>
           <div className="flow-panel-head">
             <div>
               <small>Payment</small>
@@ -442,7 +470,7 @@ export function DonationDetail({ donationId }: { donationId: string }) {
             </div>
             <ShieldCheck size={24} />
           </div>
-          <dl>
+          <dl className={detailStyles.breakdown}>
             <div>
               <dt>Cause amount</dt>
               <dd>{formatPaise(donation.amountPaise)}</dd>
@@ -464,7 +492,7 @@ export function DonationDetail({ donationId }: { donationId: string }) {
               <dd>{formatPaise(donation.refundedPaise)}</dd>
             </div>
           </dl>
-          <div className="card-actions">
+          <div className={`${detailStyles.actions} card-actions`}>
             <button
               className="button button-secondary"
               onClick={() =>
@@ -483,14 +511,14 @@ export function DonationDetail({ donationId }: { donationId: string }) {
             </button>
           </div>
         </section>
-        <section className="flow-panel receipt-card">
+        <section className={`${detailStyles.card} flow-panel receipt-card`}>
           <div className="flow-panel-head">
             <div>
               <small>Donation preferences</small>
               <h2>What the organization can see</h2>
             </div>
           </div>
-          <dl>
+          <dl className={detailStyles.breakdown}>
             <div>
               <dt>Name preference</dt>
               <dd>{donation.anonymous ? "Anonymous" : donation.publicName}</dd>
@@ -523,24 +551,34 @@ export function OrganizationDonationLedger({
   const [status, setStatus] = useState("ALL");
   const [query, setQuery] = useState("");
   const [range, setRange] = useState("ALL");
-  const filtered = donations.filter(
-    (donation) => {
-      const cause = causes.find((item) => item.id === donation.causeId);
-      const matchesStatus = status === "ALL" || donation.status === status;
-      const matchesQuery = `${cause?.title ?? ""} ${cause?.organization ?? ""} ${donation.id} ${donation.razorpayReference}`
+  const [selectedDonationId, setSelectedDonationId] = useState<string | null>(
+    null,
+  );
+  useEffect(() => {
+    if (!admin) return;
+    const previousOverflowX = document.body.style.overflowX;
+    document.body.style.overflowX = "clip";
+    return () => {
+      document.body.style.overflowX = previousOverflowX;
+    };
+  }, [admin]);
+  const filtered = donations.filter((donation) => {
+    const cause = causes.find((item) => item.id === donation.causeId);
+    const matchesStatus = status === "ALL" || donation.status === status;
+    const matchesQuery =
+      `${cause?.title ?? ""} ${cause?.organization ?? ""} ${donation.id} ${donation.razorpayReference}`
         .toLowerCase()
         .includes(query.trim().toLowerCase());
-      const ageDays = Math.floor(
-        (Date.now() - new Date(donation.createdAt).getTime()) / 86_400_000,
-      );
-      const matchesRange =
-        range === "ALL" ||
-        (range === "30" && ageDays <= 30) ||
-        (range === "90" && ageDays <= 90) ||
-        (range === "365" && ageDays <= 365);
-      return matchesStatus && matchesQuery && matchesRange;
-    },
-  );
+    const ageDays = Math.floor(
+      (Date.now() - new Date(donation.createdAt).getTime()) / 86_400_000,
+    );
+    const matchesRange =
+      range === "ALL" ||
+      (range === "30" && ageDays <= 30) ||
+      (range === "90" && ageDays <= 90) ||
+      (range === "365" && ageDays <= 365);
+    return matchesStatus && matchesQuery && matchesRange;
+  });
   const captured = donations.filter((donation) =>
     ["CAPTURED", "PARTIALLY_REFUNDED"].includes(donation.status),
   );
@@ -576,7 +614,9 @@ export function OrganizationDonationLedger({
           className="button button-secondary"
           onClick={() =>
             downloadText(
-              "insips-organization-donations.csv",
+              admin
+                ? "insips-admin-donation-ledger.csv"
+                : "insips-organization-donations.csv",
               donationCsv(filtered),
               "text/csv",
             )
@@ -612,7 +652,11 @@ export function OrganizationDonationLedger({
           </strong>
         </article>
       </div>
-      <div className="simple-chart" aria-label="Captured donation amounts" role="img">
+      <div
+        className="simple-chart"
+        aria-label="Captured donation amounts"
+        role="img"
+      >
         {captured.length ? (
           captured.slice(0, 6).map((donation) => {
             const maxAmount = Math.max(
@@ -622,7 +666,9 @@ export function OrganizationDonationLedger({
             return (
               <i
                 key={donation.id}
-                style={{ height: `${Math.max(20, (donation.amountPaise / maxAmount) * 100)}%` }}
+                style={{
+                  height: `${Math.max(20, (donation.amountPaise / maxAmount) * 100)}%`,
+                }}
               />
             );
           })
@@ -645,7 +691,11 @@ export function OrganizationDonationLedger({
           </label>
           <label>
             <span>Date range</span>
-            <select aria-label="Filter ledger date range" onChange={(event) => setRange(event.target.value)} value={range}>
+            <select
+              aria-label="Filter ledger date range"
+              onChange={(event) => setRange(event.target.value)}
+              value={range}
+            >
               <option value="ALL">All time</option>
               <option value="30">Last 30 days</option>
               <option value="90">Last 90 days</option>
@@ -654,7 +704,11 @@ export function OrganizationDonationLedger({
           </label>
           <label>
             <span>Status</span>
-            <select aria-label="Filter ledger status" onChange={(event) => setStatus(event.target.value)} value={status}>
+            <select
+              aria-label="Filter ledger status"
+              onChange={(event) => setStatus(event.target.value)}
+              value={status}
+            >
               <option value="ALL">All payments</option>
               <option value="CAPTURED">Captured</option>
               <option value="PENDING">Pending</option>
@@ -667,7 +721,12 @@ export function OrganizationDonationLedger({
       </div>
       <section className="flow-table-card">
         {filtered.length ? (
-          <DonationTable donations={filtered} causes={causes} />
+          <DonationTable
+            adminView={admin}
+            causes={causes}
+            donations={filtered}
+            onSelect={admin ? setSelectedDonationId : undefined}
+          />
         ) : (
           <div className="empty-flow-state">
             <strong>No donations match these filters</strong>
@@ -686,6 +745,107 @@ export function OrganizationDonationLedger({
           </div>
         )}
       </section>
+      {admin && selectedDonationId
+        ? (() => {
+            const selectedDonation = donations.find(
+              (donation) => donation.id === selectedDonationId,
+            );
+            if (!selectedDonation) return null;
+            const cause = causes.find(
+              (item) => item.id === selectedDonation.causeId,
+            );
+            const eventType =
+              selectedDonation.status === "PARTIALLY_REFUNDED"
+                ? "REFUND_PROCESSED"
+                : `PAYMENT_${selectedDonation.status}`;
+            return (
+              <aside
+                aria-label="Donation detail"
+                className="ledger-detail-panel"
+              >
+                <div className="ledger-detail-header">
+                  <div>
+                    <span>Audit detail</span>
+                    <h2>{cause?.title ?? selectedDonation.causeId}</h2>
+                  </div>
+                  <button
+                    aria-label="Close donation detail"
+                    className="icon-button"
+                    type="button"
+                    onClick={() => setSelectedDonationId(null)}
+                  >
+                    <X size={17} />
+                  </button>
+                </div>
+                <p className="ledger-detail-note">
+                  Local test-mode record. Review payment and transfer state
+                  before taking any operational action.
+                </p>
+                <dl className="ledger-detail-grid">
+                  <div>
+                    <dt>Donation ID</dt>
+                    <dd>{selectedDonation.id}</dd>
+                  </div>
+                  <div>
+                    <dt>Organization</dt>
+                    <dd>
+                      {cause?.organization ?? selectedDonation.organizationId}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Gross amount</dt>
+                    <dd>{formatPaise(selectedDonation.amountPaise)}</dd>
+                  </div>
+                  <div>
+                    <dt>INSIPS fee</dt>
+                    <dd>
+                      {formatPaise(selectedDonation.platformFeePaise)} ·{" "}
+                      {selectedDonation.feeRateBps} bps
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Razorpay fee</dt>
+                    <dd>{formatPaise(selectedDonation.razorpayFeePaise)}</dd>
+                  </div>
+                  <div>
+                    <dt>Refunded</dt>
+                    <dd>{formatPaise(selectedDonation.refundedPaise)}</dd>
+                  </div>
+                  <div>
+                    <dt>Net organization amount</dt>
+                    <dd>
+                      {formatPaise(selectedDonation.netOrganizationPaise)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Payment event</dt>
+                    <dd>{eventType.replaceAll("_", " ")}</dd>
+                  </div>
+                  <div>
+                    <dt>Transfer status</dt>
+                    <dd>
+                      {selectedDonation.transferStatus.replaceAll("_", " ")}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Payment reference</dt>
+                    <dd>
+                      {selectedDonation.razorpayReference ?? "Not assigned"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Created</dt>
+                    <dd>
+                      {new Date(selectedDonation.createdAt).toLocaleString(
+                        "en-IN",
+                      )}
+                    </dd>
+                  </div>
+                </dl>
+              </aside>
+            );
+          })()
+        : null}
     </div>
   );
 }
@@ -725,61 +885,85 @@ export function CauseDirectory({ causes }: { causes: PublicCause[] }) {
         </label>
       </header>
       <div className="cause-card-grid">
-        {filteredCauses.map((cause) => {
-          const progress = Math.min(
-            100,
-            Math.round((cause.raisedPaise / cause.targetPaise) * 100),
-          );
-          return (
-            <article className="cause-card" key={cause.id}>
-              <div className="cause-art" data-category={cause.category}>
-                <span>{cause.category}</span>
-              </div>
-              <div>
-                <small>{cause.organizationName}</small>
-                <h2>{cause.title}</h2>
-                <p>{cause.summary}</p>
-                <div className="progress-line">
-                  <i style={{ width: `${progress}%` }} />
+        {filteredCauses.length ? (
+          filteredCauses.map((cause) => {
+            const progress = Math.min(
+              100,
+              Math.round((cause.raisedPaise / cause.targetPaise) * 100),
+            );
+            return (
+              <article className="cause-card" key={cause.id}>
+                <div className="cause-art" data-category={cause.category}>
+                  <span>{cause.category}</span>
                 </div>
-                <div className="cause-progress-copy">
-                  <strong>{formatPaise(cause.raisedPaise)}</strong>
-                  <span>
-                    of {formatPaise(cause.targetPaise)} · {progress}%
-                  </span>
+                <div>
+                  <small>{cause.organizationName}</small>
+                  <h2>{cause.title}</h2>
+                  <p>{cause.summary}</p>
+                  <div className="progress-line">
+                    <i style={{ width: `${progress}%` }} />
+                  </div>
+                  <div className="cause-progress-copy">
+                    <strong>{formatPaise(cause.raisedPaise)}</strong>
+                    <span>
+                      of {formatPaise(cause.targetPaise)} · {progress}%
+                    </span>
+                  </div>
+                  <div className="card-actions">
+                    <Link
+                      className="button button-primary"
+                      href={`/causes/${cause.slug}`}
+                    >
+                      View cause
+                    </Link>
+                    <button
+                      aria-label={`${followedCauses.includes(cause.id) ? "Unfollow" : "Follow"} ${cause.title}`}
+                      className={
+                        followedCauses.includes(cause.id) ? "active" : ""
+                      }
+                      onClick={() => toggleFollowCause(cause.id)}
+                      type="button"
+                    >
+                      <Heart size={17} />
+                    </button>
+                    <button
+                      aria-label={`${bookmarkedCauses.includes(cause.id) ? "Remove bookmark" : "Bookmark"} ${cause.title}`}
+                      className={
+                        bookmarkedCauses.includes(cause.id) ? "active" : ""
+                      }
+                      onClick={() => toggleBookmarkCause(cause.id)}
+                      type="button"
+                    >
+                      <Bookmark size={17} />
+                    </button>
+                  </div>
                 </div>
-                <div className="card-actions">
-                  <Link
-                    className="button button-primary"
-                    href={`/causes/${cause.slug}`}
-                  >
-                    View cause
-                  </Link>
-                  <button
-                    aria-label={`${followedCauses.includes(cause.id) ? "Unfollow" : "Follow"} ${cause.title}`}
-                    className={
-                      followedCauses.includes(cause.id) ? "active" : ""
-                    }
-                    onClick={() => toggleFollowCause(cause.id)}
-                    type="button"
-                  >
-                    <Heart size={17} />
-                  </button>
-                  <button
-                    aria-label={`${bookmarkedCauses.includes(cause.id) ? "Remove bookmark" : "Bookmark"} ${cause.title}`}
-                    className={
-                      bookmarkedCauses.includes(cause.id) ? "active" : ""
-                    }
-                    onClick={() => toggleBookmarkCause(cause.id)}
-                    type="button"
-                  >
-                    <Bookmark size={17} />
-                  </button>
-                </div>
-              </div>
-            </article>
-          );
-        })}
+              </article>
+            );
+          })
+        ) : (
+          <div className="empty-flow-state" role="status">
+            <strong>
+              {query
+                ? "No causes match that search"
+                : "No published causes yet"}
+            </strong>
+            <p>
+              {query
+                ? "Try an organization name, cause category, or a broader phrase."
+                : "Published causes will appear here when organizations make them available."}
+            </p>
+            {query ? (
+              <button
+                className="button button-secondary"
+                onClick={() => setQuery("")}
+                type="button"
+              >
+                Clear search
+              </button>
+            ) : null}
+          </div>
+        )}
       </div>
     </main>
   );
@@ -869,18 +1053,34 @@ export function CauseDetail({ cause }: { cause: PublicCause }) {
           <p>{cause.summary}</p>
           <strong>{cause.organizationName}</strong>
           <div className="card-actions">
-            <button onClick={() => toggleFollowCause(cause.id)} type="button">
+            <button
+              className="button button-secondary"
+              onClick={() => toggleFollowCause(cause.id)}
+              type="button"
+            >
               <Heart size={17} />{" "}
               {followedCauses.includes(cause.id) ? "Following" : "Follow cause"}
             </button>
-            <button onClick={() => toggleBookmarkCause(cause.id)} type="button">
+            <button
+              className="button button-secondary"
+              onClick={() => toggleBookmarkCause(cause.id)}
+              type="button"
+            >
               <Bookmark size={17} />{" "}
               {bookmarkedCauses.includes(cause.id) ? "Bookmarked" : "Bookmark"}
             </button>
-            <button onClick={() => void shareCause()} type="button">
+            <button
+              className="button button-secondary"
+              onClick={() => void shareCause()}
+              type="button"
+            >
               <Share2 size={17} /> Share
             </button>
-            <button onClick={() => void downloadQr()} type="button">
+            <button
+              className="button button-secondary"
+              onClick={() => void downloadQr()}
+              type="button"
+            >
               <QrCode size={17} /> Download QR
             </button>
           </div>
@@ -895,9 +1095,7 @@ export function CauseDetail({ cause }: { cause: PublicCause }) {
               }}
             />
           </div>
-          <small>
-            Campaign target · ends {cause.endDate}
-          </small>
+          <small>Campaign target · ends {cause.endDate}</small>
         </div>
       </header>
       <div className="cause-content-grid">

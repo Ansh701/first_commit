@@ -53,6 +53,25 @@ export const demoCauses = [
   },
 ] as const;
 
+export const demoEvents = [
+  {
+    id: "event-health-orientation",
+    title: "Community preventive-health orientation",
+    organization: "Sahaara Health Network",
+    date: "24 Oct 2026 · 10:00",
+    location: "Bengaluru · synthetic venue",
+    seats: 42,
+  },
+  {
+    id: "event-reading-day",
+    title: "Community reading day",
+    organization: "Udaan Learning Foundation",
+    date: "08 Nov 2026 · 09:30",
+    location: "Pune · synthetic venue",
+    seats: 65,
+  },
+] as const;
+
 export type CorporateMatchingCampaign = {
   id: string;
   name: string;

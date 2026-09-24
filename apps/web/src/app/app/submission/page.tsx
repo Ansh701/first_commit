@@ -34,7 +34,7 @@ export default function SubmissionPage() {
         <div className="page-actions">
           <Link
             className="button button-secondary"
-            href="/app/evidence/demo-csr-1"
+            href="/app/evidence/verify-registration"
           >
             Edit confirmations
           </Link>
@@ -54,7 +54,7 @@ export default function SubmissionPage() {
             </p>
             <Link
               className="button button-primary"
-              href="/app/evidence/demo-csr-1"
+              href="/app/evidence/verify-registration"
             >
               Review suggestions <ArrowRight size={16} />
             </Link>

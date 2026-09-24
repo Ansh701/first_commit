@@ -1,7 +1,7 @@
 import { getPublicOrganizations } from "@/lib/server/content-repository";
-import { ShortlistClient } from "@/components/shortlist-client";
+import { CsrShortlistExperience } from "./csr-shortlist-experience";
 
 export default async function ShortlistPage() {
   const organizations = await getPublicOrganizations();
-  return <ShortlistClient organizations={organizations} />;
+  return <CsrShortlistExperience organizations={organizations} />;
 }

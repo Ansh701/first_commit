@@ -30,6 +30,7 @@ import { getIdentityAdapter } from "@/lib/auth-adapter";
 import {
   corporateMatchingCampaigns,
   demoCauses,
+  demoEvents,
   organizationFeed,
   volunteerOpportunities,
 } from "@/lib/platform-demo-data";
@@ -227,7 +228,9 @@ export function DonorItemHistory() {
       return;
     }
     transitionItemPledge(id, "CANCELLED");
-    setNotice("Pledge cancelled. The organization has been notified in this local fixture.");
+    setNotice(
+      "Pledge cancelled. The organization has been notified in this local fixture.",
+    );
   }
 
   return (
@@ -302,74 +305,79 @@ export function DonorItemHistory() {
       {visiblePledges.length > 0 ? (
         <div className="donor-items-list">
           {visiblePledges.map((pledge) => {
-          const need = itemNeeds.find((item) => item.id === pledge.needId);
-          const organization = demoCauses.find(
-            (cause) => cause.organizationId === need?.organizationId,
-          )?.organization;
-          return (
-            <article className="flow-panel donor-item-card" key={pledge.id}>
-              <div className="flow-panel-head">
-                <div>
-                  <small>{need?.category ?? "Item need"}</small>
-                  <h2>{need?.title ?? "Item need unavailable"}</h2>
-                  <p className="donor-item-organization">
-                    {organization ?? "Verified organization"}
-                  </p>
-                </div>
-                <span className={`state-badge ${pledge.status.toLowerCase()}`}>
-                  {pledge.status.replaceAll("_", " ")}
-                </span>
-              </div>
-              <dl className="donor-item-details">
-                <div>
-                  <dt>Quantity</dt>
-                  <dd>{pledge.quantity} items</dd>
-                </div>
-                <div>
-                  <dt>Condition</dt>
-                  <dd>{pledge.condition}</dd>
-                </div>
-                <div>
-                  <dt>Fulfilment</dt>
-                  <dd>
-                    {pledge.preference === "PICKUP" ? "Pickup requested" : "Drop-off"}
-                  </dd>
-                </div>
-              </dl>
-              {pledge.notes ? (
-                <p className="donor-item-notes">
-                  <strong>Your note</strong> {pledge.notes}
-                </p>
-              ) : null}
-              <div className="timeline-list">
-                {pledge.timeline.map((entry) => (
-                  <div key={`${entry.label}-${entry.at}`}>
-                    <span />
-                    <p>
-                      <strong>{entry.label}</strong>
-                      <small>{entry.at}</small>
+            const need = itemNeeds.find((item) => item.id === pledge.needId);
+            const organization = demoCauses.find(
+              (cause) => cause.organizationId === need?.organizationId,
+            )?.organization;
+            return (
+              <article className="flow-panel donor-item-card" key={pledge.id}>
+                <div className="flow-panel-head">
+                  <div>
+                    <small>{need?.category ?? "Item need"}</small>
+                    <h2>{need?.title ?? "Item need unavailable"}</h2>
+                    <p className="donor-item-organization">
+                      {organization ?? "Verified organization"}
                     </p>
                   </div>
-                ))}
-              </div>
-              <div className="donor-item-card-footer">
-                {need ? (
-                  <Link href="/items">View this item need</Link>
-                ) : null}
-                {["PLEDGED", "CHANGES_REQUESTED", "ACCEPTED", "SCHEDULED"].includes(
-                  pledge.status,
-                ) ? (
-                  <button
-                    className="text-button donor-item-cancel"
-                    onClick={() => cancelPledge(pledge.id)}
-                    type="button"
+                  <span
+                    className={`state-badge ${pledge.status.toLowerCase()}`}
                   >
-                    Cancel pledge
-                  </button>
+                    {pledge.status.replaceAll("_", " ")}
+                  </span>
+                </div>
+                <dl className="donor-item-details">
+                  <div>
+                    <dt>Quantity</dt>
+                    <dd>{pledge.quantity} items</dd>
+                  </div>
+                  <div>
+                    <dt>Condition</dt>
+                    <dd>{pledge.condition}</dd>
+                  </div>
+                  <div>
+                    <dt>Fulfilment</dt>
+                    <dd>
+                      {pledge.preference === "PICKUP"
+                        ? "Pickup requested"
+                        : "Drop-off"}
+                    </dd>
+                  </div>
+                </dl>
+                {pledge.notes ? (
+                  <p className="donor-item-notes">
+                    <strong>Your note</strong> {pledge.notes}
+                  </p>
                 ) : null}
-              </div>
-            </article>
-          );
+                <div className="timeline-list">
+                  {pledge.timeline.map((entry) => (
+                    <div key={`${entry.label}-${entry.at}`}>
+                      <span />
+                      <p>
+                        <strong>{entry.label}</strong>
+                        <small>{entry.at}</small>
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <div className="donor-item-card-footer">
+                  {need ? <Link href="/items">View this item need</Link> : null}
+                  {[
+                    "PLEDGED",
+                    "CHANGES_REQUESTED",
+                    "ACCEPTED",
+                    "SCHEDULED",
+                  ].includes(pledge.status) ? (
+                    <button
+                      className="text-button donor-item-cancel"
+                      onClick={() => cancelPledge(pledge.id)}
+                      type="button"
+                    >
+                      Cancel pledge
+                    </button>
+                  ) : null}
+                </div>
+              </article>
+            );
           })}
         </div>
       ) : (
@@ -610,7 +618,9 @@ export function VolunteerDirectory({ manage = false }: { manage?: boolean }) {
       : true;
     const matchesMode =
       opportunityMode === "ALL" ||
-      opportunity.location.toLowerCase().includes(opportunityMode.toLowerCase());
+      opportunity.location
+        .toLowerCase()
+        .includes(opportunityMode.toLowerCase());
     return matchesQuery && matchesMode;
   });
   return (
@@ -721,10 +731,9 @@ export function VolunteerDirectory({ manage = false }: { manage?: boolean }) {
             </div>
           ) : null}
         </section>
-      ) : (
-        visibleOpportunities.length ? (
-          <div className="opportunity-grid">
-            {visibleOpportunities.map((opportunity) => {
+      ) : visibleOpportunities.length ? (
+        <div className="opportunity-grid">
+          {visibleOpportunities.map((opportunity) => {
             const application = volunteerApplications.find(
               (item) => item.opportunityId === opportunity.id,
             );
@@ -754,25 +763,24 @@ export function VolunteerDirectory({ manage = false }: { manage?: boolean }) {
                 </button>
               </article>
             );
-            })}
-          </div>
-        ) : (
-          <section className="flow-panel volunteer-empty-state" role="status">
-            <HandHeart size={26} />
-            <h2>No volunteer opportunities match</h2>
-            <p>Try a broader search or switch back to all formats.</p>
-            <button
-              className="button button-secondary"
-              onClick={() => {
-                setOpportunityQuery("");
-                setOpportunityMode("ALL");
-              }}
-              type="button"
-            >
-              Clear filters
-            </button>
-          </section>
-        )
+          })}
+        </div>
+      ) : (
+        <section className="flow-panel volunteer-empty-state" role="status">
+          <HandHeart size={26} />
+          <h2>No volunteer opportunities match</h2>
+          <p>Try a broader search or switch back to all formats.</p>
+          <button
+            className="button button-secondary"
+            onClick={() => {
+              setOpportunityQuery("");
+              setOpportunityMode("ALL");
+            }}
+            type="button"
+          >
+            Clear filters
+          </button>
+        </section>
       )}
     </div>
   );
@@ -823,51 +831,48 @@ export function ActivityFeed() {
 
 export function EventDirectory() {
   const { eventRegistrations, registerForEvent } = useProductDemo();
-  const events = [
-    {
-      id: "event-health-orientation",
-      title: "Community preventive-health orientation",
-      organization: "Sahaara Health Network",
-      date: "24 Oct 2026 · 10:00",
-      location: "Bengaluru · synthetic venue",
-      seats: 42,
-    },
-    {
-      id: "event-reading-day",
-      title: "Community reading day",
-      organization: "Udaan Learning Foundation",
-      date: "08 Nov 2026 · 09:30",
-      location: "Pune · synthetic venue",
-      seats: 65,
-    },
-  ];
+  const [registrationMessage, setRegistrationMessage] = useState("");
   return (
     <main className="public-flow-page" id="main-content">
-      <header>
+      <header className="events-route-header">
         <span className="fixture-chip">Organization events</span>
         <h1>Register for a community event.</h1>
         <p>
-          Every event below is fictional and exists only to demonstrate the
-          registration flow.
+          Join a local gathering, orientation, or learning day hosted by an
+          organization you can explore on INSIPS.
         </p>
       </header>
-      <div className="opportunity-grid">
-        {events.map((event) => {
+      {registrationMessage ? (
+        <p className="events-route-status" role="status">
+          <TicketCheck size={16} /> {registrationMessage}
+        </p>
+      ) : null}
+      <div className="opportunity-grid events-route-grid">
+        {demoEvents.map((event) => {
           const registered = eventRegistrations.includes(event.id);
           return (
-            <article className="flow-panel" key={event.id}>
-              <CalendarDays size={25} />
+            <article className="flow-panel events-route-card" key={event.id}>
+              <div className="events-route-card-icon" aria-hidden="true">
+                <CalendarDays size={22} />
+              </div>
               <small>{event.organization}</small>
               <h2>{event.title}</h2>
-              <p>{event.date}</p>
-              <p>
-                <MapPin size={15} /> {event.location}
-              </p>
-              <strong>{event.seats} test seats available</strong>
+              <div className="events-route-meta">
+                <p>{event.date}</p>
+                <p>
+                  <MapPin size={15} /> {event.location}
+                </p>
+              </div>
+              <strong>{event.seats} places available</strong>
               <button
                 className="button button-primary"
                 disabled={registered}
-                onClick={() => registerForEvent(event.id)}
+                onClick={() => {
+                  registerForEvent(event.id);
+                  setRegistrationMessage(
+                    `Your place for ${event.title} is saved in the local demo.`,
+                  );
+                }}
                 type="button"
               >
                 {registered ? (
@@ -968,6 +973,7 @@ export function TeamManagement() {
 export function NotificationCentre() {
   const { notifications, markNotificationsRead } = useProductDemo();
   const unread = notifications.filter((item) => !item.read).length;
+  const [message, setMessage] = useState("");
   return (
     <div className="flow-page">
       <header className="flow-page-heading">
@@ -983,12 +989,20 @@ export function NotificationCentre() {
         <button
           className="button button-secondary"
           disabled={!unread}
-          onClick={markNotificationsRead}
+          onClick={() => {
+            markNotificationsRead();
+            setMessage("All notifications are marked as read.");
+          }}
           type="button"
         >
           <Check size={16} /> Mark all read
         </button>
       </header>
+      {message ? (
+        <p className="notification-status" role="status">
+          {message}
+        </p>
+      ) : null}
       <section className="flow-panel notification-list">
         {notifications.map((notification) => (
           <article
@@ -1247,7 +1261,9 @@ function CorporateMatchingWorkspace() {
         ),
       );
       resetForm({ clearFeedback: false });
-      setFormSuccess("Campaign changes are saved in the local workspace fixture.");
+      setFormSuccess(
+        "Campaign changes are saved in the local workspace fixture.",
+      );
     } else {
       setCampaigns((current) => [
         ...current,
@@ -1282,7 +1298,10 @@ function CorporateMatchingWorkspace() {
           </p>
         </div>
       </header>
-      <section aria-label="Matching campaign summary" className="matching-summary">
+      <section
+        aria-label="Matching campaign summary"
+        className="matching-summary"
+      >
         <div>
           <span>Campaign budget</span>
           <strong>{formatInr(totalBudgetPaise)}</strong>
@@ -1297,7 +1316,9 @@ function CorporateMatchingWorkspace() {
         </div>
         <div>
           <span>Remaining budget</span>
-          <strong>{formatInr(Math.max(0, totalBudgetPaise - totalCapturedPaise))}</strong>
+          <strong>
+            {formatInr(Math.max(0, totalBudgetPaise - totalCapturedPaise))}
+          </strong>
         </div>
       </section>
       <div className="matching-workbench">
@@ -1305,24 +1326,35 @@ function CorporateMatchingWorkspace() {
           <div className="matching-section-heading">
             <div>
               <span className="fixture-chip">Local campaign editor</span>
-              <h2>{editingId ? "Edit campaign" : "Create a matching campaign"}</h2>
+              <h2>
+                {editingId ? "Edit campaign" : "Create a matching campaign"}
+              </h2>
             </div>
             {editingId ? (
-              <button className="button button-secondary" onClick={() => resetForm()} type="button">
+              <button
+                className="button button-secondary"
+                onClick={() => resetForm()}
+                type="button"
+              >
                 New campaign
               </button>
             ) : null}
           </div>
           <p className="matching-helper">
-            Define the commitment first. Payment capture remains a separate server-confirmed
-            event and never changes from this form.
+            Define the commitment first. Payment capture remains a separate
+            server-confirmed event and never changes from this form.
           </p>
           <form className="matching-form" onSubmit={submitCampaign}>
             <label>
               <span>Campaign name</span>
               <input
                 aria-label="Campaign name"
-                onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    name: event.target.value,
+                  }))
+                }
                 value={form.name}
               />
             </label>
@@ -1334,7 +1366,10 @@ function CorporateMatchingWorkspace() {
                   inputMode="numeric"
                   min="1"
                   onChange={(event) =>
-                    setForm((current) => ({ ...current, budgetRupees: event.target.value }))
+                    setForm((current) => ({
+                      ...current,
+                      budgetRupees: event.target.value,
+                    }))
                   }
                   type="number"
                   value={form.budgetRupees}
@@ -1345,7 +1380,10 @@ function CorporateMatchingWorkspace() {
                 <select
                   aria-label="Match ratio"
                   onChange={(event) =>
-                    setForm((current) => ({ ...current, matchRatio: event.target.value }))
+                    setForm((current) => ({
+                      ...current,
+                      matchRatio: event.target.value,
+                    }))
                   }
                   value={form.matchRatio}
                 >
@@ -1360,7 +1398,12 @@ function CorporateMatchingWorkspace() {
                 <span>Start date</span>
                 <input
                   aria-label="Start date"
-                  onChange={(event) => setForm((current) => ({ ...current, startDate: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      startDate: event.target.value,
+                    }))
+                  }
                   type="date"
                   value={form.startDate}
                 />
@@ -1369,7 +1412,12 @@ function CorporateMatchingWorkspace() {
                 <span>End date</span>
                 <input
                   aria-label="End date"
-                  onChange={(event) => setForm((current) => ({ ...current, endDate: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      endDate: event.target.value,
+                    }))
+                  }
                   type="date"
                   value={form.endDate}
                 />
@@ -1397,12 +1445,20 @@ function CorporateMatchingWorkspace() {
               </div>
             </fieldset>
             {formError ? (
-              <p aria-live="assertive" className="matching-form-message error" role="alert">
+              <p
+                aria-live="assertive"
+                className="matching-form-message error"
+                role="alert"
+              >
                 {formError}
               </p>
             ) : null}
             {formSuccess ? (
-              <p aria-live="polite" className="matching-form-message success" role="status">
+              <p
+                aria-live="polite"
+                className="matching-form-message success"
+                role="status"
+              >
                 {formSuccess}
               </p>
             ) : null}
@@ -1410,19 +1466,28 @@ function CorporateMatchingWorkspace() {
               <button className="button button-primary" type="submit">
                 {editingId ? "Save campaign" : "Create campaign"}
               </button>
-              <button className="button button-secondary" onClick={() => resetForm()} type="button">
+              <button
+                className="button button-secondary"
+                onClick={() => resetForm()}
+                type="button"
+              >
                 Clear form
               </button>
             </div>
           </form>
         </section>
-        <section aria-label="Matching campaigns" className="matching-campaign-list">
+        <section
+          aria-label="Matching campaigns"
+          className="matching-campaign-list"
+        >
           <div className="matching-section-heading">
             <div>
               <span className="fixture-chip">Campaign history</span>
               <h2>Commitments in review</h2>
             </div>
-            <span className="matching-count">{campaigns.length} record{campaigns.length === 1 ? "" : "s"}</span>
+            <span className="matching-count">
+              {campaigns.length} record{campaigns.length === 1 ? "" : "s"}
+            </span>
           </div>
           {campaigns.length ? (
             campaigns.map((campaign) => {
@@ -1435,30 +1500,64 @@ function CorporateMatchingWorkspace() {
                     <div>
                       <h3>{campaign.name}</h3>
                       <p>
-                        {campaign.matchRatio} match · {campaign.startDate} to {campaign.endDate}
+                        {campaign.matchRatio} match · {campaign.startDate} to{" "}
+                        {campaign.endDate}
                       </p>
                     </div>
-                    <span className={`matching-status ${campaign.status.toLowerCase()}`}>
+                    <span
+                      className={`matching-status ${campaign.status.toLowerCase()}`}
+                    >
                       {campaign.status}
                     </span>
                   </header>
                   <div className="matching-metrics">
-                    <div><span>Budget</span><strong>{formatInr(campaign.budgetPaise)}</strong></div>
-                    <div><span>Pledged</span><strong>{formatInr(campaign.pledgedPaise)}</strong></div>
-                    <div><span>Captured</span><strong>{formatInr(campaign.capturedPaise)}</strong></div>
-                    <div><span>Remaining</span><strong>{formatInr(Math.max(0, campaign.budgetPaise - campaign.capturedPaise))}</strong></div>
+                    <div>
+                      <span>Budget</span>
+                      <strong>{formatInr(campaign.budgetPaise)}</strong>
+                    </div>
+                    <div>
+                      <span>Pledged</span>
+                      <strong>{formatInr(campaign.pledgedPaise)}</strong>
+                    </div>
+                    <div>
+                      <span>Captured</span>
+                      <strong>{formatInr(campaign.capturedPaise)}</strong>
+                    </div>
+                    <div>
+                      <span>Remaining</span>
+                      <strong>
+                        {formatInr(
+                          Math.max(
+                            0,
+                            campaign.budgetPaise - campaign.capturedPaise,
+                          ),
+                        )}
+                      </strong>
+                    </div>
                   </div>
                   <div className="matching-cause-list">
                     <span>Eligible causes</span>
-                    <div>{eligibleCauses.map((cause) => <span key={cause.id}>{cause.category}</span>)}</div>
+                    <div>
+                      {eligibleCauses.map((cause) => (
+                        <span key={cause.id}>{cause.category}</span>
+                      ))}
+                    </div>
                   </div>
                   <div className="matching-campaign-actions">
-                    <button className="button button-secondary" onClick={() => editCampaign(campaign)} type="button">
+                    <button
+                      className="button button-secondary"
+                      onClick={() => editCampaign(campaign)}
+                      type="button"
+                    >
                       Edit campaign
                     </button>
                     <details>
                       <summary>View history</summary>
-                      <ul>{campaign.history.map((event) => <li key={event}>{event}</li>)}</ul>
+                      <ul>
+                        {campaign.history.map((event) => (
+                          <li key={event}>{event}</li>
+                        ))}
+                      </ul>
                     </details>
                   </div>
                 </article>
@@ -1481,16 +1580,16 @@ export function OrganizationAnalytics() {
     useProductDemo();
   const [range, setRange] = useState("365");
   const rangeStart =
-    range === "all"
-      ? null
-      : Date.now() - Number(range) * 24 * 60 * 60 * 1000;
+    range === "all" ? null : Date.now() - Number(range) * 24 * 60 * 60 * 1000;
   const filteredDonations = donations.filter(
     (donation) =>
-      rangeStart === null || new Date(donation.createdAt).getTime() >= rangeStart,
+      rangeStart === null ||
+      new Date(donation.createdAt).getTime() >= rangeStart,
   );
   const recognizedDonations = filteredDonations.filter(
     (donation) =>
-      donation.status === "CAPTURED" || donation.status === "PARTIALLY_REFUNDED",
+      donation.status === "CAPTURED" ||
+      donation.status === "PARTIALLY_REFUNDED",
   );
   const causeActivity = causes
     .map((cause) => {
@@ -1547,7 +1646,18 @@ export function OrganizationAnalytics() {
               downloadCsv("insips-impact-export.csv", [
                 ["Metric", "Value"],
                 ["Donation records", filteredDonations.length],
-                ["Recognized donation amount", recognizedDonations.reduce((total, donation) => total + Math.max(0, donation.amountPaise - donation.refundedPaise), 0)],
+                [
+                  "Recognized donation amount",
+                  recognizedDonations.reduce(
+                    (total, donation) =>
+                      total +
+                      Math.max(
+                        0,
+                        donation.amountPaise - donation.refundedPaise,
+                      ),
+                    0,
+                  ),
+                ],
                 ["Item needs", itemNeeds.length],
                 ["Volunteer applications", volunteerApplications.length],
               ])
@@ -1560,9 +1670,7 @@ export function OrganizationAnalytics() {
       </header>
       <div className="summary-stat-grid">
         <article>
-          <strong>
-            {recognizedDonations.length}
-          </strong>
+          <strong>{recognizedDonations.length}</strong>
           <span>recognized donations</span>
         </article>
         <article>
@@ -1591,7 +1699,11 @@ export function OrganizationAnalytics() {
           </div>
         </div>
         {causeActivity.length ? (
-          <div aria-label="Donation activity by cause" className="analytics-bars" role="list">
+          <div
+            aria-label="Donation activity by cause"
+            className="analytics-bars"
+            role="list"
+          >
             {causeActivity.map(({ cause, amountPaise }) => (
               <div className="analytics-bar" key={cause.id} role="listitem">
                 <div className="analytics-bar-copy">
@@ -1600,7 +1712,9 @@ export function OrganizationAnalytics() {
                 </div>
                 <div className="analytics-bar-track">
                   <i
-                    style={{ width: `${(amountPaise / maxCauseAmount) * 100}%` }}
+                    style={{
+                      width: `${(amountPaise / maxCauseAmount) * 100}%`,
+                    }}
                   />
                 </div>
               </div>
@@ -1609,7 +1723,10 @@ export function OrganizationAnalytics() {
         ) : (
           <div className="empty-flow-state">
             <strong>No recognized donations in this range</strong>
-            <p>Choose a wider date range or return when a confirmed donation is recorded.</p>
+            <p>
+              Choose a wider date range or return when a confirmed donation is
+              recorded.
+            </p>
           </div>
         )}
       </section>
@@ -1628,10 +1745,11 @@ export function CorporateWorkspace({
   const [discoverSort, setDiscoverSort] = useState("relevance");
   const [shortlistQuery, setShortlistQuery] = useState("");
   const [comparisonIds, setComparisonIds] = useState<string[]>([]);
-  const [shortlistNotes, setShortlistNotes] = useState<Record<string, string>>({});
+  const [shortlistNotes, setShortlistNotes] = useState<Record<string, string>>(
+    {},
+  );
   const [savedNoteId, setSavedNoteId] = useState<string | null>(null);
-  if (page === "matching")
-    return <CorporateMatchingWorkspace />;
+  if (page === "matching") return <CorporateMatchingWorkspace />;
   const categories = [
     "All focus areas",
     ...Array.from(new Set(demoCauses.map((cause) => cause.category))),
@@ -1696,7 +1814,10 @@ export function CorporateWorkspace({
       </header>
       {page === "discover" ? (
         <>
-          <section aria-label="Cause discovery filters" className="corporate-discovery-controls">
+          <section
+            aria-label="Cause discovery filters"
+            className="corporate-discovery-controls"
+          >
             <label className="corporate-filter">
               <span>Search causes or organizations</span>
               <input
@@ -1734,7 +1855,8 @@ export function CorporateWorkspace({
           </section>
           <div className="corporate-discovery-meta">
             <span>
-              Showing <strong>{visible.length}</strong> of {demoCauses.length} seeded causes
+              Showing <strong>{visible.length}</strong> of {demoCauses.length}{" "}
+              seeded causes
             </span>
             <span>Shortlist decisions stay separate from public totals.</span>
           </div>
@@ -1759,7 +1881,10 @@ export function CorporateWorkspace({
               <span>matching review</span>
             </div>
           </section>
-          <section aria-label="Shortlist tools" className="corporate-shortlist-tools">
+          <section
+            aria-label="Shortlist tools"
+            className="corporate-shortlist-tools"
+          >
             <label className="corporate-filter">
               <span>Search saved causes</span>
               <input
@@ -1788,7 +1913,10 @@ export function CorporateWorkspace({
               >
                 Export shortlist
               </button>
-              <Link className="button button-primary" href="/corporate/discover">
+              <Link
+                className="button button-primary"
+                href="/corporate/discover"
+              >
                 Discover more
               </Link>
             </div>
@@ -1798,7 +1926,10 @@ export function CorporateWorkspace({
       {isOverview ? (
         <>
           <section className="corporate-overview-brief">
-            <div className="corporate-stat-strip" aria-label="Corporate workspace summary">
+            <div
+              className="corporate-stat-strip"
+              aria-label="Corporate workspace summary"
+            >
               <div className="corporate-stat">
                 <strong>{corporateShortlist.length}</strong>
                 <span>saved causes</span>
@@ -1833,79 +1964,85 @@ export function CorporateWorkspace({
       {visible.length ? (
         <div className="cause-card-grid compact">
           {visible.map((cause) => (
-          <article className="cause-card" key={cause.id}>
-            <div className="cause-art" data-category={cause.category}>
-              <span>{cause.category}</span>
-            </div>
-            <div>
-              <small>{cause.organization}</small>
-              <h2>{cause.title}</h2>
-              <p>{cause.summary}</p>
-              {isShortlist ? (
-                <div className="corporate-shortlist-detail">
-                  <div className="corporate-shortlist-detail-row">
-                    <span>Trust trail</span>
-                    <Link href={`/causes/${cause.slug}`}>Open cause evidence</Link>
+            <article className="cause-card" key={cause.id}>
+              <div className="cause-art" data-category={cause.category}>
+                <span>{cause.category}</span>
+              </div>
+              <div>
+                <small>{cause.organization}</small>
+                <h2>{cause.title}</h2>
+                <p>{cause.summary}</p>
+                {isShortlist ? (
+                  <div className="corporate-shortlist-detail">
+                    <div className="corporate-shortlist-detail-row">
+                      <span>Trust trail</span>
+                      <Link href={`/causes/${cause.slug}`}>
+                        Open cause evidence
+                      </Link>
+                    </div>
+                    <div className="corporate-shortlist-detail-row">
+                      <span>Review window</span>
+                      <strong>Through {cause.endDate}</strong>
+                    </div>
+                    <div className="corporate-shortlist-note">
+                      <span>Internal note</span>
+                      <textarea
+                        aria-label={`Internal note for ${cause.title}`}
+                        onChange={(event) =>
+                          setShortlistNotes((current) => ({
+                            ...current,
+                            [cause.id]: event.target.value,
+                          }))
+                        }
+                        placeholder="Add a question or decision note for your team"
+                        rows={3}
+                        value={shortlistNotes[cause.id] ?? ""}
+                      />
+                      <span className="corporate-shortlist-note-actions">
+                        <button
+                          className="button button-secondary"
+                          onClick={() => setSavedNoteId(cause.id)}
+                          type="button"
+                        >
+                          Save note
+                        </button>
+                        {savedNoteId === cause.id ? (
+                          <span
+                            aria-live="polite"
+                            className="corporate-note-status"
+                            role="status"
+                          >
+                            Note saved to this local workspace.
+                          </span>
+                        ) : null}
+                      </span>
+                    </div>
+                    <label className="corporate-compare-control">
+                      <input
+                        checked={comparisonIds.includes(cause.id)}
+                        onChange={() =>
+                          setComparisonIds((current) =>
+                            current.includes(cause.id)
+                              ? current.filter((id) => id !== cause.id)
+                              : [...current, cause.id],
+                          )
+                        }
+                        type="checkbox"
+                      />
+                      <span>Include in comparison</span>
+                    </label>
                   </div>
-                  <div className="corporate-shortlist-detail-row">
-                    <span>Review window</span>
-                    <strong>Through {cause.endDate}</strong>
-                  </div>
-                  <div className="corporate-shortlist-note">
-                    <span>Internal note</span>
-                    <textarea
-                      aria-label={`Internal note for ${cause.title}`}
-                      onChange={(event) =>
-                        setShortlistNotes((current) => ({
-                          ...current,
-                          [cause.id]: event.target.value,
-                        }))
-                      }
-                      placeholder="Add a question or decision note for your team"
-                      rows={3}
-                      value={shortlistNotes[cause.id] ?? ""}
-                    />
-                    <span className="corporate-shortlist-note-actions">
-                      <button
-                        className="button button-secondary"
-                        onClick={() => setSavedNoteId(cause.id)}
-                        type="button"
-                      >
-                        Save note
-                      </button>
-                      {savedNoteId === cause.id ? (
-                        <span aria-live="polite" className="corporate-note-status" role="status">
-                          Note saved to this local workspace.
-                        </span>
-                      ) : null}
-                    </span>
-                  </div>
-                  <label className="corporate-compare-control">
-                    <input
-                      checked={comparisonIds.includes(cause.id)}
-                      onChange={() =>
-                        setComparisonIds((current) =>
-                          current.includes(cause.id)
-                            ? current.filter((id) => id !== cause.id)
-                            : [...current, cause.id],
-                        )
-                      }
-                      type="checkbox"
-                    />
-                    <span>Include in comparison</span>
-                  </label>
-                </div>
-              ) : null}
-              <button
-                className="button button-secondary"
-                onClick={() => toggleCorporateShortlist(cause.id)}
-                type="button"
-              >
-                {corporateShortlist.includes(cause.id)
-                  ? "Remove from shortlist"
-                  : "Add to shortlist"}
-              </button>
-            </div>
+                ) : null}
+                <button
+                  className="button button-secondary"
+                  onClick={() => toggleCorporateShortlist(cause.id)}
+                  type="button"
+                >
+                  {corporateShortlist.includes(cause.id)
+                    ? "Remove from shortlist"
+                    : "Add to shortlist"}
+                </button>
+              </div>
             </article>
           ))}
         </div>
@@ -1935,7 +2072,10 @@ export function CorporateWorkspace({
                 Clear search
               </button>
             ) : (
-              <Link className="button button-primary" href="/corporate/discover">
+              <Link
+                className="button button-primary"
+                href="/corporate/discover"
+              >
                 Discover causes
               </Link>
             )
@@ -2067,13 +2207,17 @@ export function AdminOverview() {
               {reviewHistory.slice(0, 4).map((entry) => (
                 <div key={entry.id}>
                   <strong>{entry.action}</strong>
-                  <small>{entry.actor} · {entry.at}</small>
+                  <small>
+                    {entry.actor} · {entry.at}
+                  </small>
                   {entry.reason ? <p>{entry.reason}</p> : null}
                 </div>
               ))}
             </div>
           ) : (
-            <p className="admin-empty-copy">No review decisions recorded yet.</p>
+            <p className="admin-empty-copy">
+              No review decisions recorded yet.
+            </p>
           )}
         </div>
       </section>

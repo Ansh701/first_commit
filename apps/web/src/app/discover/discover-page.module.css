@@ -1,0 +1,3 @@
+.page :global(.org-logo) {
+  color: var(--accent);
+}

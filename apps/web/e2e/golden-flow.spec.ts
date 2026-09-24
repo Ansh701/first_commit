@@ -138,7 +138,11 @@ test("organization onboarding autosaves and resumes a draft", async ({
   await page.goto("/app/onboarding");
   await page.evaluate(() => localStorage.removeItem("insips-product-demo-v1"));
   await page.reload();
-  await page.getByRole("button", { name: /Account/ }).click();
+  if ((page.viewportSize()?.width ?? 1440) < 861) {
+    await page.getByLabel("Jump to step").selectOption("ACCOUNT");
+  } else {
+    await page.getByRole("button", { name: /Account/ }).click();
+  }
   await page.getByLabel("Contact phone").fill("+91 90000 11111");
   await page.getByRole("button", { name: /Save and continue/ }).click();
   await expect(
@@ -148,8 +152,12 @@ test("organization onboarding autosaves and resumes a draft", async ({
   await expect(
     page.getByRole("heading", { name: "Organization profile" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: /Account/ }).click();
-  await expect(page.getByLabel("Contact phone")).toHaveValue("+91 90000 11111");
+  if ((page.viewportSize()?.width ?? 1440) < 861) {
+    await page.getByLabel("Jump to step").selectOption("ACCOUNT");
+  } else {
+    await page.getByRole("button", { name: /Account/ }).click();
+  }
+  await expect(page.getByLabel("Contact phone")).toHaveValue("+919000011111");
 });
 
 test("admin requests a document correction and then approves the resubmission", async ({
@@ -168,12 +176,16 @@ test("admin requests a document correction and then approves the resubmission", 
   );
 
   await page.goto("/app/onboarding");
-  await page.getByRole("button", { name: /Documents/ }).click();
+  await page.getByRole("button", { name: /documents/i }).click();
   await page
     .locator("article")
     .filter({ hasText: "Bank account proof" })
-    .getByRole("button", { name: "Upload correction" })
-    .click();
+    .locator('input[type="file"]')
+    .setInputFiles({
+      name: "bank-account-proof-correction.pdf",
+      mimeType: "application/pdf",
+      buffer: Buffer.from("synthetic correction fixture"),
+    });
 
   await page.goto("/admin/organizations/org-udaan-learning");
   await page.getByRole("button", { name: /Bank account proof/ }).click();

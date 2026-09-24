@@ -1,0 +1,4 @@
+.page :global(.content-body),
+.page :global(.content-cta) {
+  width: min(var(--reading-width), calc(100% - 2rem));
+}

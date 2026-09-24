@@ -36,7 +36,7 @@ export default function ActiveReviewPage() {
           </p>
           <Link
             className="button button-primary"
-            href="/app/evidence/demo-csr-1"
+            href="/app/evidence/verify-registration"
           >
             Prepare demo submission
           </Link>

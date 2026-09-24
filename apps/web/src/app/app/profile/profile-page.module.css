@@ -1,0 +1,26 @@
+.page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  .page :global(.page-heading),
+  .page :global(.page-heading > *),
+  .page :global(.page-actions),
+  .page :global(.page-actions .button) {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .page :global(.page-actions) {
+    width: 100%;
+  }
+
+  .page :global(.page-actions .button) {
+    width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
+}

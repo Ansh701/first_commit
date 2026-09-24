@@ -1,0 +1,159 @@
+.route {
+  min-height: 100%;
+  padding-bottom: 5.5rem;
+}
+
+.route :global(.page-heading) {
+  margin-bottom: 1.35rem;
+}
+
+.route :global(.page-heading h1) {
+  max-width: 700px;
+  font-size: clamp(2.65rem, 5vw, 4.4rem);
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(175px, 220px) auto;
+  gap: 0.7rem;
+  align-items: stretch;
+  margin-bottom: 0.85rem;
+}
+
+.searchField,
+.filterField {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.searchField:focus-within,
+.filterField:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.searchField input,
+.filterField select {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.filterField select {
+  cursor: pointer;
+}
+
+.resultsBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.resultsBar strong {
+  color: var(--text);
+}
+
+.resultsBar a {
+  color: var(--primary);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.resultsHint {
+  text-align: right;
+}
+
+.route :global(.organization-grid) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.route :global(.org-card) {
+  min-height: 286px;
+  border-radius: var(--radius-md);
+}
+
+.route :global(.org-logo) {
+  color: var(--text);
+}
+
+.route :global(.org-card h2) {
+  font-size: 1.2rem;
+}
+
+.route :global(.state-panel) {
+  min-height: 240px;
+  margin-top: 1.25rem;
+}
+
+@media (max-width: 860px) {
+  .toolbar {
+    grid-template-columns: minmax(0, 1fr) minmax(160px, 1fr) auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .route {
+    padding-bottom: 6.5rem;
+  }
+
+  .route :global(.page-heading) {
+    margin-bottom: 1.15rem;
+  }
+
+  .route :global(.page-heading h1) {
+    font-size: clamp(1.85rem, 8vw, 2.7rem);
+    max-width: 100%;
+  }
+
+  .toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar .button {
+    width: 100%;
+  }
+
+  .resultsBar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .resultsHint {
+    text-align: left;
+  }
+
+  .route :global(.organization-grid) {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .route :global(.org-card) {
+    min-height: 270px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .searchField,
+  .filterField {
+    transition: none;
+  }
+}

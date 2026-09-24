@@ -1,0 +1,141 @@
+.page :global(.public-flow-page) {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: clamp(5rem, 10vw, 8.5rem) 0 clamp(4rem, 8vw, 7rem);
+}
+
+.page :global(.events-route-header) {
+  max-width: 760px;
+  margin-bottom: clamp(2rem, 4vw, 3.5rem);
+}
+
+.page :global(.events-route-header h1) {
+  max-width: 760px;
+  margin: 1rem 0 0.85rem;
+  font-size: clamp(2.8rem, 6vw, 5.7rem);
+  letter-spacing: -0.065em;
+  line-height: 0.98;
+}
+
+.page :global(.events-route-header p) {
+  max-width: 600px;
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  line-height: 1.7;
+}
+
+.page :global(.events-route-status) {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: fit-content;
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 0.95rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 42%, var(--line));
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, var(--accent-soft) 74%, var(--surface));
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.page :global(.events-route-grid) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.page :global(.events-route-card) {
+  display: flex;
+  min-width: 0;
+  min-height: 20rem;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: clamp(1.35rem, 3vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: 1.35rem;
+  background:
+    radial-gradient(
+      circle at 100% 0,
+      color-mix(in srgb, var(--accent-soft) 68%, transparent),
+      transparent 42%
+    ),
+    var(--surface);
+  box-shadow: 0 1.2rem 2.8rem color-mix(in srgb, var(--ink) 7%, transparent);
+}
+
+.page :global(.events-route-card-icon) {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  margin-bottom: 2.2rem;
+  border-radius: 0.9rem;
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.page :global(.events-route-card small) {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page :global(.events-route-card h2) {
+  max-width: 26rem;
+  margin: 0.55rem 0 1.1rem;
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+
+.page :global(.events-route-meta) {
+  display: grid;
+  gap: 0.45rem;
+  margin-bottom: 1.35rem;
+  color: var(--muted);
+}
+
+.page :global(.events-route-meta p) {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.page :global(.events-route-card strong) {
+  margin-top: auto;
+  color: var(--ink);
+}
+
+.page :global(.events-route-card .button) {
+  margin-top: 1rem;
+}
+
+@media (max-width: 760px) {
+  .page :global(.public-flow-page) {
+    width: min(100% - 2rem, 34rem);
+    padding-top: 4rem;
+  }
+
+  .page :global(.events-route-header h1) {
+    font-size: clamp(2.7rem, 13vw, 4.1rem);
+  }
+
+  .page :global(.events-route-grid) {
+    grid-template-columns: 1fr;
+  }
+
+  .page :global(.events-route-card) {
+    min-height: 18rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page :global(.events-route-card) {
+    scroll-behavior: auto;
+  }
+}

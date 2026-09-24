@@ -24,9 +24,16 @@ import {
   WalletCards,
 } from "lucide-react";
 import { BrandMark } from "./brand-mark";
+import { useDemo } from "./demo-provider";
 import { ThemeToggle } from "./theme-toggle";
 
-type WorkspaceRole = "organization" | "reviewer" | "csr" | "donor" | "admin" | "corporate";
+type WorkspaceRole =
+  | "organization"
+  | "reviewer"
+  | "csr"
+  | "donor"
+  | "admin"
+  | "corporate";
 
 const navByRole = {
   organization: [
@@ -43,7 +50,11 @@ const navByRole = {
   ],
   reviewer: [
     { href: "/review", label: "Review queue", icon: ClipboardCheck },
-    { href: "/review/submission-demo", label: "Active review", icon: ShieldCheck },
+    {
+      href: "/review/submission-demo",
+      label: "Active review",
+      icon: ShieldCheck,
+    },
   ],
   csr: [
     { href: "/csr/discover", label: "Discover", icon: Search },
@@ -57,45 +68,86 @@ const navByRole = {
   ],
   admin: [
     { href: "/admin", label: "Admin overview", icon: Gauge },
-    { href: "/admin/organizations", label: "Organization verification", icon: ShieldCheck },
+    {
+      href: "/admin/organizations",
+      label: "Organization verification",
+      icon: ShieldCheck,
+    },
     { href: "/admin/donations", label: "Donation ledger", icon: WalletCards },
   ],
   corporate: [
     { href: "/corporate", label: "Corporate overview", icon: Gauge },
     { href: "/corporate/discover", label: "Discover causes", icon: Search },
-    { href: "/corporate/shortlist", label: "Cause shortlist", icon: BadgeCheck },
+    {
+      href: "/corporate/shortlist",
+      label: "Cause shortlist",
+      icon: BadgeCheck,
+    },
     { href: "/corporate/matching", label: "Matching pledges", icon: HandHeart },
   ],
 } as const;
 
 const labels = {
-  organization: { title: "Organization workspace", name: "Udaan Learning Foundation", initials: "UL" },
-  reviewer: { title: "Platform review", name: "Maya · Reviewer", initials: "MR" },
+  organization: {
+    title: "Organization workspace",
+    name: "Udaan Learning Foundation",
+    initials: "UL",
+  },
+  reviewer: {
+    title: "Platform review",
+    name: "Maya · Reviewer",
+    initials: "MR",
+  },
   csr: { title: "CSR workspace", name: "Aarav · CSR", initials: "AC" },
   donor: { title: "Donor account", name: "Aarav Mehta", initials: "AM" },
-  admin: { title: "Platform administration", name: "Mira · Admin", initials: "MS" },
-  corporate: { title: "Corporate workspace", name: "Rhea · Impact team", initials: "RI" },
+  admin: {
+    title: "Platform administration",
+    name: "Mira · Admin",
+    initials: "MS",
+  },
+  corporate: {
+    title: "Corporate workspace",
+    name: "Rhea · Impact team",
+    initials: "RI",
+  },
 } as const;
 
 function isActive(pathname: string, href: string) {
-  if (["/app", "/review", "/donor", "/admin", "/corporate"].includes(href)) return pathname === href;
+  if (["/app", "/review", "/donor", "/admin", "/corporate"].includes(href))
+    return pathname === href;
   return pathname.startsWith(href);
 }
 
-export function WorkspaceShell({ role, children }: { role: WorkspaceRole; children: React.ReactNode }) {
+export function WorkspaceShell({
+  role,
+  children,
+}: {
+  role: WorkspaceRole;
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const nav = navByRole[role];
   const label = labels[role];
+  const { submissionStatus } = useDemo();
   const reduceMotion = useReducedMotion();
-  const current = nav.find((item) => isActive(pathname, item.href))?.label ?? label.title;
+  const current =
+    nav.find((item) => isActive(pathname, item.href))?.label ?? label.title;
 
   return (
     <div className="workspace-frame">
-      <aside className="workspace-sidebar" aria-label={`${label.title} navigation`}>
-        <div className="sidebar-brand"><BrandMark /></div>
+      <aside
+        className="workspace-sidebar"
+        aria-label={`${label.title} navigation`}
+      >
+        <div className="sidebar-brand">
+          <BrandMark />
+        </div>
         <div className="workspace-identity">
           <span className="avatar avatar-gradient">{label.initials}</span>
-          <span><small>{label.title}</small><strong>{label.name}</strong></span>
+          <span>
+            <small>{label.title}</small>
+            <strong>{label.name}</strong>
+          </span>
           <ChevronDown size={15} aria-hidden="true" />
         </div>
         <p className="workspace-nav-label">Workspace</p>
@@ -103,39 +155,137 @@ export function WorkspaceShell({ role, children }: { role: WorkspaceRole; childr
           {nav.map((item) => {
             const Icon = item.icon;
             const active = isActive(pathname, item.href);
-            return <motion.div key={item.href} whileHover={reduceMotion ? undefined : { x: 2 }} whileTap={{ scale: 0.985 }}>
-              <Link href={item.href} className={active ? "active" : ""} aria-current={active ? "page" : undefined} style={active ? { color: "var(--text)" } : undefined}>
-                <Icon size={18} aria-hidden="true" /><span>{item.label}</span>
-                {item.label === "Evidence" || item.label === "Review queue" ? <small>1</small> : null}
-              </Link>
-            </motion.div>;
+            return (
+              <motion.div
+                key={item.href}
+                whileHover={reduceMotion ? undefined : { x: 2 }}
+                whileTap={{ scale: 0.985 }}
+              >
+                <Link
+                  href={item.href}
+                  className={active ? "active" : ""}
+                  aria-current={active ? "page" : undefined}
+                  style={active ? { color: "var(--text)" } : undefined}
+                >
+                  <Icon size={18} aria-hidden="true" />
+                  <span>{item.label}</span>
+                  {item.label === "Evidence" ? <small>1</small> : null}
+                  {item.label === "Review queue" ? (
+                    <small>{submissionStatus === "draft" ? 0 : 1}</small>
+                  ) : null}
+                </Link>
+              </motion.div>
+            );
           })}
         </nav>
         <div className="sidebar-group">
           <p className="workspace-nav-label">Trust profile</p>
-          <Link href={role === "organization" ? "/organizations/udaan-learning-foundation" : "/discover"}><BadgeCheck size={17} /> Public indicators <span className="sidebar-status-dot" /></Link>
-          <Link href="/how-trust-works"><Compass size={17} /> Methodology</Link>
+          <Link
+            href={
+              role === "organization"
+                ? "/organizations/udaan-learning-foundation"
+                : "/discover"
+            }
+          >
+            <BadgeCheck size={17} /> Public indicators{" "}
+            <span className="sidebar-status-dot" />
+          </Link>
+          <Link href="/how-trust-works">
+            <Compass size={17} /> Methodology
+          </Link>
         </div>
-        <div className="sidebar-callout"><span className="callout-icon"><Sparkles size={17} /></span><strong>Compass is assistive</strong><p>People confirm and review every claim.</p><Link href="/how-trust-works" style={{ color: "var(--text)" }}>Read the method <ChevronDown className="flip" size={14} /></Link></div>
-        <div className="sidebar-bottom"><Link href="/" aria-label="Open public site"><Home size={18} /><span>Public site</span></Link><Link href="/account" aria-label="Open account"><Settings size={18} /><span>Account</span></Link></div>
+        <div className="sidebar-callout">
+          <span className="callout-icon">
+            <Sparkles size={17} />
+          </span>
+          <strong>Compass is assistive</strong>
+          <p>People confirm and review every claim.</p>
+          <Link href="/how-trust-works" style={{ color: "var(--text)" }}>
+            Read the method <ChevronDown className="flip" size={14} />
+          </Link>
+        </div>
+        <div className="sidebar-bottom">
+          <Link href="/" aria-label="Open public site">
+            <Home size={18} />
+            <span>Public site</span>
+          </Link>
+          <Link href="/account" aria-label="Open account">
+            <Settings size={18} />
+            <span>Account</span>
+          </Link>
+        </div>
       </aside>
       <div className="workspace-body">
         <header className="workspace-topbar">
-          <div className="mobile-brand"><BrandMark compact /></div>
-          <div className="topbar-context"><span className="topbar-breadcrumb">INSIPS <i>/</i> {label.title} <i>/</i> <strong>{current}</strong></span></div>
+          <div className="mobile-brand">
+            <BrandMark compact />
+          </div>
+          <div className="topbar-context">
+            <span className="topbar-breadcrumb">
+              INSIPS <i>/</i> {label.title} <i>/</i> <strong>{current}</strong>
+            </span>
+          </div>
           <div className="topbar-actions">
-            <form className="topbar-search" action="/discover"><Search size={16} /><label className="sr-only" htmlFor="workspace-search">Search workspace</label><input id="workspace-search" name="q" placeholder="Search workspace" /><kbd>⌘K</kbd></form>
+            <form className="topbar-search" action="/discover">
+              <Search size={16} />
+              <label className="sr-only" htmlFor="workspace-search">
+                Search workspace
+              </label>
+              <input
+                id="workspace-search"
+                name="q"
+                placeholder="Search workspace"
+              />
+              <kbd>⌘K</kbd>
+            </form>
             <ThemeToggle />
-            <Link className="icon-button topbar-notification" aria-label="Notifications" href="/notifications"><Bell size={18} /><i /></Link>
-            <Link className="avatar" aria-label="Open user account" href="/account">{label.initials}</Link>
+            <Link
+              className="icon-button topbar-notification"
+              aria-label="Notifications"
+              href="/notifications"
+            >
+              <Bell size={18} />
+              <i />
+            </Link>
+            <Link
+              className="avatar"
+              aria-label="Open user account"
+              href="/account"
+            >
+              {label.initials}
+            </Link>
           </div>
         </header>
-        <div className="fixture-ribbon" role="status"><span /> Synthetic local fixture · no live external processing</div>
-        <main className="workspace-main" id="main-content">{children}</main>
+        <div className="fixture-ribbon" role="status">
+          <span /> Synthetic local fixture · no live external processing
+        </div>
+        <main className="workspace-main" id="main-content">
+          {children}
+        </main>
       </div>
-      <nav className="mobile-bottom-nav" aria-label="Mobile workspace navigation">
-        {nav.slice(0, 4).map((item) => { const Icon = item.icon; const active = isActive(pathname, item.href); return <Link href={item.href} className={active ? "active" : ""} style={active ? { color: "var(--text)" } : undefined} key={item.href}><Icon size={19} /><span>{item.label.split(" ")[0]}</span></Link>; })}
-        <Link href="/account" aria-label="More navigation"><Menu size={19} /><span>More</span></Link>
+      <nav
+        className="mobile-bottom-nav"
+        aria-label="Mobile workspace navigation"
+      >
+        {nav.slice(0, 4).map((item) => {
+          const Icon = item.icon;
+          const active = isActive(pathname, item.href);
+          return (
+            <Link
+              href={item.href}
+              className={active ? "active" : ""}
+              style={active ? { color: "var(--text)" } : undefined}
+              key={item.href}
+            >
+              <Icon size={19} />
+              <span>{item.label.split(" ")[0]}</span>
+            </Link>
+          );
+        })}
+        <Link href="/account" aria-label="More navigation">
+          <Menu size={19} />
+          <span>More</span>
+        </Link>
       </nav>
     </div>
   );

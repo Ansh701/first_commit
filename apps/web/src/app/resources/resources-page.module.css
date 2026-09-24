@@ -1,0 +1,11 @@
+.page :global(.content-body) {
+  width: min(980px, calc(100% - 2rem));
+}
+
+.page :global(.content-cta) {
+  width: min(var(--reading-width), calc(100% - 2rem));
+}
+
+.page :global(.content-index) {
+  color: var(--accent);
+}

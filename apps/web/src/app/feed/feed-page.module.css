@@ -1,0 +1,41 @@
+.page :global(.public-feed-shell) {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: clamp(4rem, 8vw, 7rem) 0 1rem;
+}
+
+.page :global(.public-feed) {
+  grid-auto-rows: max-content;
+}
+
+.page :global(.feed-item) {
+  height: auto;
+}
+
+@media (max-width: 720px) {
+  .page :global(.public-feed-shell) {
+    width: min(100% - 2rem, 34rem);
+  }
+
+  .page :global(.public-feed) {
+    grid-auto-rows: max-content;
+  }
+
+  .page :global(.feed-item) {
+    min-height: auto;
+  }
+
+  .page :global(.feed-media),
+  .page :global(.feed-media img),
+  .page :global(.feed-media video),
+  .page :global(.feed-media-empty) {
+    height: 230px;
+    min-height: 230px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page :global(.public-feed) {
+    scroll-behavior: auto;
+  }
+}

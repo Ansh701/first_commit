@@ -10,12 +10,22 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useState } from "react";
 import { useDemo } from "@/components/demo-provider";
+import { useProductDemo } from "@/components/product-demo-provider";
 import { StatusPill } from "@/components/status-pill";
 import { evidencePipelineStages } from "@/lib/workspace-fixtures";
+import styles from "../evidence-page-experience.module.css";
 
 export default function EvidenceDetailPage() {
   const { claims, suggestions, decideSuggestion } = useDemo();
+  const { verificationDocuments } = useProductDemo();
+  const params = useParams<{ id: string }>();
+  const [editingClaimId, setEditingClaimId] = useState<string | null>(null);
+  const [editedValues, setEditedValues] = useState<Record<string, string>>({});
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const document = verificationDocuments.find((item) => item.id === params.id);
   const resolved = Object.values(suggestions).filter(
     (value) => value !== "pending",
   ).length;
@@ -23,8 +33,25 @@ export default function EvidenceDetailPage() {
     (value) => value === "accepted",
   ).length;
 
+  function makeDecision(claimId: string, decision: "accepted" | "dismissed") {
+    decideSuggestion(claimId, decision);
+    setEditingClaimId(null);
+    setFeedback(
+      decision === "accepted"
+        ? "Candidate accepted for submission."
+        : "Candidate dismissed and kept out of submission.",
+    );
+  }
+
+  function saveEdit(claimId: string) {
+    setEditingClaimId(null);
+    setFeedback(
+      `Candidate edit for ${claimId} saved locally. Accept it when the value is ready.`,
+    );
+  }
+
   return (
-    <>
+    <div className={styles.detailPage}>
       <header className="page-heading">
         <div>
           <StatusPill tone="ai">INSIPS Compass · AI-assisted</StatusPill>
@@ -38,13 +65,20 @@ export default function EvidenceDetailPage() {
           <Link className="button button-secondary" href="/app/evidence">
             Back to evidence
           </Link>
-          <Link
-            className="button button-primary"
-            href="/app/submission"
-            aria-disabled={accepted === 0}
-          >
-            Continue to submission
-          </Link>
+          {accepted > 0 ? (
+            <Link className="button button-primary" href="/app/submission">
+              Continue to submission
+            </Link>
+          ) : (
+            <button
+              className="button button-primary"
+              disabled
+              title="Accept at least one candidate before submitting"
+              type="button"
+            >
+              Continue to submission
+            </button>
+          )}
         </div>
       </header>
 
@@ -56,6 +90,12 @@ export default function EvidenceDetailPage() {
           in this local session.
         </span>
       </div>
+
+      {feedback ? (
+        <div className={styles.feedback} role="status">
+          <CheckCircle2 size={16} /> <span>{feedback}</span>
+        </div>
+      ) : null}
 
       <div className="evidence-layout">
         <section className="panel">
@@ -84,7 +124,27 @@ export default function EvidenceDetailPage() {
                   <div className="suggestion-header">
                     <div>
                       <h3>{claim.label}</h3>
-                      <p className="suggestion-value">{claim.value}</p>
+                      {editingClaimId === claim.id ? (
+                        <div className={styles.editField}>
+                          <label htmlFor={`edit-${claim.id}`}>
+                            Candidate value
+                          </label>
+                          <input
+                            id={`edit-${claim.id}`}
+                            onChange={(event) =>
+                              setEditedValues((current) => ({
+                                ...current,
+                                [claim.id]: event.target.value,
+                              }))
+                            }
+                            value={editedValues[claim.id] ?? claim.value}
+                          />
+                        </div>
+                      ) : (
+                        <p className="suggestion-value">
+                          {editedValues[claim.id] ?? claim.value}
+                        </p>
+                      )}
                     </div>
                     <StatusPill
                       tone={
@@ -105,21 +165,29 @@ export default function EvidenceDetailPage() {
                   >
                     <button
                       className={`button ${decision === "accepted" ? "button-primary" : "button-secondary"}`}
-                      onClick={() => decideSuggestion(claim.id, "accepted")}
+                      onClick={() => makeDecision(claim.id, "accepted")}
                       type="button"
                     >
                       <Check size={14} /> Accept
                     </button>
                     <button
                       className="button button-secondary"
-                      onClick={() => decideSuggestion(claim.id, "accepted")}
+                      onClick={() => {
+                        if (editingClaimId === claim.id) {
+                          saveEdit(claim.id);
+                        } else {
+                          setEditingClaimId(claim.id);
+                          setFeedback(null);
+                        }
+                      }}
                       type="button"
                     >
-                      <Edit3 size={14} /> Edit
+                      <Edit3 size={14} />
+                      {editingClaimId === claim.id ? "Save edit" : "Edit"}
                     </button>
                     <button
                       className={`button ${decision === "dismissed" ? "button-danger" : "button-ghost"}`}
-                      onClick={() => decideSuggestion(claim.id, "dismissed")}
+                      onClick={() => makeDecision(claim.id, "dismissed")}
                       type="button"
                     >
                       <X size={14} /> Dismiss
@@ -130,13 +198,20 @@ export default function EvidenceDetailPage() {
             })}
           </div>
           <div className="panel-footer">
-            <Link
-              className={`button ${accepted ? "button-primary" : "button-secondary"}`}
-              href={accepted ? "/app/submission" : "#"}
-              aria-disabled={!accepted}
-            >
-              Continue with {accepted} {accepted === 1 ? "claim" : "claims"}
-            </Link>
+            {accepted > 0 ? (
+              <Link className="button button-primary" href="/app/submission">
+                Continue with {accepted} {accepted === 1 ? "claim" : "claims"}
+              </Link>
+            ) : (
+              <button
+                className="button button-secondary"
+                disabled
+                title="Accept at least one candidate before submitting"
+                type="button"
+              >
+                Continue with 0 claims
+              </button>
+            )}
           </div>
         </section>
 
@@ -169,7 +244,7 @@ export default function EvidenceDetailPage() {
             <div className="panel-header">
               <div>
                 <h2>Document</h2>
-                <p>Private · synthetic data only</p>
+                <p>Private · {document?.label ?? "synthetic data only"}</p>
               </div>
               <span className="file-icon">
                 <FileText size={19} />
@@ -181,7 +256,7 @@ export default function EvidenceDetailPage() {
                   <CheckCircle2 size={17} />
                 </span>
                 <span>
-                  <strong>Synthetic_CSR-1_Certificate.pdf</strong>
+                  <strong>{document?.label ?? "Evidence document"}</strong>
                   <p>2 pages · checksum recorded</p>
                 </span>
                 <StatusPill tone="approved">Clean</StatusPill>
@@ -221,6 +296,6 @@ export default function EvidenceDetailPage() {
           </details>
         </aside>
       </div>
-    </>
+    </div>
   );
 }

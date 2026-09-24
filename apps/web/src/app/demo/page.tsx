@@ -9,6 +9,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { AuthShell } from "@/components/auth-shell";
+import styles from "./demo-page.module.css";
 
 export const metadata = { title: "Synthetic demo" };
 
@@ -53,19 +54,23 @@ const roles = [
 
 export default function DemoPage() {
   return (
-    <AuthShell>
-      <div className="auth-form-card demo-launcher">
+    <AuthShell className={styles.shell}>
+      <div className={`demo-route ${styles.launcher} auth-form-card`}>
         <p className="auth-eyebrow">Synthetic local experience</p>
         <h2>Choose a workspace.</h2>
         <p className="auth-description">
           Explore the complete flow with fictional organizations and locally
           stored decisions. This launcher does not create an identity session.
         </p>
-        <div className="demo-role-grid">
+        <div className={styles.roleGrid}>
           {roles.map((role) => {
             const Icon = role.icon;
             return (
-              <Link href={role.href} key={role.href}>
+              <Link
+                className={styles.roleLink}
+                href={role.href}
+                key={role.href}
+              >
                 <span>
                   <Icon size={21} />
                 </span>
@@ -78,7 +83,7 @@ export default function DemoPage() {
             );
           })}
         </div>
-        <div className="auth-inline-message">
+        <div className={`${styles.notice} auth-inline-message`}>
           <ShieldCheck size={17} />
           <span>
             All people, identifiers, documents, and decisions in this demo are

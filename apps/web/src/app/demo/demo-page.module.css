@@ -1,0 +1,101 @@
+.launcher {
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-feature);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: var(--shadow-md);
+}
+
+.roleGrid {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+
+.roleLink {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  min-height: 64px;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .roleLink:hover {
+    border-color: var(--border-strong);
+    background: var(--surface-muted);
+    transform: translateY(-1px);
+  }
+}
+
+.roleLink > span {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: var(--radius-control);
+  background: var(--surface-muted);
+  color: var(--primary);
+}
+
+.roleLink strong,
+.roleLink small {
+  display: block;
+}
+
+.roleLink strong {
+  font-size: 0.78rem;
+}
+
+.roleLink small {
+  margin-top: 0.2rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+.roleLink > svg {
+  color: var(--faint);
+}
+
+.notice {
+  border: 1px solid var(--border);
+  background: var(--surface-muted);
+  color: var(--muted);
+}
+
+.shell :global(.auth-context .eyebrow) {
+  color: var(--accent);
+}
+
+.shell :global(.auth-context-foot) {
+  color: var(--muted);
+}
+
+.shell :global(.auth-form-side),
+.shell :global(.auth-form-top),
+.shell :global(.auth-form-wrap),
+.shell :global(.auth-form-card) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.shell :global(.auth-form-side) {
+  overflow-x: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roleLink {
+    transition: none;
+  }
+}

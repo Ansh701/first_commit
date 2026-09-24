@@ -205,6 +205,106 @@
   font-size: 0.76rem;
 }
 
+.adminDonationsRoute :global(.ledger-detail-button) {
+  min-height: 32px;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--primary);
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.adminDonationsRoute :global(.ledger-detail-button:hover),
+.adminDonationsRoute :global(.ledger-detail-button:focus-visible) {
+  border-color: var(--primary);
+  outline: 2px solid color-mix(in srgb, var(--primary) 22%, transparent);
+  outline-offset: 2px;
+}
+
+.adminDonationsRoute :global(.ledger-detail-panel) {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.adminDonationsRoute :global(.ledger-detail-header) {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.adminDonationsRoute :global(.ledger-detail-header span) {
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.adminDonationsRoute :global(.ledger-detail-header h2) {
+  margin: 0.3rem 0 0;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+.adminDonationsRoute :global(.ledger-detail-note) {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.55;
+}
+
+.adminDonationsRoute :global(.ledger-detail-grid) {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+  margin: 0;
+}
+
+.adminDonationsRoute :global(.ledger-detail-grid div) {
+  min-width: 0;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--border);
+}
+
+.adminDonationsRoute :global(.ledger-detail-grid dt) {
+  color: var(--muted);
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.adminDonationsRoute :global(.ledger-detail-grid dd) {
+  margin: 0.25rem 0 0;
+  color: var(--text);
+  font-size: 0.74rem;
+  overflow-wrap: anywhere;
+}
+
+/* Keep the ledger's grid children inside the shell at 200% zoom. */
+.adminDonationsRoute :global(.flow-page > *) {
+  min-width: 0;
+}
+
+.adminDonationsRoute :global(.summary-stat-grid article) {
+  min-width: 0;
+}
+
+.adminDonationsRoute :global(.summary-stat-grid span),
+.adminDonationsRoute :global(.summary-stat-grid strong) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 980px) {
   .donationsRoute :global(.summary-stat-grid) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -254,12 +354,7 @@
   }
 
   .donationsRoute :global(.responsive-table thead) {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
+    display: none;
   }
 
   .donationsRoute :global(.responsive-table tr) {
@@ -295,5 +390,21 @@
   .donationsRoute :global(.responsive-table td:first-child strong),
   .donationsRoute :global(.responsive-table td:first-child small) {
     grid-column: 2;
+  }
+
+  .adminDonationsRoute :global(.ledger-detail-grid) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .adminDonationsRoute :global(.summary-stat-grid) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .adminDonationsRoute :global(.ledger-filters) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .adminDonationsRoute :global(.ledger-filters label:first-child) {
+    grid-column: 1 / -1;
   }
 }
